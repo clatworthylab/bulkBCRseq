@@ -23,20 +23,20 @@ python Processing_sequences_large_scale.py [sample file list] [commands (comma s
 ```
 Available commands: 1, 2, 3, 4
 
-### Basic analysis: 1 [ python Processing_sequences_large_scale.py Samples_example.txt 1 Y Y Y ] Converting raw sequencing files to fastq, QC
+### Basic analysis: 1 - Converting raw sequencing files to fastq, QC
 ```bash
 python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 1 Y Y Y
 ```
 
-### Basic analysis: 2 [ python Processing_sequences_large_scale.py Samples_example.txt 2 Y Y Y ] Trimming and filtering reads
+### Basic analysis: 2 - Trimming and filtering reads
 ```bash
 python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 2 Y Y N
 ```
-### Basic analysis: 3 [ python Processing_sequences_large_scale.py Samples_example.txt 3 Y Y Y ] Network generation
+### Basic analysis: 3 - Network generation
 ```bash
 python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 3 Y Y Y
 ```
-### Basic analysis: 4 [ python Processing_sequences_large_scale.py Samples_example.txt 4 Y Y Y ] Generating network and population statistics
+### Basic analysis: 4 - Generating network and population statistics
 ```bash
 python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 4 Y Y Y
 ```
