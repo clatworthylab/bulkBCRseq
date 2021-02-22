@@ -30,7 +30,7 @@ python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 1 Y Y Y
 
 ### Basic analysis: 2 - Trimming and filtering reads
 ```bash
-python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 2 Y Y N
+python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 2 Y Y Y
 ```
 ### Basic analysis: 3 - Network generation
 ```bash
@@ -41,7 +41,7 @@ python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 3 Y Y Y
 python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 4 Y Y Y
 ```
 
-## Advance usage:
+## Advanced usage:
 ```bash
 python Processing_sequences_large_scale.py [sample file list] [concat file list] [commands (comma separated list)] [bsub command: Y/N] [print commands: Y/N] [run commands: Y/N]
 ```
