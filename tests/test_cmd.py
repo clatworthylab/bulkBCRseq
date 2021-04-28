@@ -40,17 +40,20 @@ class Tester:
 
 
 @pytest.fixture
-def tester_standard(tester_arg):
-  return Tester(tester_arg, None, False, True, False)
+def tester_standard(request):
+    return Tester(request.param, None, False, True, False)
+
 
 @pytest.fixture
-def tester_bsub(tester_arg):
-  return Tester(tester_arg, None, True, True, False)
+def tester_bsub(request):
+    return Tester(request.param, None, True, True, False)
+
 
 class TestRun:
-  @pytest.mark.parametrize('tester_arg', [1, 2, 3, 4])
-  def test_run1(self, tester_standard):
-      tester_standard.run_test()
+    @pytest.mark.parametrize('tester_standard', [1, 2, 3, 4], indirect=['tester_standard'])
+    def test_run1(self, tester_standard):
+        tester_standard.run_test()
 
-  def test_run2(self, tester_bsub):
-      tester_bsub.run_test()
+    @pytest.mark.parametrize('tester_bsub', [1, 2, 3, 4], indirect=['tester_bsub'])
+    def test_run2(self, tester_bsub):
+        tester_bsub.run_test()
