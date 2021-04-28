@@ -9,3 +9,4 @@ dependencies:
 - networkx
 - pip
 - pytest
+- samtools
