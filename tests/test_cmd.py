@@ -5,7 +5,7 @@ from subprocess import run
 from typing import Union
 
 
-def test_print_bsub_cmd(option, metadata = None, bsub = True, verbose = True, execute = False):
+def test_script(option, metadata = None, bsub = True, verbose = True, execute = False):
     """
     Test to print the bsub commands
 
@@ -57,7 +57,13 @@ def test_print_bsub_cmd(option, metadata = None, bsub = True, verbose = True, ex
 
 
 if __name__ == "__main__":
-    test_print_bsub_cmd(1)
-    test_print_bsub_cmd(2)
-    test_print_bsub_cmd(3)
-    test_print_bsub_cmd(4)
+    # print bsub commands
+    test_script(1)
+    test_script(2)
+    test_script(3)
+    test_script(4)
+    # print non-bsub commands
+    test_script(1, bsub = False)
+    test_script(2, bsub = False)
+    test_script(3, bsub = False)
+    test_script(4, bsub = False)
