@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import sh
+import os
+from subprocess import call  # it's equivalent to run in python>=3.5
 
 
 def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=False):
@@ -20,11 +21,12 @@ def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=Fal
         where or not to run command
 
     """
+    env = os.environ.copy()
 
     if option is None:
-        opt = 1
+      opt = 1
     else:
-        opt = option
+      opt = option
 
     if metadata is None:
         meta = 'tests/data/Sample_metadata.txt'
@@ -46,20 +48,14 @@ def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=Fal
     else:
         execute_ = 'N'
 
-    cmd = ['Processing_sequences_large_scale.py',
+    cmd = ['python',
+           'Processing_sequences_large_scale.py',
            meta,
            str(opt),
            bsub_,
            verbose_,
            execute_]
-    try:
-        # run the shell command
-        sh.python(cmd)
-    except sh.ErrorReturnCode as e:
-        # print the error, so we know what went wrong
-        print e
-        # make sure the test fails
-        pytest.fail(e)
+    call(cmd, env=env)
 
 
 if __name__ == "__main__":
