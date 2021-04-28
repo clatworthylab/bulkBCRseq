@@ -139,6 +139,9 @@ else:
     dir_source_code = os.getcwd()
   if not dir_source_code.endswith('/'):
     dir_source_code = dir_source_code + '/'
+  
+  if not os.path.exists(dir_source_code):
+    raise OSError('Cannot locate path to source code directory.')
 
   idss,dirss='',''
   commands = []
