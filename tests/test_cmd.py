@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# basic requirements for test data
 import os
-from subprocess import run
+from subprocess import call # it's equivalent to run in python>=3.5
 from typing import Union
 
 
@@ -24,7 +23,6 @@ def test_script(option, metadata = None, bsub = True, verbose = True, execute = 
 
     """
     env = os.environ.copy()
-    run(cmd, env=env)
 
     if metadata is None:
         meta = 'tests/data/Sample_metadata.txt'
@@ -53,7 +51,7 @@ def test_script(option, metadata = None, bsub = True, verbose = True, execute = 
            bsub_,
            verbose_,
            execute_]
-    run(cmd, env=env)
+    call(cmd, env=env)
 
 
 if __name__ == "__main__":
