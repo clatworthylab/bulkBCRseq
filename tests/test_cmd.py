@@ -3,7 +3,7 @@ import os
 from subprocess import call  # it's equivalent to run in python>=3.5
 
 
-def test_script(option, metadata=None, bsub=True, verbose=True, execute=False):
+def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=False):
     """
     Test to print the bsub commands
 
@@ -22,6 +22,11 @@ def test_script(option, metadata=None, bsub=True, verbose=True, execute=False):
 
     """
     env = os.environ.copy()
+
+    if option is None:
+        opt = 1
+    else:
+        opt = option
 
     if metadata is None:
         meta = 'tests/data/Sample_metadata.txt'
@@ -46,7 +51,7 @@ def test_script(option, metadata=None, bsub=True, verbose=True, execute=False):
     cmd = ['python',
            'Processing_sequences_large_scale.py',
            meta,
-           str(option),
+           str(opt),
            bsub_,
            verbose_,
            execute_]
@@ -55,12 +60,12 @@ def test_script(option, metadata=None, bsub=True, verbose=True, execute=False):
 
 if __name__ == "__main__":
     # print bsub commands
-    test_script(1)
+    test_script()
     test_script(2)
     test_script(3)
     test_script(4)
     # print non-bsub commands
-    test_script(1, bsub=False)
+    test_script(bsub=False)
     test_script(2, bsub=False)
     test_script(3, bsub=False)
     test_script(4, bsub=False)
