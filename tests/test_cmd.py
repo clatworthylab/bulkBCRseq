@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from subprocess import Popen, PIPE
+from subprocess import call  # it's equivalent to run in python>=3.5
 
 
 def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=False):
@@ -24,9 +24,9 @@ def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=Fal
     env = os.environ.copy()
 
     if option is None:
-        opt = 1
+      opt = 1
     else:
-        opt = option
+      opt = option
 
     if metadata is None:
         meta = 'tests/data/Sample_metadata.txt'
@@ -55,8 +55,7 @@ def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=Fal
            bsub_,
            verbose_,
            execute_]
-    p = Popen(cmd, env=env, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    print p.stdout, p.stdin, p.stderr
+    call(cmd, env=env)
 
 
 if __name__ == "__main__":
