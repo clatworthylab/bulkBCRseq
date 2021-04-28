@@ -5,7 +5,24 @@ from subprocess import run
 from typing import Union
 
 
-def test_print_bsub_cmd(step: int, metadata: Union[None, str] = None, bsub: bool = True, print: bool = True, run: bool = False):
+def test_print_bsub_cmd(option, metadata = None, bsub = True, verbose = True, execute = False):
+    """
+    Test to print the bsub commands
+
+    Parameters
+    ----------
+    option : int
+        options for running the main script
+    metadata : str, optional
+        path to metadata.txt file
+    bsub : bool
+        whether or not use bsub command
+    verbose : bool
+        whether or not to print command
+    execute : bool
+        where or not to run command
+
+    """
     env = os.environ.copy()
     run(cmd, env=env)
 
@@ -14,13 +31,28 @@ def test_print_bsub_cmd(step: int, metadata: Union[None, str] = None, bsub: bool
     else:
         meta = metadata
 
+    if bsub:
+      bsub_ = 'Y'
+    else:
+      bsub_ = 'N'
+
+    if verbose:
+      verbose_ = 'Y'
+    else:
+      verbose_ = 'N'
+
+    if execute:
+      execute_ = 'Y'
+    else:
+      execute_ = 'N'
+
     cmd = ['python',
            'Processing_sequences_large_scale.py',
            meta,
-           str(step),
-           'Y',
-           'Y',
-           'N']
+           str(option),
+           bsub_,
+           verbose_,
+           execute_]
     run(cmd, env=env)
 
 
