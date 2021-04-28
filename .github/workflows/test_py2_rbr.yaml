@@ -62,4 +62,4 @@ jobs:
     
     - name: Test with pytest
       run: |
-        pytest tests -W ignore::DeprecationWarning -W ignore::PendingDeprecationWarning -W ignore::FutureWarning
+        pytest -rP tests -W ignore::DeprecationWarning -W ignore::PendingDeprecationWarning -W ignore::FutureWarning
