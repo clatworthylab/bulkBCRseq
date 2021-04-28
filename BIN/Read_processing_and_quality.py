@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 import math
 import sys
+import os
 from collections import defaultdict
 # sys.path.append('/lustre/scratch118/infgen/team146/rbr1/BCR_TCR_REPERTOIRE_FILTERING_PIPELINE/BIN/')
 # sys.path.append('/nfs/users/nfs_k/kt16/BCRSeq/BIN/')
-sys.path.append('/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/')
+bin_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/'
+if not os.path.exists(bin_path):
+  bin_path = os.getcwd() + '/BIN/'
+if not os.path.exists(bin_path):
+  raise OSError('Cannot locate path to BIN folder')
+
+sys.path.append(bin_path)
 import Functions
 from Functions import *
-import os
 import commands
 import sys
 from operator import itemgetter
