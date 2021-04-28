@@ -2714,8 +2714,10 @@ def QC_samples(dir,gene,id,source,length,species,barcode_group):
     print reads2
     if(1==1):
       threshold,length = "32","100"
-      command1 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads1 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_1 -m "+threshold+" -l "+length
-      command2 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads2 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_2 -m "+threshold+" -l "+length
+      # command1 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads1 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_1 -m "+threshold+" -l "+length
+      # command2 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads2 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_2 -m "+threshold+" -l "+length
+      command1 = "java -jar QUASR_v7.01/qualityControl.jar -f "+reads1 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_1 -m "+threshold+" -l "+length
+      command2 = "java -jar QUASR_v7.01/qualityControl.jar -f "+reads2 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_2 -m "+threshold+" -l "+length
       command3 = "cat "+dir+"FASTQ_FILES/Sequences_"+id+"_1.qc.fq | perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "+dir+"FASTQ_FILES/Sequences_"+id+"_1.fasta"
       command4 = "cat "+dir+"FASTQ_FILES/Sequences_"+id+"_2.qc.fq | perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "+dir+"FASTQ_FILES/Sequences_"+id+"_2.fasta"
       print command1
