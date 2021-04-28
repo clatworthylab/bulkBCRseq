@@ -135,6 +135,11 @@ else:
   (ids,  samples,  infos,  gene,  source,pairs,pairs_final,dirs, platform,spec,primer,others,reverse_primer_group)=Get_info(file)
   print dir
   dir_source_code = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+  if not os.path.exists(dir_source_code):
+    dir_source_code = os.getcwd()
+  if not dir_source_code.endswith('/'):
+    dir_source_code = dir_source_code + '/'
+
   idss,dirss='',''
   commands = []
   for i in range(0,len(samples)):
@@ -154,16 +159,16 @@ else:
       command1 = "python "+dir_source_code+"BIN/Read_processing_and_quality.py "+dir+" "+id+" "+sample+" "+gene_types+" "+pair+" "+species+" "+sources +" "+str(200)+" "+primers+" "+platforms+" 3 "+other+" "+reverse_primer_group[i]
       commands.append(bsub+command1)
     if( "4" in command):
-      command2 = "python BIN/Generate_repertoire_statistics.py "+dir+"ORIENTATED_SEQUENCES/ANNOTATIONS/ "+id+" "+dir+"ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_"+id+".fasta "+dir+"ORIENTATED_SEQUENCES/Filtered_ORFs_sequences_all_"+id+".fasta "+gene_types+" "+species+" "+dir+"ORIENTATED_SEQUENCES/NETWORKS/Cluster_identities_"+id+".txt ANNOTATE,STATISTICS "+reverse_primer_group[i]
+      command2 = "python "+dir_source_code+"BIN/Generate_repertoire_statistics.py "+dir+"ORIENTATED_SEQUENCES/ANNOTATIONS/ "+id+" "+dir+"ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_"+id+".fasta "+dir+"ORIENTATED_SEQUENCES/Filtered_ORFs_sequences_all_"+id+".fasta "+gene_types+" "+species+" "+dir+"ORIENTATED_SEQUENCES/NETWORKS/Cluster_identities_"+id+".txt ANNOTATE,STATISTICS "+reverse_primer_group[i]
       commands.append(bsub+command2)
     if( "4.5" in command):
-      command3 = "python BIN/Local_immune_repertoire_annotator.py "+dir+"ORIENTATED_SEQUENCES/ANNOTATIONS/TEST/ "+id+" "+dir+"ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_"+id+".fasta "+gene_types+" "+species
+      command3 = "python "+dir_source_code+"BIN/Local_immune_repertoire_annotator.py "+dir+"ORIENTATED_SEQUENCES/ANNOTATIONS/TEST/ "+id+" "+dir+"ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_"+id+".fasta "+gene_types+" "+species
       commands.append(bsub+command3)
     if("ISO1" in command):
-      command1 = "python BIN/IsoTyper_1.0.py "+id+" "+id+" "+dir+" "+species+" "+reverse_primer_group[i]
+      command1 = "python "+dir_source_code+"BIN/IsoTyper_1.0.py "+id+" "+id+" "+dir+" "+species+" "+reverse_primer_group[i]
       commands.append(bsub+command1)
     if("NONISO1" in command):
-      command1 = "python BIN/Non_isotyper_1.0.py "+id+" "+id+" "+dir+" "+species+" "
+      command1 = "python "+dir_source_code+"BIN/Non_isotyper_1.0.py "+id+" "+id+" "+dir+" "+species+" "
       commands.append(bsub+command1)
     idss,dirss=idss+","+id, dirss+","+dir+"ORIENTATED_SEQUENCES/"
     #if("5" in command): ## Generate separate network plots
@@ -173,13 +178,13 @@ else:
   idss,dirss = idss[1:len(idss)],dirss[1:len(dirss)]
   desc = file.replace("Samples_","").replace(".txt","")
   if("10" in command):
-    command10 = "python BIN/Get_figure_params.py "+dirss+" "+desc+" "+idss
+    command10 = "python "+dir_source_code+"BIN/Get_figure_params.py "+dirss+" "+desc+" "+idss
     commands.append(bsub+command10)
   if("10.5" in command):
-    command10 = "python BIN/Get_coloured_figures.py "+dirss+" "+desc+" "+idss
+    command10 = "python "+dir_source_code+"BIN/Get_coloured_figures.py "+dirss+" "+desc+" "+idss
     commands.append(bsub+command10)
   if("11" in command):
-    command11 = "/software/bin/R-dev CMD BATCH "+dirs[0]+"ORIENTATED_SEQUENCES/Network_generation_"+desc+".R"
+    command11 = "R CMD BATCH "+dirs[0]+"ORIENTATED_SEQUENCES/Network_generation_"+desc+".R"
     commands.append(bsub+command11)
   for comm in commands:
     if(print_command=="Y"):print comm, "\n"
