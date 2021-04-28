@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from subprocess import call  # it's equivalent to run in python>=3.5
+from subprocess import Popen, PIPE
 
 
 def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=False):
@@ -55,7 +55,8 @@ def test_script(option=None, metadata=None, bsub=True, verbose=True, execute=Fal
            bsub_,
            verbose_,
            execute_]
-    call(cmd, env=env)
+    p = Popen(cmd, env=env, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    print p.stdout, p.stdin, p.stderr
 
 
 if __name__ == "__main__":
