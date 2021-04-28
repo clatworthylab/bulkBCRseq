@@ -5,6 +5,8 @@ from subprocess import call  # it's equivalent to run in python>=3.5
 
 
 class Tester:
+    __test__ = False
+
     def __init__(self, option, metadata, bsub, verbose, execute):
         self.option = option
         self.metadata = metadata
