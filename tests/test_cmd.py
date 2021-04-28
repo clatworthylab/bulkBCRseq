@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import os
-from subprocess import call # it's equivalent to run in python>=3.5
-from typing import Union
+from subprocess import call  # it's equivalent to run in python>=3.5
 
 
-def test_script(option, metadata = None, bsub = True, verbose = True, execute = False):
+def test_script(option, metadata=None, bsub=True, verbose=True, execute=False):
     """
     Test to print the bsub commands
 
@@ -30,19 +29,19 @@ def test_script(option, metadata = None, bsub = True, verbose = True, execute = 
         meta = metadata
 
     if bsub:
-      bsub_ = 'Y'
+        bsub_ = 'Y'
     else:
-      bsub_ = 'N'
+        bsub_ = 'N'
 
     if verbose:
-      verbose_ = 'Y'
+        verbose_ = 'Y'
     else:
-      verbose_ = 'N'
+        verbose_ = 'N'
 
     if execute:
-      execute_ = 'Y'
+        execute_ = 'Y'
     else:
-      execute_ = 'N'
+        execute_ = 'N'
 
     cmd = ['python',
            'Processing_sequences_large_scale.py',
@@ -61,7 +60,7 @@ if __name__ == "__main__":
     test_script(3)
     test_script(4)
     # print non-bsub commands
-    test_script(1, bsub = False)
-    test_script(2, bsub = False)
-    test_script(3, bsub = False)
-    test_script(4, bsub = False)
+    test_script(1, bsub=False)
+    test_script(2, bsub=False)
+    test_script(3, bsub=False)
+    test_script(4, bsub=False)
