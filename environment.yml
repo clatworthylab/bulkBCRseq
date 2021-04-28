@@ -1,0 +1,10 @@
+name: tragopogon
+channels:
+- conda-forge
+- bioconda
+- anaconda
+- defaults
+dependencies:
+- numpy
+- networkx
+- pip
