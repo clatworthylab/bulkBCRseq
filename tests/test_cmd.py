@@ -62,29 +62,38 @@ def argument_printer():
 
     return _test_script
 
+
 def test_script_1_bsub(argument_printer):
     argument_printer(1, None, True, True, False)
+
 
 def test_script_2_bsub(argument_printer):
     argument_printer(2, None, True, True, False)
 
+
 def test_script_3_bsub(argument_printer):
     argument_printer(3, None, True, True, False)
+
 
 def test_script_4_bsub(argument_printer):
     argument_printer(4, None, True, True, False)
 
+
 def test_script_1(argument_printer):
     argument_printer(1, None, False, True, False)
+
 
 def test_script_2(argument_printer):
     argument_printer(2, None, False, True, False)
 
+
 def test_script_3(argument_printer):
     argument_printer(3, None, False, True, False)
 
+
 def test_script_4(argument_printer):
     argument_printer(4, None, False, True, False)
+
 
 if __name__ == "__main__":
     # print bsub commands
