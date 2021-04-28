@@ -4,105 +4,53 @@ import pytest
 from subprocess import call  # it's equivalent to run in python>=3.5
 
 
-@pytest.fixture()
-def argument_printer():
-    def _test_script(option=None, metadata=None, bsub=True, verbose=True, execute=False):
-        """
-        Test to print the bsub commands
+class Tester:
+    def __init__(self, option, metadata, bsub, verbose, execute):
+        self.option = option
+        self.metadata = metadata
+        self.bsub = bsub
+        self.verbose = verbose
+        self.execute = execute
 
-        Parameters
-        ----------
-        option : int
-            options for running the main script
-        metadata : str, optional
-            path to metadata.txt file
-        bsub : bool
-            whether or not use bsub command
-        verbose : bool
-            whether or not to print command
-        execute : bool
-            where or not to run command
-
-        """
+    def run_test(self):
         env = os.environ.copy()
-
-        if option is None:
+        if self.option is None:
             opt = 1
         else:
-            opt = option
-
-        if metadata is None:
+            opt = self.option
+        if self.metadata is None:
             meta = 'tests/data/Sample_metadata.txt'
         else:
-            meta = metadata
-
-        if bsub:
+            meta = self.metadata
+        if self.bsub:
             bsub_ = 'Y'
         else:
             bsub_ = 'N'
-
-        if verbose:
+        if self.verbose:
             verbose_ = 'Y'
         else:
             verbose_ = 'N'
-
-        if execute:
+        if self.execute:
             execute_ = 'Y'
         else:
             execute_ = 'N'
-
-        cmd = ['python',
-               'Processing_sequences_large_scale.py',
-               meta,
-               str(opt),
-               bsub_,
-               verbose_,
-               execute_]
+        cmd = ['python', 'Processing_sequences_large_scale.py',
+               meta, str(opt), bsub_, verbose_, execute_]
         call(cmd, env=env)
 
-    return _test_script
 
+@pytest.fixture
+def tester_standard(tester_arg):
+  return Tester(tester_arg, None, False, True, False)
 
-def test_script_1_bsub(argument_printer):
-    argument_printer(1, None, True, True, False)
+@pytest.fixture
+def tester_bsub(tester_arg):
+  return Tester(tester_arg, None, True, True, False)
 
+class TestRun:
+  @pytest.mark.parametrize('tester_arg', [1, 2, 3, 4])
+  def test_run1(self, tester_standard):
+      tester_standard.run_test()
 
-def test_script_2_bsub(argument_printer):
-    argument_printer(2, None, True, True, False)
-
-
-def test_script_3_bsub(argument_printer):
-    argument_printer(3, None, True, True, False)
-
-
-def test_script_4_bsub(argument_printer):
-    argument_printer(4, None, True, True, False)
-
-
-def test_script_1(argument_printer):
-    argument_printer(1, None, False, True, False)
-
-
-def test_script_2(argument_printer):
-    argument_printer(2, None, False, True, False)
-
-
-def test_script_3(argument_printer):
-    argument_printer(3, None, False, True, False)
-
-
-def test_script_4(argument_printer):
-    argument_printer(4, None, False, True, False)
-
-
-if __name__ == "__main__":
-    # print bsub commands
-    test_script_1_bsub()
-    test_script_2_bsub()
-    test_script_3_bsub()
-    test_script_4_bsub()
-    # print non-bsub commands
-    test_script_1()
-    test_script_2()
-    test_script_3()
-    test_script_4()
+  def test_run2(self, tester_bsub):
+      tester_bsub.run_test()
