@@ -9,4 +9,6 @@ dependencies:
 - networkx
 - pip
 - pytest
+- blast
+- mafft
 - samtools

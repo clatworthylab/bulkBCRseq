@@ -1,11 +1,22 @@
 #!/usr/bin/env python
 import math
 import sys
+import os
 from collections import defaultdict
-sys.path.append('BIN/')
+# sys.path.append('BIN/')
+bin_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/'
+lib_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/'
+if not os.path.exists(bin_path):
+  bin_path = os.getcwd() + '/BIN/'
+if not os.path.exists(bin_path):
+  raise OSError('Cannot locate path to BIN folder')
+if not os.path.exists(lib_path):
+  lib_path = os.getcwd() + '/LIBRARY/'
+if not os.path.exists(lib_path):
+  raise OSError('Cannot locate path to LIBRARY folder')
+sys.path.append(bin_path)
 import Functions
 from Functions import *
-import os
 import re
 import time
 import commands
