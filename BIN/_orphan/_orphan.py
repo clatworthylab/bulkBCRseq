@@ -289,3 +289,38 @@ def dfg():
         write_out(out, Output_trim)
     else:
         print("EDIT CODE HERE: print out trimmed sequences")
+
+
+def get_codons():
+    fh = open(lib_path + "Codon_table2.txt", "r")
+    codon = Tree()
+    for l in fh:
+        l = l.strip()
+        l1 = l.split()
+        l2 = list(l1[0])
+        codon[l2[0]][l2[1]][l2[2]][l1[1]].value = 1
+    fh.close()
+    return (codon)
+
+
+def reverse_comp(seq, rc):
+    s = ''
+    l = len(seq)
+    for i in range(0, l):
+        j = l - i - 1
+        s = s + rc[seq[j]]
+    return (s)
+
+
+def Get_position(a, b):
+    a = list(a)
+    b = list(b)
+    A = Alignment()
+    c, x, y, s = A.align(a, b)
+    start = -1
+    print(y)
+    for i in range(0, len(y)):
+        if (y[i] is not None):
+            start = i
+            break
+    return (start)
