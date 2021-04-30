@@ -6,10 +6,10 @@ sys.path.append('./')
 import Functions
 from Functions import *
 import os
-import commands
+import subprocess
 import sys
 from operator import itemgetter
-from itertools import izip
+
 from operator import add
 import numpy as np
 import copy
@@ -72,7 +72,7 @@ def Get_annotations(annot_file):
           v = v.split()[1].split("*")[0]
           j = j.split()[1].split("*")[0]
           cdr3 = cdr3.split()[0]+":"+v+":"+j
-          v_muts, j_muts = map(int,v_muts.split()[0].split("/")), map(int,j_muts.split()[0].split("/"))
+          v_muts, j_muts = list(map(int,v_muts.split()[0].split("/"))), list(map(int,j_muts.split()[0].split("/")))
           v_muts, j_muts = v_muts[1]-v_muts[0], j_muts[1]-j_muts[0]
           mutations[id] = [v_muts, j_muts,cdr3, v+"\t"+j]
           CDR3s[cdr3][id].value = 1
@@ -187,7 +187,7 @@ def Compare_mutations_IMGT_internal(annot_file_internal,annot_file_IMGT,mutation
       if(mutations[id][0]-annots[id][2]>1):
         #print ">", id, mutations[id][0],annots[id][2]
         #print seqs[id]
-        print id+"\t"+str(mutations[id][0])+"\t"+str(annots[id][2])
+        print(id+"\t"+str(mutations[id][0])+"\t"+str(annots[id][2]))
       if(name in mut_correlation):mut_correlation[name]= mut_correlation[name]+1
       else:mut_correlation[name]=1
   out="#sample\tinternal mutations\tIMGT mutations\tfrequecy\n"
@@ -213,7 +213,7 @@ def Get_sequences(seq_file):
   seqs,freqs,alias = {},{},{}
   for header,sequence in fasta_iterator(fh):
     seqs[header.split("__")[0]]=sequence
-    f = map(int, header.split("__")[1].split("|")[0].split("_"))
+    f = list(map(int, header.split("__")[1].split("|")[0].split("_")))
     freqs[header.split("__")[0]] = f
     alias[header.split("__")[0]] = header
   fh.close()
@@ -235,7 +235,7 @@ def Get_closest_links(clusters, c,seqs,freqs,merged_cluster_nearest_neighbours,a
             s2 = seqs[id2]
             aln1, aln2, p = Trim_sequences(s1, s2, len(s1), len(s2), max_mm)
             if(p==1):
-              d = [i for i,(a1i,a2i)  in enumerate(izip(aln1,aln2)) if a1i!=a2i]
+              d = [i for i,(a1i,a2i)  in enumerate(zip(aln1,aln2)) if a1i!=a2i]
               if(len(d)<min_distance[0]):
                 min_distance = [len(d), id1,id2]
     if(min_distance[0]<8):
@@ -280,7 +280,7 @@ def something():
         else:passed = 0
       if(passed==0):
         excluded_clusters[id] = 1 
-  print len(aligned_seqs), len(excluded_clusters)
+  print(len(aligned_seqs), len(excluded_clusters))
   return()
 
 def Calculate_merge_cluster_edges(seqs, merged_cluster_file,merged_cluster_nearest_neighbours, edge_file,freqs,alias):
@@ -308,7 +308,7 @@ def Calculate_merge_cluster_edges(seqs, merged_cluster_file,merged_cluster_neare
   for c in clusters:
     ind1 = ind1+1
     if (len(clusters[c])>1):
-      print "\r",c, len(clusters[c]), ind1*100.0/len(clusters),
+      print("\r",c, len(clusters[c]), ind1*100.0/len(clusters), end=' ')
       Get_closest_links(clusters, c,seqs,freqs,merged_cluster_nearest_neighbours,alias)
   os.system("cat "+edge_file+" >> "+merged_cluster_nearest_neighbours)
   return()
@@ -393,7 +393,7 @@ def Get_annotation(annot_file):
       l=l.strip().split()
       if(len(l)>=19):
         v,j,v_mm,j_mm = l[1],l[13],int(l[len(l)-4]), int(l[len(l)-3])
-        if(v_mm+j_mm>60):print l
+        if(v_mm+j_mm>60):print(l)
         annots[l[0].split("__")[0]] = [v,j,v_mm,j_mm]
   fh.close()
   return(annots)
@@ -442,7 +442,7 @@ def Assess_transitional_frequencies(merged_cluster_nearest_neighbours,clusters, 
               weight1 = (f1[i]*1.0/sum(f1))*(f2[j]*1.0/sum(f2))
               weight2 = (1.0/len(non_zero1)) *(1.0/len(non_zero2))
               name = classes[i]+"\t"+classes[j]
-              print classes[i]+"|"+classes[j], "\t",np.array(classes)[non_zero1],np.array(classes)[non_zero2]
+              print(classes[i]+"|"+classes[j], "\t",np.array(classes)[non_zero1],np.array(classes)[non_zero2])
               if(name in mutations_weighted):mutations_weighted[name] = mutations_weighted[name]+ weight1
               else:mutations_weighted[name]= weight1
               if(name in mutations_unweighted):mutations_unweighted[name] = mutations_unweighted[name] + weight2
@@ -492,22 +492,22 @@ def Assess_parental_frequencies1(annots,parental_classification_file_directed,ed
   for id in alias:
     classes = alias[id].split("|")[1].split("_")
     break
-  print classes
+  print(classes)
   for c in clusters:
     if(len(clusters[c])>1):
       f = [0]*len(classes)
       for id in clusters[c]:
-        f = map(add, f, freqs[id])
+        f = list(map(add, f, freqs[id]))
       class_usage = Get_class_usage(f,classes)
-      print class_usage
+      print(class_usage)
 
 
 def Assess_parental_frequencies(annots,parental_classification_file_directed,edge_file,freqs,alias,sample,cluster_file):
   total = ''
   for id in freqs:
     if(len(total)==0):total=freqs[id]
-    else:total = map(add, total, freqs[id])
-  print total, sum(total)
+    else:total = list(map(add, total, freqs[id]))
+  print(total, sum(total))
   totals = {}
   for id in alias:
     classes = alias[id].split("|")[1].split("_")
@@ -682,7 +682,7 @@ def Get_VJ_gene_usage_subtype_specific(annot_file_IMGT,annot_file, seq_file,subt
   fh=open(subtybe_VJ_gene_usage_file,"w")
   fh.write(out)
   fh.close()
-  print total1, total2
+  print(total1, total2)
   return()
 
 def Get_maximum_sequence_clusters(clusters, seqs, maximum_cluster_file,freqs,alias,maximum_cluster_file_filtered):
@@ -698,7 +698,7 @@ def Get_maximum_sequence_clusters(clusters, seqs, maximum_cluster_file,freqs,ali
     if(len(clusters[c])>10):
       tot = [0]*l
       for id in clusters[c]:
-        tot = map(add,tot, freqs[id])
+        tot = list(map(add,tot, freqs[id]))
       totals.append([c,sum(tot)])
   totals.sort(key=lambda x: x[1],reverse = True)
   out,ind,out1 = '',0,''
@@ -714,7 +714,7 @@ def Get_maximum_sequence_clusters(clusters, seqs, maximum_cluster_file,freqs,ali
       Write_out(out, maximum_cluster_file)
       Write_out(out1, maximum_cluster_file_filtered)
       out,ind,out1 = '',0,''
-  print totals
+  print(totals)
   Write_out(out, maximum_cluster_file)
   Write_out(out1, maximum_cluster_file_filtered)
   insert = ''
@@ -807,7 +807,7 @@ def Classify_sequences_into_developmental_stages_per_cluster(sample, annot_file_
       l=len(freqs[id])
       chains= alias[id].split("|")[1].split("_")
       total = total+sum(freqs[id])
-  print total
+  print(total)
   for i in range(0,len(chains)):
     chains[i] = chains[i].split("*")[0]
     if(reverse_primer_group !="ISOTYPER"):
@@ -817,12 +817,12 @@ def Classify_sequences_into_developmental_stages_per_cluster(sample, annot_file_
   fh=open(per_cluster_developmental_classification_file,"w")
   fh.close()
   out,ind = '#ID\tsequence\tclassifiation\tall_classes\tV\tJ\tmutation\tCDR3\tnode size\tnode %\tcluster ID\tcluster size\n',0
-  print len(alias)
+  print(len(alias))
   for c in clusters: 
     if(len(clusters[c])>0):
       freq,mm,vj = [0]*l,[],{}
       for id in clusters[c]:
-        freq = map(add, freq, freqs[id])
+        freq = list(map(add, freq, freqs[id]))
         if(id in mutations):
           mm = mm+[mutations[id][0]+mutations[id][1]]
           vj_class = mutations[id][3]
@@ -1055,7 +1055,7 @@ def Get_unique_CDR3_regions_per_isotype_group(subsample_file,annot_file, per_clu
             Caa[CDR3s_refined[id][1]], Cnn[CDR3s_refined[id][0]] = 1,1
           meanaa, meannn,meanratio = meanaa+[len(Caa)], meannn+[len(Cnn)],meanratio+[len(Caa)*1.0/len(Cnn)]
         out=out+ "\t".join(map(str,  [sample, t,len(types[t]), depth, mean(meanaa), mean(meannn), mean(meanratio)]))+"\n"
-  print unique_CDR3_regions_per_isotype_group_file
+  print(unique_CDR3_regions_per_isotype_group_file)
   fh=open(unique_CDR3_regions_per_isotype_group_file,"w")
   fh.write(out)
   fh.close()
@@ -1172,7 +1172,7 @@ def Get_pre_post_class_switching(cluster_file, sample, annot_file, pre_post_clas
         if(id in annots):
           freq = freqs[id]
           if(len(n_reads)==0):n_reads = freq
-          else:n_reads = map(add,n_reads, freq)
+          else:n_reads = list(map(add,n_reads, freq))
           nz = [i for i in range(len(freq)) if freq[i]!=0]
           chain = ",".join(np.sort(np.unique(chains[nz])))
           if(chain in chain_mutations):
@@ -1203,7 +1203,7 @@ def Get_cluster_mutation_sharing_stats(cluster_file, annot_file, seq_file, clust
     #chains[i] = chains[i].split("*")[0]
     if(chains[i].split("*")[0] not in chains_all):chains_all = chains_all+[chains[i].split("*")[0]]
   chains_all.sort()
-  print chains_all
+  print(chains_all)
   fh=open(cluster_mutation_sharing_probability,"w")
   fh.close()
   indexing = [0]*len(chains)
@@ -1216,7 +1216,7 @@ def Get_cluster_mutation_sharing_stats(cluster_file, annot_file, seq_file, clust
     f = [0]*len(chains)
     muts = []
     for id in clusters[c]:
-      f = map(add, f, freqs[id])
+      f = list(map(add, f, freqs[id]))
       if(id in annots):
         muts = muts+[annots[id][2]]*sum(freqs[id])
     f1 = [0]*len(chains_all)
@@ -1395,7 +1395,7 @@ def Get_GL_distance_class_distributions(seq_file, annot_file,GL_distance_class_d
     c = t.split("\t")[0]
     if(cluster_sizes[c]>=10):
       out=out+t+"\t"+str(cluster_distribution[t])+"\n"
-      print t+"\t"+str(cluster_distribution[t])
+      print(t+"\t"+str(cluster_distribution[t]))
       ind = ind+1
       if(ind>100):
         Write_out(out, GL_distance_class_distribution_file)
@@ -1433,7 +1433,7 @@ def IgD_IgM_ratio(annot_file, seq_file,IgD_IgM_ratio_file,cluster_file,sample):
   out="#ID\tTotal_reads\tIgD-IgM ratio\tN mutations\tnumber of sequences\n"
   for name in type_freq:
     out=out+sample+"\t"+name+"\t"+str(type_freq[name])+"\n"
-  print IgD_IgM_ratio_file
+  print(IgD_IgM_ratio_file)
   fh=open(IgD_IgM_ratio_file,"w")
   fh.write(out)
   fh.close()
@@ -1451,7 +1451,7 @@ def Cluster_size_connection_sharing_probability(annot_file, seq_file, merged_clu
     for id in clusters[c]:
       if(id in gl_mutations):
         if(len(freq)==0):freq = freqs[id]
-        else:freq = map(add, freq, freqs[id])
+        else:freq = list(map(add, freq, freqs[id]))
         muts_cluster = muts_cluster+[sum(gl_mutations[id])]
     if(len(muts_cluster)>0):
       number_shared = len([i for i in range(len(freq)) if freq[i]!=0])
@@ -1536,7 +1536,7 @@ def Gini_index(cpoints,cvdf, vpoints,vvdf):
 
 def Get_Renyi(x):
   x1 = np.array(x)
-  if(sum(x1)==0): print x1
+  if(sum(x1)==0): print(x1)
   x1 = x1*1.0/sum(x1)
   r = -1*sum(x1*np.log(x1))
   return(r)
@@ -1622,7 +1622,7 @@ def Get_largest_cluster(sample, annot_file, cluster_file,per_cluster_development
     if(n_c>10):break
     f_uniq,f = [0]*len(classes), [0]*len(classes)
     for id in clusters[c[0]]:
-      count = map(int,id.split("__")[1].split("|")[0].split("_"))
+      count = list(map(int,id.split("__")[1].split("|")[0].split("_")))
       nz = [i for i in range(len(count)) if count[i]!=0]
       for i in nz:
         f_uniq[i],f[i] =f_uniq[i]+1,f[i]+count[i]
@@ -1635,7 +1635,7 @@ def Get_largest_cluster(sample, annot_file, cluster_file,per_cluster_development
         out, ind = '',0
   Write_out(out, example_cluster_annot_file)
   out, ind = '',0
-  print example_cluster_annot_file
+  print(example_cluster_annot_file)
   return()
 
 def dfgs():
@@ -1643,14 +1643,14 @@ def dfgs():
   out=''
   for header,sequence in fasta_iterator(fh):
     if(header.split("__")[0] in clusters[max_c]):
-      print header
+      print(header)
       out=out+">"+header+"\n"+sequence+"\n"
   fh.close()
   out_file = example_cluster_annot_file+"_Clust_"+max_c+".txt"
   fh=open(out_file,"w")
   fh.write(out)
   fh.close()
-  print out_file
+  print(out_file)
   return()
 
 def Get_clusters_specific(sample, annot_file, cluster_file,per_cluster_developmental_classification_file,example_cluster_annot_file,seq_file):
@@ -1683,11 +1683,11 @@ def Generate_trees(sample, annot_file, cluster_file,per_cluster_developmental_cl
       insert = ''
       #if( len(clusters[c]) > 5000):insert = '--parttree'
       command = "/software/pubseq/bin/mafft-6.857/bin/mafft --retree 2 --op 100 "+insert+" "+infile+" > "+aligned
-      commands.getoutput(command)
+      subprocess.getoutput(command)
     command="TREE"
     if(command=="TREE"):
       command = "FastTree -nt "+aligned+" > "+tree_file
-      commands.getoutput(command)
+      subprocess.getoutput(command)
     command = "MIN_MUTS"
     if(command=="MIN_MUTS"):
       ids = []
@@ -1710,12 +1710,12 @@ def Generate_trees(sample, annot_file, cluster_file,per_cluster_developmental_cl
       from Bio import Phylo
       import networkx, pylab
       tree = Phylo.read(tree_file, 'newick')
-      print tree
+      print(tree)
       #net = Phylo.to_networkx(tree)
       #networkx.draw(net)
       #pylab.show()
       break
-    print c
+    print(c)
   return()
 
 def Initialise_clusters (sample, annot_file, cluster_file,per_cluster_developmental_classification_file,example_cluster_annot_file,seq_file):
@@ -1763,7 +1763,7 @@ def Initialise_clusters (sample, annot_file, cluster_file,per_cluster_developmen
             fh=open(out_file1,"w")
             fh.write(out)
             fh.close()
-            print c, count#, clusters[c]
+            print(c, count)#, clusters[c]
   out_file1 = example_cluster_annot_file+"_ALL.txt"
   fh=open(out_file1,"w")
   fh.write(out1)
@@ -1778,7 +1778,7 @@ def Get_network_parameters_per_sequence_classification(sample, cluster_file, dev
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      id,freq, id_short,clust = l[2],map(int, l[2].split("__")[1].split("|")[0].split("_")),l[2].split("__")[0],l[1]
+      id,freq, id_short,clust = l[2],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))),l[2].split("__")[0],l[1]
       if(len(chains)==0):chains = l[2].split("|")[1].split("_")
       id_short = id.split("__")[0]
       if(id_short in classification_ids):
@@ -1800,7 +1800,7 @@ def Get_network_parameters_per_sequence_classification(sample, cluster_file, dev
           else:
             if("IGHD,IGHM_unmutated" in classification_ids[id_short]):c1 = "IGHD,IGHM_unmutated"
             elif("IGHD,IGHM_mutated" in classification_ids[id_short]):c1 = "IGHD,IGHM_mutated"
-            else:print c, id, classification_ids[id_short]
+            else:print(c, id, classification_ids[id_short])
             if(c1 in freqs):freqs[c1] = freqs[c1]+freq[i]
             else:freqs[c1]=freq[i]
         for c in freqs:
@@ -1855,7 +1855,7 @@ def Subsample_repertoire(subsample_file, sample_depth, seq_file,samplex,cluster_
   for header,sequence in fasta_iterator(fh):
     id = header.split("__")[0]
     if(id in clusters):
-      freq,classes = map(int, header.split("__")[1].split("|")[0].split("_")), header.split("|")[1].split("_")
+      freq,classes = list(map(int, header.split("__")[1].split("|")[0].split("_"))), header.split("|")[1].split("_")
       nz = [i for i in range(len(freq)) if freq[i]!=0]
       for i in nz: 
         for j in range(0,freq[i]):
@@ -1871,7 +1871,7 @@ def Subsample_repertoire(subsample_file, sample_depth, seq_file,samplex,cluster_
     classes_lab = "_".join(classes)
     for r in range(0,n_repeats):
       rep_id = "REP"+str(r)+"_"+samplex
-      print "\t",sample_depth
+      print("\t",sample_depth)
       sample = random.sample(sequences, sample_depth)
       seqs = Functions.Tree()
       out,ind='',0
@@ -1922,7 +1922,7 @@ def Summarise_Get_network_parameters_per_classificiation_subsample_clones(sample
     if(l[0]!="#"):
       l=l.strip().split()
       id = l[0]+"\t"+l[2]
-      values = map(float, l[3:len(l)])
+      values = list(map(float, l[3:len(l)]))
       X.append(values)
       if(id in ids):ids[id] = ids[id]+[ind]
       else:ids[id]=[ind]
@@ -1948,7 +1948,7 @@ def Summarise_Get_network_parameters_per_classificiation_subsample_clones(sample
   fh=open(per_cluster_developmental_classification_network_parameters_subsampled_CLONE.replace("parameters_SUBSAMPLED", "parameters_SUMMARY_SUBSAMPLED"), "w")
   fh.write(out)
   fh.close()
-  print out
+  print(out)
   return()
 
 def Raw_values_Get_network_parameters_per_classificiation_subsample_clones(sample,per_cluster_developmental_classification_file, per_cluster_developmental_classification_network_parameters_subsampled_CLONE,reverse_primer_group,cluster_file,subsample_depth_file,developmental_classification_file):
@@ -1973,7 +1973,7 @@ def Raw_values_Get_network_parameters_per_classificiation_subsample_clones(sampl
   #    else:print id,"FAIL"
   fh.close()
   del muts1
-  print "READ DEVELOP FILE"
+  print("READ DEVELOP FILE")
   fh=open(subsample_depth_file,"r")
   subsample_depth,subsample_depth_clone = {},{}
   for l in fh:
@@ -1996,7 +1996,7 @@ def Raw_values_Get_network_parameters_per_classificiation_subsample_clones(sampl
     index=index+1
     if (index>1):
       l=l.strip().split()
-      id,freq, id_short,clust = l[2],map(int, l[2].split("__")[1].split("|")[0].split("_")),l[2].split("__")[0], l[1]
+      id,freq, id_short,clust = l[2],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))),l[2].split("__")[0], l[1]
       class_raw = l[2].split("|")[1].split("_")
       #classification = classification_clusters[clust]
       nz = [i for i in range(len(freq)) if freq[i]!=0]
@@ -2043,14 +2043,14 @@ def Raw_values_Get_network_parameters_per_classificiation_subsample_clones(sampl
     clas1 = clas
     if(clas=="IGHA"):clas1="IGHA1/2"
     if(clas1 in subsample_depth):
-      print clas,"\t",len(clusters[clas]), len(np.unique(clusters[clas]))
+      print(clas,"\t",len(clusters[clas]), len(np.unique(clusters[clas])))
       if(subsample_depth[clas1] <= len(np.unique(clusters[clas]))):
         clusters_sub = np.array(clusters[clas])
         ids_sub = np.array(ids_clusters[clas])
         depth = subsample_depth[clas1]
         sample_indices = np.arange(len(ids_sub)) 
         unique_elements, c_sizes = np.unique(np.array(clusters_sub), return_counts=True)
-        print len(np.unique(clusters_sub))
+        print(len(np.unique(clusters_sub)))
         for r in range(0,repeats):
           #print r
           n = len(sample_indices)
@@ -2132,10 +2132,10 @@ def Get_network_parameters_per_classificiation_subsample(samplex,per_cluster_dev
       if(id in muts1):
         muts[id] = [muts1[id], cluster, types]
       else:
-        print id,"FAIL"
+        print(id,"FAIL")
   fh.close()
   del muts1
-  print "READ DEVELOP FILE"
+  print("READ DEVELOP FILE")
   fh=open(cluster_file,"r")
   v_sizes,c_sizes = {},Tree()
   index = 0
@@ -2147,7 +2147,7 @@ def Get_network_parameters_per_classificiation_subsample(samplex,per_cluster_dev
     index=index+1
     if (index>1):
       l=l.strip().split()
-      id,freq, id_short,clust = l[2],map(int, l[2].split("__")[1].split("|")[0].split("_")),l[2].split("__")[0], l[1]
+      id,freq, id_short,clust = l[2],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))),l[2].split("__")[0], l[1]
       clust = l[1]
       classification = l[2].split("|")[1].split("_")
       nz = [i for i in range(len(freq)) if freq[i]!=0]
@@ -2196,7 +2196,7 @@ def Get_network_parameters_per_classificiation_subsample(samplex,per_cluster_dev
       if(subsample_depth[c]>0):
         depth = subsample_depth[c]
         v = v_sizes[c]
-        print sum(v), depth
+        print(sum(v), depth)
         if(sum(v)>depth):
           prob = np.array(v)/(sum(v)*1.0)
           xlen = len(v)
@@ -2329,7 +2329,7 @@ def Get_expanded_cluster_summary(cluster_SUBSAMPLE_information_file,cluster_isot
   return()
 
 def Get_V_gene_isotype_frequency_grouped(sample, annot_file, V_gene_isotype_frequency_file_grouped,per_cluster_developmental_classification_file,CDR3_length_file_grouped,per_V_gene_cluster_file,per_V_gene_cluster_summary_file):
-  print V_gene_isotype_frequency_file_grouped
+  print(V_gene_isotype_frequency_file_grouped)
   seqs,freqs,alias = Get_sequences(seq_file)
   CDR3s,mutations = Get_annotations(annot_file)
   counts,CDR3_lengths,counts_uniq = {},{},{}
@@ -2490,7 +2490,7 @@ def Isotypes_shared_with_one_other_subsampled(sample,reverse_primer_group, subsa
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      id,freq, id_short,clust = l[2].split("__")[0],map(int, l[2].split("__")[1].split("|")[0].split("_")),l[2].split("__")[0], l[1]
+      id,freq, id_short,clust = l[2].split("__")[0],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))),l[2].split("__")[0], l[1]
       clust,f = l[1],sum(freq)
       classification = l[2].split("|")[1].split("_")
       subsample = l[0]
@@ -2547,7 +2547,7 @@ def Per_cluster_analysis_isotype_sharing_subsampled(sample,reverse_primer_group,
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      id,freq, id_short,clust = l[2].split("__")[0],map(int, l[2].split("__")[1].split("|")[0].split("_")),l[2].split("__")[0], l[1]
+      id,freq, id_short,clust = l[2].split("__")[0],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))),l[2].split("__")[0], l[1]
       clust,f = l[1],sum(freq)
       classification = l[2].split("|")[1].split("_")
       subsample = l[0]
@@ -2583,7 +2583,7 @@ def Per_cluster_analysis_isotype_sharing_subsampled(sample,reverse_primer_group,
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      id,freq, id_short,clust = l[2].split("__")[0],map(int, l[2].split("__")[1].split("|")[0].split("_")),l[2].split("__")[0], l[1]
+      id,freq, id_short,clust = l[2].split("__")[0],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))),l[2].split("__")[0], l[1]
       clust,f = l[1],sum(freq)
       classification = l[2].split("|")[1].split("_")
       subsample = "ALL"
@@ -2700,7 +2700,7 @@ def Get_repeated_raw_values(sample,reverse_primer_group, subsample_depth_file,is
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      freq, id_short,clust =map(int, l[2].split("__")[1].split("|")[0].split("_")),l[2].split("__")[0], int(l[1])
+      freq, id_short,clust =list(map(int, l[2].split("__")[1].split("|")[0].split("_"))),l[2].split("__")[0], int(l[1])
       classification = l[2].split("|")[1].split("_")
       nz = [i for i in range(len(freq)) if freq[i]!=0]
       for i in nz:
@@ -2729,8 +2729,8 @@ def Get_repeated_raw_values(sample,reverse_primer_group, subsample_depth_file,is
     else:
       out=out+c+"\t"+str(len(class_IDs[c]))+"\tNA\tFAIL: NOT DEFINED IN REFERENCE FILE\n"
   classes.sort()
-  print out
-  print classes
+  print(out)
+  print(classes)
   out="#sample\tisotype1\tisotype2\ttotal1\ttotal2\tdepth1\tdepth2\toverlap1\toverlap2\tmean_muts_overlap1\tmean_muts_overlap2\tmean_muts_no_overlap1\tmean_muts_no_overlap2\n"
   out1, ind ='', 0
   for f in [isotype_sharing_vertices_SUBSAMPLED,isotype_sharing_vertices_UNSAMPLED]:
@@ -2886,7 +2886,7 @@ def Get_distribution_mutational_differences(tmp_file1,len_cluster):
   insert = ''
   if(len_cluster > 1000):insert = '--parttree'
   command0 = "/software/pubseq/bin/mafft-6.857/bin/mafft --retree 2 "+insert+" "+tmp_file1+" > "+aligned
-  commands.getoutput(command0)
+  subprocess.getoutput(command0)
   fh=open(aligned,"r")
   sub_seqs =[]
   for header,sequence in fasta_iterator(fh):
@@ -2905,7 +2905,7 @@ def Get_distribution_mutational_differences(tmp_file1,len_cluster):
   return(dist)
 
 def Get_mutational_distance_distribution_per_cluster(seq_file, per_cluster_developmental_classification_file, mutational_distance_distribution_per_cluster,tmp_file1,sample):
-  print per_cluster_developmental_classification_file
+  print(per_cluster_developmental_classification_file)
   fh = open(per_cluster_developmental_classification_file,"r")
   clusters,cluster_info = Tree(),{}
   for l in fh:
@@ -2920,7 +2920,7 @@ def Get_mutational_distance_distribution_per_cluster(seq_file, per_cluster_devel
   for header,sequence in fasta_iterator(fh):
     seqs[header.split("__")[0]] = sequence
   fh.close()
-  print "N IDs:",len(ids),"N seqs:", len(seqs)
+  print("N IDs:",len(ids),"N seqs:", len(seqs))
   fh=open(mutational_distance_distribution_per_cluster,"w")
   fh.close()
   out,ind= "#sample\tcluster_ID\tcluster_size\tcluster_definition\tn_differences\tfrequency\n",0
@@ -2942,7 +2942,7 @@ def Get_mutational_distance_distribution_per_cluster(seq_file, per_cluster_devel
           out, ind= '',0
   Write_out(out, mutational_distance_distribution_per_cluster)
   out, ind= '',0
-  print mutational_distance_distribution_per_cluster
+  print(mutational_distance_distribution_per_cluster)
   return()
 
 def Isotype_per_cluster_sharing_probabilities(seq_file,per_cluster_developmental_classification_file, per_cluster_inter_isotype_sharing,sample,reverse_primer_group):
@@ -2999,7 +2999,7 @@ def Get_cluster_properties_per_isotype(cluster_properties_per_isotype_SUBSAMPLED
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      subsample, cluster,freq,classification = l[0],l[1],map(int, l[2].split("__")[1].split("|")[0].split("_")), l[2].split("|")[1].split("_")
+      subsample, cluster,freq,classification = l[0],l[1],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))), l[2].split("|")[1].split("_")
       nz = [i for i in range(len(freq)) if freq[i]!=0]
       classes = {}
       for i in nz:
@@ -3079,7 +3079,7 @@ def Proportion_clusters_isotype_overlapping(sample, reverse_primer_group, subsam
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      subsample, cluster, freq, classification,id = l[0],l[1],map(int, l[2].split("__")[1].split("|")[0].split("_")), l[2].split("|")[1].split("_"), l[2].split("__")[0]
+      subsample, cluster, freq, classification,id = l[0],l[1],list(map(int, l[2].split("__")[1].split("|")[0].split("_"))), l[2].split("|")[1].split("_"), l[2].split("__")[0]
       nz = [i for i in range(len(freq)) if freq[i]!=0]
       total = total+sum(freq)
       for i in nz:
@@ -3153,7 +3153,7 @@ def Get_charges_internal_annotation(sample,annot_file_internal, developmental_cl
           v = v_fam
           CDR3_VJ[id] = str(len(cdr3))+"\t"+v+"\t"+j+"\t"+v+":"+j+"\t"+v_fam+"\t"+v_fam+":"+j
   fh.close()
-  print len(CDR3_VJ) , len(CDR3)
+  print(len(CDR3_VJ) , len(CDR3))
   fh = open(developmental_classification_file,"r") 
   CDR3_lengths,CDR3_charge,total,clusters_done = {},{},0,{}
   for l in fh:
@@ -3211,7 +3211,7 @@ def Get_charges_IMGT_annotation(sample, annot_file, developmental_classification
     fh.write(out)
     fh.close()
   else:
-    print "\tFAIL",c
+    print("\tFAIL",c)
   return()
 
 def Get_secondary_rearrangement_potential(sample, annot_file,annot_file3, secondary_rearrangement_file,seq_file,raw_secondary_rearrangement_file, secondary_rearrangement_cdr3_lengths,mapped_secondary_rearrangements,tmp_file1,v_replacement_transition_counts,secondary_rearrangement_file_SAMPLED,cluster_file,reverse_primer_group):
@@ -3304,8 +3304,8 @@ def Map_secondary_rearrangement_joins(seq_file,sample, annot_file3, raw_secondar
             annot_out= annot_out+sample+"\t"+str(cluster_number)+"\t"+vs[i]+"\t"+aln_seqs[ids[i]]+"\n"
           ind = ind+1
           out_all = out_all+annot_out
-          print annot_out
-          print cluster_number
+          print(annot_out)
+          print(cluster_number)
           if(ind>50):
             Write_out(out_all, mapped_secondary_rearrangements)
             out_all,ind = '',0
@@ -3316,7 +3316,7 @@ def Map_secondary_rearrangement_joins(seq_file,sample, annot_file3, raw_secondar
   out = "#sample\ttransition\tfrequency\n"
   for trans in transition:
     out=out+sample+"\t"+trans+"\t"+str(transition[trans])+"\n"
-  print out
+  print(out)
   fh=open(v_replacement_transition_counts,"w")
   fh.write(out)
   fh.close()
@@ -3328,7 +3328,7 @@ def Get_aligned_sequences(out, tmp_file1,regions):
   fh.close()
   insert = ''
   command1 = "/software/pubseq/bin/mafft-6.857/bin/mafft --retree 2 "+insert+" "+tmp_file1+" > "+tmp_file1+".aligned"
-  commands.getoutput(command1)
+  subprocess.getoutput(command1)
   fh=open(tmp_file1+".aligned","r")
   aln_seqs = {}
   region_starts = {}
@@ -3530,7 +3530,7 @@ def Get_secondary_rearrangement_sequences1(sample, annot_file,annot_file3, secon
         id, ndj_region =  l[1].split("__")[0], l[17]
         n1,n2 = l[21],l[28]
         if(id in freqs):
-          total = map(add, total, freqs[id])
+          total = list(map(add, total, freqs[id]))
           if(min([len(n1),len(n2)]) > 3):
             classification = alias[l[1].split("__")[0]].split("|")[1].split("_")
             if(len(ndj_region)>8):
@@ -3546,7 +3546,7 @@ def Get_secondary_rearrangement_sequences1(sample, annot_file,annot_file3, secon
   fh.close()
   stem,done = Tree(),{}
   for j in J_regions:
-    print "J",j
+    print("J",j)
     stem_regions = []
     for id in J_regions[j]:
       stem_regions.append(stems[id])
@@ -3635,7 +3635,7 @@ def Get_secondary_rearrangement_sequences1(sample, annot_file,annot_file3, secon
   fh=open(secondary_rearrangement_file,"w")
   fh.write(out)
   fh.close()
-  print out
+  print(out)
   return()
 
 def Get_secondary_rearrangement_sequences(sample, annot_file,annot_file3, secondary_rearrangement_file,seq_file,raw_secondary_rearrangement_file,reverse_primer_group):
@@ -3684,9 +3684,9 @@ def Get_secondary_rearrangement_sequences(sample, annot_file,annot_file3, second
               stems[id] = [v,j,ndj_region, len(ndj_region), ndj_region.upper() ,v1,id,v_region,junction.upper()+v_region]
   fh.close()
   stem,done = Tree(),{}
-  print len(stems)
+  print(len(stems))
   for j in J_regions:
-    print "J",j
+    print("J",j)
     stem_regions = []
     for id in J_regions[j]:
       stem_regions.append(stems[id])
@@ -3759,7 +3759,7 @@ def Get_secondary_rearrangement_sequences(sample, annot_file,annot_file3, second
   fh=open(secondary_rearrangement_file,"w")
   fh.write(out)
   fh.close()
-  print out
+  print(out)
   return()
 
 def Subsample_per_Vgene(raw_secondary_rearrangement_file, sample_depth, secondary_rearrangement_file_SAMPLED,cluster_file,seq_file,sample,annot_file):
@@ -3809,7 +3809,7 @@ def Subsample_per_Vgene(raw_secondary_rearrangement_file, sample_depth, secondar
     for v in subsample_groups[c]:
       if(len(Vgene_array[v])>=sample_depth):
         v_genes_sample.append(v)
-    print len(v_genes_sample), len(subsample_groups[c])
+    print(len(v_genes_sample), len(subsample_groups[c]))
     v_gene_editing_frequencies_overall = {}
     for v in v_genes_sample:
       v_gene_editing_frequencies_overall[v] = []
@@ -3832,7 +3832,7 @@ def Subsample_per_Vgene(raw_secondary_rearrangement_file, sample_depth, secondar
         v_gene_editing_frequencies_overall[v] = v_gene_editing_frequencies_overall[v]+[V_editing_frequencies[v]]
     for v in v_gene_editing_frequencies_overall:
       out=out+ "\t".join(map(str, [sample, v,sample_depth,repeats,len(v_genes_sample), mean(v_gene_editing_frequencies_overall[v])]))+"\n"
-  print out
+  print(out)
   fh=open(secondary_rearrangement_file_SAMPLED.replace("Secondary_rearrangement_file_","Secondary_NORMALISED_PER_GENE_rearrangement_file_"),"w")
   fh.write(out)
   fh.close()
@@ -3894,7 +3894,7 @@ def Subsample_secondary_rearrangments(raw_secondary_rearrangement_file, sample_d
   fh=open(secondary_rearrangement_file_SAMPLED,"w")
   fh.close()
   out = '#sample\tsample_ID\tisotype\tsample depth\tisotype_total\tid_replacement_freq\tuniq_id_replacement_freq\treplacement_v_gene_incidence\treplacement_incidence\n'
-  print len(ids_array),total
+  print(len(ids_array),total)
   for clas in classes_all:
     if(len(classes_all[clas])>sample_depth):
       ids_array1 = []
@@ -3961,9 +3961,9 @@ def Screen_auto_Ab_sequences(annot_file4, sample, seq_file, captured_auto_antibo
           j= l[4].split()[1].split("*")[0]
           if(v+":"+j in seq_type):
             cdr3 = l[14]
-            print cdr3
+            print(cdr3)
             if(cdr3 in seq_type[v+":"+j]):
-              print l
+              print(l)
   fh.close()
 
 
@@ -4081,7 +4081,7 @@ def Get_CDR3_length_VJ_genes(seq_file,annot_file,CDR3_length_vjgenes,sample):
             chains_sub = {}
             v_muts, j_muts,mut_n = l[6], l[12] ,0
             if(v_muts.count('nt')!=0 and j_muts.count('nt')!=0):
-              v_muts, j_muts = map(int,v_muts.split()[0].split("/")), map(int,j_muts.split()[0].split("/"))
+              v_muts, j_muts = list(map(int,v_muts.split()[0].split("/"))), list(map(int,j_muts.split()[0].split("/")))
               v_muts, j_muts = v_muts[1]-v_muts[0], j_muts[1]-j_muts[0]
               mut_n = 1
             for i in nz:
@@ -4164,7 +4164,7 @@ def Get_autoreactive_V4_34_motif_frequency(annot_file4, V4_34_quantification_fil
     classes = alias[id].split("|")[1].split("_")
     break
   fh=open(annot_file4, "r")
-  print annot_file4
+  print(annot_file4)
   avy, nhs, avy_nhs,total,v4_34 = {},{},{},{},{}
   for l in fh:
     if(l[0]!="#"):
@@ -4278,7 +4278,7 @@ def Get_total_network_summary(sample, annot_file, isotype_usages_SUBSAMPLED_clon
   out = "#Id\tsubsample\tIsotype\tuniq_BCR_frequency\tmean_mutations\n"
   for c in counts:
     out=out+"\t".join(map(str, [sample, c, counts[c], mean(mutations[c])]))+"\n"
-  print out
+  print(out)
   fh=open(isotype_usages_SUBSAMPLED_clone,"w")
   fh.write(out)
   fh.close()
@@ -4557,7 +4557,7 @@ def Get_gene_mutation_frequencies(seq_file, annot_file,mutational_gene_freq_file
   seqs,freqs,alias = Get_sequences(seq_file)
   #annots = Get_annotation(annot_file)
   CDR3s,mutations = Get_annotations(annot_file_IMGT)
-  print len(mutations)
+  print(len(mutations))
   gene_mutations = {}
   for id in mutations:
     mut = mutations[id][0]
@@ -4716,7 +4716,7 @@ def Get_mutational_positions_per_gene(seq_file, developmental_classification_fil
       l=l.strip().split()
       classification[l[1]] = l[2].split("|")
   fh.close()
-  print len(classification)
+  print(len(classification))
   mutational_variation = {}
   mutational_variation_summary = Tree()
   fh=open(annot_file7,"r")
@@ -4809,7 +4809,7 @@ def Get_mutations_and_switching_of_expanded_clusters_specific_isotypes(seq_file,
             if(name in sequence_types):sequence_types[name] = sequence_types[name]+1
             else:sequence_types[name]=1
           else:
-            print "ERROR",id
+            print("ERROR",id)
         #print c, name
         if(len(sequence_types)>=2):
           number_isotypes = len(total_isotypes)
@@ -4904,7 +4904,7 @@ def Get_mutations_per_expanded_cluster(seq_file, annot_file2, sample,mutations_p
 
 def Indel_analysis_per_chain(seq_file, sample, indel_file,annot_file,reverse_primer_group):
   seqs,freqs,alias = Get_sequences(seq_file)
-  print annot_file
+  print(annot_file)
   fh=open(annot_file,"r")
   indels_position,totals = {},{}
   for l in fh:
@@ -4968,7 +4968,7 @@ def Indel_analysis_per_chain(seq_file, sample, indel_file,annot_file,reverse_pri
 def Mutation_selection_per_chain(seq_file, annot_file2, sample, syn_non_syn_mutations,syn_non_syn_mutations_summary,reverse_primer_group):
   seqs,freqs,alias = Get_sequences(seq_file)
   fh=open(annot_file2,"r")
-  print annot_file2
+  print(annot_file2)
   regions = ['FR1','CDR1','FR2','CDR2','FR3','CDR3']
   n_nucleotides = [23,41,59,77,95,113]
   col_total =     [25,43,61,79,97,115]
@@ -4980,7 +4980,7 @@ def Mutation_selection_per_chain(seq_file, annot_file2, sample, syn_non_syn_muta
   m_CDR_mm,m_FWR_mm,m_CDR_FWR_ratio,m_silent,m_nonsilent,m_silent_nonsilent_ratio,FWR3 = {},{},{},{},{},{},{}
   counts_all = [m_CDR_mm,m_FWR_mm,m_CDR_FWR_ratio,m_silent,m_nonsilent,m_silent_nonsilent_ratio, FWR3]
   count_type = ['mean CDR_mm per BCR','mean FWR_mm per BCR','mean CDR_FWR_ratio','mean silent per BCR','mean nonsilent per BCR','mean silent_nonsilent_ratio',"FWR3_mm"]
-  print len(freqs)
+  print(len(freqs))
   for l in fh:
     l=l.strip().split("\t")
     if(l[2].count("productive")!=0 and len(l) >= 130):
@@ -5044,7 +5044,7 @@ def Get_proportion_non_functional_reads(seq_file, non_functional_rearrangments_c
   total1, total2 = {},{}
   fh = open(non_ORF_filtered_reads, "r")
   for header,sequence in fasta_iterator(fh):
-    freq, classification = map(int, header.split("__")[1].split("|")[0].split("_")), header.split("|")[1].split("_")
+    freq, classification = list(map(int, header.split("__")[1].split("|")[0].split("_"))), header.split("|")[1].split("_")
     nz = [i for i in range(len(freq)) if freq[i]!=0]
     for i in nz:
       c = classification[i].split("*")[0]
@@ -5055,7 +5055,7 @@ def Get_proportion_non_functional_reads(seq_file, non_functional_rearrangments_c
   fh.close()
   fh = open(seq_file,"r")
   for header,sequence in fasta_iterator(fh):
-    freq, classification = map(int, header.split("__")[1].split("|")[0].split("_")), header.split("|")[1].split("_")
+    freq, classification = list(map(int, header.split("__")[1].split("|")[0].split("_"))), header.split("|")[1].split("_")
     nz = [i for i in range(len(freq)) if freq[i]!=0]
     for i in nz:
       c = classification[i].split("*")[0]
@@ -5107,7 +5107,7 @@ def Get_clonality_above_n_mutations(seq_file, annot_file_IMGT, clonality_mutatio
       (vgini)=Get_Gini(vpoints,vvdf)
       out=out+sample+"\t"+str(mm)+"\t"+c+"\t"+str(sum(chain_counts[c]))+"\t"+str(len(chain_counts[c]))+"\t"+str(vgini)+"\t"+str(len(chain_counts[c]))+"\t"+str(total)+"\n"
     Write_out(out, clonality_mutation_correlation)
-    print "\t",sample,mm
+    print("\t",sample,mm)
   return()
 
 def Get_per_cluster_per_isotype_degree(seq_file, edge_file, cluster_file, per_cluster_per_isotype_degree_file,sample,annot_file_IMGT):
@@ -5200,7 +5200,7 @@ def Get_unmutated_repertoire(seq_file, annot_file_IMGT, seq_unmutated_file,clust
           Write_out(out, seq_unmutated_file)
           out, ind = '',0
     else:
-      print freq, muts
+      print(freq, muts)
   Write_out(out, seq_unmutated_file)
   fh=open(cluster_file,"r")
   ind = 0
@@ -5215,7 +5215,7 @@ def Get_unmutated_repertoire(seq_file, annot_file_IMGT, seq_unmutated_file,clust
           out1,ind = '',0
   fh.close()
   Write_out(out1,clusters_unmutated_file)
-  print "FILTERING\t"+str(total)+"\t"+str(filtered)
+  print("FILTERING\t"+str(total)+"\t"+str(filtered))
   return()
 
 def Get_example_sequence(seq_file, annot_file):
@@ -5225,9 +5225,9 @@ def Get_example_sequence(seq_file, annot_file):
     if( mutations1[id][0]+ mutations1[id][1]==0):
       if(sum(freqs[id])>=5):
         if(len(seqs[id])>370):
-          print mutations1[id], id, sum(freqs[id]), freqs[id]
-          print len(seqs[id])
-          print seqs[id]
+          print(mutations1[id], id, sum(freqs[id]), freqs[id])
+          print(len(seqs[id]))
+          print(seqs[id])
   return()
 
 def Get_mutational_frequencies(seq_file, annot_file,mutational_freq_file,cluster_file,sample,annot_file_IMGT,reverse_primer_group,n_unmutated_file):
@@ -5309,7 +5309,7 @@ def Make_trees_from_clusters(cluster_annotation_file,merged_cluster_file,seq_fil
   for l in fh:
     if(l[0]!="#"):
       l=l.strip().split()
-      cluster, freqs = l[0], map(int, l[1].split(","))
+      cluster, freqs = l[0], list(map(int, l[1].split(",")))
       if(cluster not in done and cluster!="ALL"):
         done[cluster] = 1
         non_zero = [i for i in range(len(freqs)) if freqs[i]!=0]
@@ -5421,7 +5421,7 @@ def Annotating_clusters_for_analysis(merged_cluster_file, cluster_annotation_fil
   CDR3s,mutations = Get_annotations(annot_file)
   chains,total = '',''
   out,ind = '',0
-  mutations_all = range(100)
+  mutations_all = list(range(100))
   out = "#Cluster ID\tcluster_totals\tChain\tV gene\tJ gene\t"+"\t".join(map(str, mutations_all))+"\n"
   for c in clusters: 
     f,muts = {},{}
@@ -5430,7 +5430,7 @@ def Annotating_clusters_for_analysis(merged_cluster_file, cluster_annotation_fil
       if(id in mutations):
         if(len(chains)==0):chains = alias[id].split("|")[1].split("_")
         if(len(f)==0):f = freqs[id]
-        else:f = map(add, f, freqs[id])
+        else:f = list(map(add, f, freqs[id]))
         mut = mutations[id][0]+mutations[id][1]
         vj = mutations[id][3]
         f1 = freqs[id]
@@ -5448,7 +5448,7 @@ def Annotating_clusters_for_analysis(merged_cluster_file, cluster_annotation_fil
         Write_out(out, cluster_annotation_file)
         out ,ind = '',0
     if(len(total)==0):total = f
-    else:total =map(add,f, total)
+    else:total =list(map(add,f, total))
   for chain in chains:
     out=out+"ALL\t"+",".join(map(str,total))+"\t"+chain+"\tNA\t"+"\t".join(map(str,[0]*len(mutations_all)))+"\n"
   Write_out(out, cluster_annotation_file)
@@ -5506,7 +5506,7 @@ input_dir = sys.argv[3]+"ORIENTATED_SEQUENCES/"
 output_dir = input_dir
 species = sys.argv[4]
 reverse_primer_group = sys.argv[5]
-print "reverse_primer_group ",reverse_primer_group
+print("reverse_primer_group ",reverse_primer_group)
 command_source = ["1"]
 ###########################
 id1 = id
@@ -5710,11 +5710,11 @@ if(command == "PRINT FILES"):
       isotype_sharing_SUBSAMPLED,clusters_isotype_overlapping_SUBSAMPLED]
   for f in a:
   #  print "cat "+f.replace(id,"REP*")+"> "+f.replace(id,"REP").replace("ISOTYPER/","ISOTYPER/All_")
-    print "cat "+f.replace(id,"*")+" > "+f.replace(id,"").replace("ISOTYPER/","ISOTYPER/All_").replace("_.txt",".txt")
+    print("cat "+f.replace(id,"*")+" > "+f.replace(id,"").replace("ISOTYPER/","ISOTYPER/All_").replace("_.txt",".txt"))
 
 #command = 11
 if(command == "STANDARD"):
-  print "subsample depth: ",subsample_depth
+  print("subsample depth: ",subsample_depth)
   #### TOP
   #Merge_clusters_on_CDR3_region(seq_file, annot_file, tmp_file1, merged_cluster_file, merged_cluster_nearest_neighbours,cluster_file,edge_file)
   #Classify_sequences_into_developmental_stages(sample, annot_file, cluster_file, developmental_classification_file,reverse_primer_group)
