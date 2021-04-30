@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import re
 import networkx as nx
-import numpy as np
-from operator import itemgetter
+from operator import itemgetter, add
 import subprocess
-from functions import *
+from ..functions import *
 import sys
 import os
 
@@ -76,7 +75,7 @@ def reduce_sequences(trim2, trim3, primer_file):
             f = [0] * times
             for id in seqs[seq]:
                 f1 = list(map(int, id.split("__")[1].split("|")[0].split("_")))
-                f = list(map(np.add, f, f1))
+                f = list(map(add, f, f1))
             header = ">" + id.split("__")[0] + "__" + "_".join(map(
                 str, f)) + "|" + head
             out = out + header + "\n" + seq + "\n"
@@ -2582,7 +2581,7 @@ def decon_identical(seq_file, att_file, file_vertex, file_seqs, tmp_file,
                 if (total == 0):
                     total = freq
                 else:
-                    total = list(map(np.add, freq, total))
+                    total = list(map(add, freq, total))
                 inverse[j.split("__")[0]] = i
                 out = out + ">" + j + "||" + i + "\n" + seqs[j.split("__")
                                                              [0]] + "\n"
