@@ -1,9 +1,9 @@
 #!/usr/bin/python
-#import math
+# import math
 import sys
-#from collections import defaultdict
+# from collections import defaultdict
 import os
-import subprocess
+# import subprocess
 
 
 def Get_info(file):
