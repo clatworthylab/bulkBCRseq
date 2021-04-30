@@ -1,4 +1,4 @@
-name: test_py2_original.yaml
+name: test_py2_original
 
 on:
   pull_request:
