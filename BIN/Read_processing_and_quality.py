@@ -19,7 +19,7 @@ if not os.path.exists(lib_path):
 sys.path.append(bin_path)
 import Functions
 from Functions import *
-import commands
+import subprocess
 from operator import itemgetter
 import networkx as nx
 import re
@@ -63,15 +63,15 @@ def Reduce_sequences(Trim2, Trim3,primer_file):
         seqs[seq][header].value = 1
         head = header.split("|")[1]
       else:
-        print seq
+        print(seq)
     fh.close()
     out,ind,times='',0,len(head.split("_"))
-    print "number of chains", times 
+    print("number of chains", times) 
     for seq in seqs:
       f = [0]*times
       for id in seqs[seq]:
-        f1 = map(int, id.split("__")[1].split("|")[0].split("_"))
-        f = map(add, f, f1)
+        f1 = list(map(int, id.split("__")[1].split("|")[0].split("_")))
+        f = list(map(add, f, f1))
       header = ">"+id.split("__")[0]+"__"+"_".join(map(str,f))+"|"+head
       out=out+header+"\n"+seq+"\n"
       ind = ind+1
@@ -81,7 +81,7 @@ def Reduce_sequences(Trim2, Trim3,primer_file):
     Write_out(out, Trim3)
   else:
     command1 = "cp "+Trim2+" "+Trim3
-    commands.getoutput(command1)
+    subprocess.getoutput(command1)
   return()
 
 def Get_match(primer, seq):
@@ -134,7 +134,7 @@ def Reverse_comp(seq, rc):
   for i in range(0,l):
     j=l-i-1
     if(seq[j] not in rc):
-      print seq
+      print(seq)
     else:
       s=s+rc[seq[j]]
   return(s)
@@ -258,7 +258,7 @@ def Filter_IgJ_genes(Trim1, Trim2, refj,control,primer_file,ref_const,primer_tag
 def Check_fasta_not_empty(fh):
   pfh = 0
   for l in fh:
-    print l
+    print(l)
     if(len(l)!=0):pfh =1
     break
   return(pfh)
@@ -273,7 +273,7 @@ def Get_consensus_sequence(u_seq, u_freq,tmp_file,threshold):
   insert = ''
   if( len(u_seq) > 2000):insert = '--parttree'
   command1 = "mafft --retree 2 "+insert+" "+tmp_file+"txt > "+tmp_file+"aligned"
-  commands.getoutput(command1)
+  subprocess.getoutput(command1)
   fh=open(tmp_file+"aligned","r")
   max_seqs={}
   pfh= Check_fasta_not_empty(fh)
@@ -343,7 +343,7 @@ def Trim_sequences_BCR_TCR(Tmp_file,Fail_file,Output_trim, gene,paired,species,p
   threshold_BARCODE = 0.80 ### Certainty for accepting a barcode
   if(barcoded_j==1 and barcoded_v==0):
     inside = 1
-    print "J barcoded"
+    print("J barcoded")
     Single_J_barcoded_trimming_clustered(forward, reverse,  barcoded_j, barcoded_v, rc,Tmp_file,Fail_file,Output_trim,primer_tag_file,tmp_file,gene,paired,species,primer_file,primer_tag_file_count,threshold_BARCODE,ref_const,inside,v_ref)
   return()
 
@@ -430,7 +430,7 @@ def Separate_sequences(primer_tag_file_count,primer_tag_file, Output_trim,ref_co
         id = l[0].split("__")[0]
         seqs[consensus][id].value = 1
   fh.close()
-  print len(seqs)
+  print(len(seqs))
   out,ind = '',0
   seq_info, seq_uniq = {},Tree()
   classes = {}
@@ -448,7 +448,7 @@ def Separate_sequences(primer_tag_file_count,primer_tag_file, Output_trim,ref_co
           seq_info[id] = [len(seqs[s]), seq,scores[0][1]]
           classes[scores[0][1]] = 1
   del seqs
-  print len(classes)
+  print(len(classes))
   classes_all = []
   for c in classes:
     classes_all.append(c)
@@ -512,7 +512,7 @@ def Check_barcodes_MALBAC(primer_tag_file_count,primer_tag_file,Fail_file,Output
       v_tag, j_tag, sequence, header = l[2],l[1],l[3],l[0]
       seqs[j_tag+"\t"+v_tag][sequence][header].value = 1
   fh.close()
-  print len(seqs), "Unique tags"
+  print(len(seqs), "Unique tags")
   min_depth = (1.0/(1-threshold))
   total_tags,ind,passed_seqs_total = 0,0,0
   fail_less_than_threshold = 0
@@ -527,7 +527,7 @@ def Check_barcodes_MALBAC(primer_tag_file_count,primer_tag_file,Fail_file,Output
     f = sum(u_freq)
     h = h.split(":")[0].split("__")[0]+"__"+str(sum(u_freq))
     #print t1, sum(u_freq), len(u_freq), u_freq
-    if(sum(u_freq)>20):print "BC group size:\t",len(u_freq),t1.split() 
+    if(sum(u_freq)>20):print("BC group size:\t",len(u_freq),t1.split()) 
     if(len(u_freq)==1): 
       passed_seqs_total = passed_seqs_total+f
       outp=outp+h+"\t"+str(f)+"\t"+str(f)+"\t"+t1+"\t0\tYES\t"+s+"\t"+s+"\n"
@@ -559,7 +559,7 @@ def Check_barcodes_MALBAC(primer_tag_file_count,primer_tag_file,Fail_file,Output
        outp, ind = '',0
   Write_out(outp, primer_tag_file)
   outp, ind = '',0
-  print total_tags, passed_seqs_total, fail_less_than_threshold
+  print(total_tags, passed_seqs_total, fail_less_than_threshold)
   return()
 
 def Get_consensus_sequence_cluster(u_seq, u_freq,tmp_file,threshold):
@@ -572,7 +572,7 @@ def Get_consensus_sequence_cluster(u_seq, u_freq,tmp_file,threshold):
   insert = ''
   if( len(u_seq) > 2000):insert = '--parttree'
   command1 = "mafft --retree 2 "+insert+" "+tmp_file+"txt > "+tmp_file+"aligned"
-  commands.getoutput(command1)
+  subprocess.getoutput(command1)
   fh=open(tmp_file+"aligned","r")
   max_seqs={}
   for header,sequence in fasta_iterator(fh):
@@ -588,7 +588,7 @@ def Get_consensus_sequence_cluster(u_seq, u_freq,tmp_file,threshold):
     f = [0]*len(bases)
     for s in max_seqs:
       if(s[i] not in base_dict):
-        print i, s[i], max_seqs
+        print(i, s[i], max_seqs)
       f[base_dict[s[i]]]=f[base_dict[s[i]]]+u_freq[max_seqs[s]]
     if(f[4]==0):start==1
     if(max(f)*1.0/sum(f) >= threshold):
@@ -780,7 +780,7 @@ def Read_untrimmed_file_single(rc,Tmp_file,Fail_file,Output_trim, gene,paired,sp
   fh.close()
   Write_out(out, primer_tag_file_count)
   out, ind = '',0
-  print "\tTotal sequences:\t"+str(total)+"\tNumber of REV primers found:\t"+str(pass_r)+"\tNumber of FOR primers found:\t"+str(pass_f)+"\tPassed sequences:\t"+str(pass_all)
+  print("\tTotal sequences:\t"+str(total)+"\tNumber of REV primers found:\t"+str(pass_r)+"\tNumber of FOR primers found:\t"+str(pass_f)+"\tPassed sequences:\t"+str(pass_all))
   return()
 
 def Single_J_barcoded_trimming(regions_J,J_primer, J1,J2,V_primer,V1,V2,rc,Tmp_file,Fail_file,Output_trim, gene,paired,species,primer_file,primer_tag_file,tmp_file,sample,primer_tag_file_count,threshold_BARCODE,vidprimer,jidprimer,inside,ref_const,universal_rev,reverse_primer_group):
@@ -790,7 +790,7 @@ def Single_J_barcoded_trimming(regions_J,J_primer, J1,J2,V_primer,V1,V2,rc,Tmp_f
   if(gene=="KAPPA" or gene=="IGK"):minl= 110 
   if(gene=="LAMBDA" or gene == "IGL"):(minl, maxl)= (90, 150)
   J_found,v_found,tot,indexing=0,0,0,0
-  print primer_file,inside
+  print(primer_file,inside)
   Read_untrimmed_file(Tmp_file,J_primer, rc, J1, J2, regions_J,sample, maxl, minl,js,vs,V_primer,V1,V2,primer_tag_file_count,Fail_file,vidprimer,jidprimer,inside,ref_const,universal_rev,reverse_primer_group,species)
   Check_barcodes(primer_tag_file_count,primer_tag_file,Fail_file,sample,Output_trim,threshold_BARCODE)
   Print_trimmed_sequences(Output_trim, primer_tag_file, primer_tag_file_count,inside,ref_const)
@@ -799,8 +799,8 @@ def Single_J_barcoded_trimming(regions_J,J_primer, J1,J2,V_primer,V1,V2,rc,Tmp_f
 def Read_untrimmed_file(Tmp_file,J_primer, rc, J1, J2, regions_J,sample,maxl, minl,js,vs,V_primer,V1,V2,primer_tag_file_count,Fail_file,vidprimer,jidprimer,inside,ref_const,universal_rev,reverse_primer_group,species):
   if(inside==1):
     if(reverse_primer_group!="ISOTYPER" and reverse_primer_group!="ISO"):
-      print "ISO_DD"
-      print ref_const
+      print("ISO_DD")
+      print(ref_const)
       fh=open(ref_const,"r")
       ref_words,word_length,length_into_constant_region,ref_seqs = Tree(),10,50,{}
       for header,seq in fasta_iterator(fh):
@@ -810,7 +810,7 @@ def Read_untrimmed_file(Tmp_file,J_primer, rc, J1, J2, regions_J,sample,maxl, mi
           ref_words[seq[i-word_length:i]][header].value = 1
       fh.close()
     if(reverse_primer_group=="ISOTYPER" or reverse_primer_group=="ISO"):
-      print "IsoTyper primers"
+      print("IsoTyper primers")
       fh=open("/nfs/users/nfs_r/rbr1/IMMUNOLOGY/NETWORK_METHODS/STANDARD_BCR_PROCESSING/LIBRARY/Annealing_IsoTyper_constant_region_distinction_formatted_"+species+".txt","r")
       ref_words = Tree()
       for l in fh:
@@ -822,7 +822,7 @@ def Read_untrimmed_file(Tmp_file,J_primer, rc, J1, J2, regions_J,sample,maxl, mi
             ref_words[words[0]][words[1]][id].value = 1
       fh.close()
     else:
-      print "\t\t\t",reverse_primer_group
+      print("\t\t\t",reverse_primer_group)
   fh=open(primer_tag_file_count,"w")
   fh.close()
   t,seqs1,total,ind,out = 0,Tree(),0,0,"#ID\tJ_tag\tV_tag\tSequence\n"
@@ -925,7 +925,7 @@ def Read_untrimmed_file(Tmp_file,J_primer, rc, J1, J2, regions_J,sample,maxl, mi
             passes=1
             pass_constant = 1
           else:
-            print "CANNOT DISINGUISH",header, score
+            print("CANNOT DISINGUISH",header, score)
             pass_constant = 0
             passes=0
       #else:
@@ -981,7 +981,7 @@ def Read_untrimmed_file(Tmp_file,J_primer, rc, J1, J2, regions_J,sample,maxl, mi
   Write_out(out, primer_tag_file_count)
   Write_out(fail, Fail_file)
   del seqs1, out, fail
-  print sample,"\tTotal:\t",total,"\t",t,"\tN J found:\t",J_found,"\tN V found:\t",v_found,"\t% found:\t",v_found*100.0/total,"%"
+  print(sample,"\tTotal:\t",total,"\t",t,"\tN J found:\t",J_found,"\tN V found:\t",v_found,"\t% found:\t",v_found*100.0/total,"%")
   return()
 
 def Get_barcodes_completed(primer_tag_file):
@@ -1017,7 +1017,7 @@ def Check_barcodes(primer_tag_file_count,primer_tag_file,Fail_file,sample,Output
       if(j_tag+"\t"+v_tag not in bc_complete):
         seqs[j_tag+"\t"+v_tag][sequence][header].value = 1
   fh.close()
-  print len(seqs), "Unique tags"
+  print(len(seqs), "Unique tags")
   failed, ind_f,out,outp,ind ='',0,'','',0
   unique_seqs=Functions.Tree()
   min_depth = (1.0/(1-threshold))
@@ -1039,16 +1039,16 @@ def Check_barcodes(primer_tag_file_count,primer_tag_file,Fail_file,sample,Output
       if(len(u_freq)>500):break
     f = sum(u_freq)
     h = h.split(":")[0].split("__")[0]+"__"+str(sum(u_freq))
-    if(len(u_freq)>100):print "BC group size:\t",len(u_freq)
+    if(len(u_freq)>100):print("BC group size:\t",len(u_freq))
     if(len(seqs[t1])==1):
       passed_seqs_total = passed_seqs_total+f
       unique_seqs[s][h][t1].value=1
       outp=outp+h+"\t"+str(f)+"\t"+str(f)+"\t"+t1+"\t0\tYES\t"+s+"\t"+s+"\n"
-      if(f>thresh):print t1, f
+      if(f>thresh):print(t1, f)
     else:
       if(sum(u_freq)>=min_depth): # if fewer sequences associated with J-barcode, but not all are identical, then reject
         if(max(u_freq)*1.0/sum(u_freq) >threshold):
-          print "\t\t1:",t1, sum(u_freq), min_depth 
+          print("\t\t1:",t1, sum(u_freq), min_depth) 
           s = u_seq[u_freq.index(max(u_freq))]
           unique_seqs[s][h][t1].value=1
           passed_seqs_total = passed_seqs_total+f
@@ -1065,10 +1065,10 @@ def Check_barcodes(primer_tag_file_count,primer_tag_file,Fail_file,sample,Output
               outp=outp+u_header[i]+"\t"+str(u_freq[i])+"\t"+str(sum(u_freq))+"\t"+t1+"\t"+str(mismatches)+"\tYES\t"+s+"\t"+u_seq[i]+"\n"
               if(i>200):break
           else:outp=outp+h+"\tNA\t"+str(sum(u_freq))+"\t"+t1+"\tNA\tYES\t"+s+"\tNA\n"
-          if(f>thresh):print t1, f
+          if(f>thresh):print(t1, f)
         else:
-          print "\t\t2:",t1, sum(u_freq), min_depth
-          print tmp_file
+          print("\t\t2:",t1, sum(u_freq), min_depth)
+          print(tmp_file)
           consensus = Get_consensus_sequence(u_seq, u_freq,tmp_file,threshold)
           if(consensus.count("_")==0 and len(consensus)>3):
             unique_seqs[consensus][h][t1].value = 1
@@ -1093,7 +1093,7 @@ def Check_barcodes(primer_tag_file_count,primer_tag_file,Fail_file,sample,Output
             failed, ind_f = failed+">"+h+"_BC_multiplicity\n"+s+"\n", ind_f+1
             if(detailed == "TRUE"):
               for i in range(0,len(u_seq)):
-                print t1,"\t",i
+                print(t1,"\t",i)
                 mismatches = "NA"
                 outp=outp+u_header[i]+"\t"+str(u_freq[i])+"\t"+str(sum(u_freq))+"\t"+t1+"\t"+mismatches+"\tNO\t"+consensus+"\t"+u_seq[i]+"\n"
       else:
@@ -1121,10 +1121,10 @@ def Check_barcodes(primer_tag_file_count,primer_tag_file,Fail_file,sample,Output
           #if(f>thresh):print t1, f
           else:
             failed, ind_f = failed+">"+h+"_BC_multiplicity\n"+consensus+"\n", ind_f+1
-            print "FAILED"
+            print("FAILED")
         else:
           failed, ind_f = failed+">"+h+"_BC_multiplicity\n"+consensus+"\n", ind_f+1
-          print +h+"_BC_multiplicity\n"+consensus
+          print(+h+"_BC_multiplicity\n"+consensus)
           for i in range(0,len(u_seq)):
             mismatches = "NA"
             outp=outp+u_header[i]+"\t"+str(u_freq[i])+"\t"+str(sum(u_freq))+"\t"+t1+"\t"+mismatches+"\tNO\t"+consensus+"\t"+u_seq[i]+"\n"
@@ -1136,13 +1136,13 @@ def Check_barcodes(primer_tag_file_count,primer_tag_file,Fail_file,sample,Output
       failed, ind_f = '',0
   Write_out(outp, primer_tag_file)
   Write_out(failed,Fail_file)
-  print "Getting refined sequences"
+  print("Getting refined sequences")
   del failed, ind_f,out, seqs,outp
   return()
 
 def Print_trimmed_sequences(Output_trim, primer_tag_file, primer_tag_file_count,inside,ref_const):
   constant_region,regions,uniq_bcs = {},{},{}
-  print "inside",inside
+  print("inside",inside)
   if(inside in [0,1]):
     fh=open(primer_tag_file_count,"r")
     for l in fh:
@@ -1155,7 +1155,7 @@ def Print_trimmed_sequences(Output_trim, primer_tag_file, primer_tag_file_count,
           regions[const_reg]=1
           uniq_bcs[bc] = 1
     fh.close()
-    print "Number of unique BCs:",len(uniq_bcs)
+    print("Number of unique BCs:",len(uniq_bcs))
     del uniq_bcs
   fh=open(primer_tag_file,"r")
   unique_seqs,seqs = Tree(),{}
@@ -1168,13 +1168,13 @@ def Print_trimmed_sequences(Output_trim, primer_tag_file, primer_tag_file_count,
           passed = passed+1
           consensus = l[7]
           if(consensus.count("human_BC_REV_CONST")!=0):
-            print l
+            print(l)
           seqs[l[3]+":"+l[4]] = [l[0],consensus]
         else:
           failed = failed+1
           if(l[3] in uniq_failed):uniq_failed[l[3]]= uniq_failed[l[3]]+1
           else:uniq_failed[l[3]] = 1
-  print "Passed:", passed, "Failed:",failed,"(",failed*100/(failed+passed),"%)"
+  print("Passed:", passed, "Failed:",failed,"(",failed*100/(failed+passed),"%)")
   #n_seqs_associated_with_failed_BCs = []
   #for n in uniq_failed:
   #  n_seqs_associated_with_failed_BCs.append(uniq_failed[n])
@@ -1221,11 +1221,11 @@ def Print_trimmed_sequences(Output_trim, primer_tag_file, primer_tag_file_count,
 
 def dfg():
   for i in h:
-    print len(unique_seqs)
+    print(len(unique_seqs))
     out,ind = '',0
     reg = []
     for i in regions:
-      print i
+      print(i)
       reg.append(i)
     reg.sort()
     header = "_".join(reg)
@@ -1234,7 +1234,7 @@ def dfg():
       for const in unique_seqs[seq]:
         ind1 = reg.index(const)
         f[ind1] = f[ind1]+len(unique_seqs[seq][const])
-      print f
+      print(f)
       for id in unique_seqs[seq][const]:
         break
       out=out+">"+id.split("__")[0]+"__"+"_".join(map(str, f))+"|"+header+"\n"+seq+"\n"
@@ -1244,7 +1244,7 @@ def dfg():
         out, ind = '',0
     Write_out(out, Output_trim)
   else:
-    print "EDIT CODE HERE: print out trimmed sequences"
+    print("EDIT CODE HERE: print out trimmed sequences")
 
 def Get_mismatches_from_consensus(a,b):
   mm = 0
@@ -1370,7 +1370,7 @@ def Read_untrimmed_file_double1(regions_J,J_primer, J1,J2, regions_V,V_primer, V
 
 def Get_sequences(file):
   command = "gunzip "+file
-  commands.getoutput(command)
+  subprocess.getoutput(command)
   fh = open (file, "r")
   seqs = {}
   for header,sequence in fasta_iterator(fh):
@@ -1468,13 +1468,13 @@ def Split_reads_and_join_pre(file1, file2, outfile,gene,paired,id,method,primer_
   rc = Init_rc()
   file1 = dir+"FASTQ_FILES/Sequences_"+barcode_group+"_1.fasta"
   file2 = dir+"FASTQ_FILES/Sequences_"+barcode_group+"_2.fasta"
-  print "\t",other
+  print("\t",other)
   barcode, barcode_file = other.split(",")[0], other.split(",")[1]
   barcodes,allbarcodes,barcode_stem,rc_barcodes = Get_barcodes(barcode, barcode_file,rc)
   (rc)= Init_rc()
   (seqs1)=Get_sequences(file1)
   (seqs2)=Get_sequences(file2)
-  print len(seqs1), len(seqs2)
+  print(len(seqs1), len(seqs2))
   out,ind = '',0
   fh = open (outfile, "w")
   fh.close()
@@ -1530,14 +1530,14 @@ def Split_reads_and_join_pre(file1, file2, outfile,gene,paired,id,method,primer_
                         out,ind = '',0
   Write_out(out, outfile)
   del out,ind
-  print id+"\tTotal sequences:",total,"\tNumber of joined sequences:",joining, "Number of barcodes matched:",primer_match,"% retained:",primer_match*100.0/total, "IDs saved",count_barcode_saved
+  print(id+"\tTotal sequences:",total,"\tNumber of joined sequences:",joining, "Number of barcodes matched:",primer_match,"% retained:",primer_match*100.0/total, "IDs saved",count_barcode_saved)
   return()
 
 def Get_paired_reads_overlapping(file1, file2, outfile,gene,paired,id,method):
   (rc)= Init_rc()
   (seqs1)=Get_sequences(file1)
   (seqs2)=Get_sequences(file2)
-  print "Forward reads:", len(seqs1),"Reverse reads:", len(seqs2)
+  print("Forward reads:", len(seqs1),"Reverse reads:", len(seqs2))
   out,ind = '',0
   fh = open (outfile, "w")
   fh.close()
@@ -1567,7 +1567,7 @@ def Get_paired_reads_overlapping(file1, file2, outfile,gene,paired,id,method):
       fail_no_pair=fail_no_pair+1
   Write_out(out, outfile)
   del out,ind
-  print id+"\tTotal sequences:",total,"\tNumber of Failed sequences:",f_joining, "\tPercentage sequences failed:", f_joining*100.0/total,"%\tTotal remaining:",tot, "\tNo pairs:",fail_no_pair
+  print(id+"\tTotal sequences:",total,"\tNumber of Failed sequences:",f_joining, "\tPercentage sequences failed:", f_joining*100.0/total,"%\tTotal remaining:",tot, "\tNo pairs:",fail_no_pair)
   return()
 
 def Get_codons ():
@@ -1643,12 +1643,12 @@ def Blast_match_J_const(out, seqs, Trim1, Trim2, refj,e_value,indent):
   fh.write(out)
   fh.close() 
   command1 = bin_path+"blastall -p blastn -a 10 -d "+refj+" -e "+str(e_value)+" -i "+Trim1+"_blast_J -o "+Trim1+"_blast_J_results -b 1 -m 8"
-  commands.getoutput(command1)
+  subprocess.getoutput(command1)
   fh = open(Trim1+"_blast_J_results","r")
   out= ''
   for l in fh:
     l=l.strip().split()
-    header, gene = l[0].split("|")[1].split("_"), map(int, l[0].split("|")[0].split("__")[1].split("_"))
+    header, gene = l[0].split("|")[1].split("_"), list(map(int, l[0].split("|")[0].split("__")[1].split("_")))
     gene = header[gene.index(max(gene))]
     if(l[1].count(gene[0:3])!=0):
       if(int(l[6])<int(l[7]) and int(l[8])<int(l[9])):
@@ -1665,7 +1665,7 @@ def Blast_match_J(out, seqs, Trim1, Trim2, refj,e_value):
   fh.write(out)
   fh.close()
   command1 = bin_path+"blastall -p blastn -a 10 -d "+refj+" -e "+str(e_value)+" -i "+Trim1+"_blast_J -o "+Trim1+"_blast_J_results -b 1 -m 8 -W 4"
-  commands.getoutput(command1)
+  subprocess.getoutput(command1)
   fh = open(Trim1+"_blast_J_results","r")
   out,done='',{}
   for l in fh:
@@ -1684,7 +1684,7 @@ def Blast_match(V_region, ref, tmp_file,v_match):
   fh.write(V_region)
   fh.close()
   command1 = bin_path+"blastall -p blastn -a 10 -d "+ref+" -e 1 -i "+tmp_file+" -o "+tmp_file+"_blast -b 1 -m 8"
-  commands.getoutput(command1)
+  subprocess.getoutput(command1)
   fh = open(tmp_file+"_blast","r")
   passes={}
   for l in fh:
@@ -1839,7 +1839,7 @@ def Get_nucleotide_sequences(Output_trim, Filtered_out1,nn_orf_filtered,dir_ind,
         out, ind = '',0
   Write_out(out, nn_orf_filtered)
   fh.close()
-  print len(ids), len(done)
+  print(len(ids), len(done))
   return()
 
 def dfgdFG():
@@ -1854,9 +1854,9 @@ def dfgdFG():
             f = [0]*len(id.split("|")[1].split("_"))
           else:
             f = 0
-        freq = map(int,id.split("__")[1].split("|")[0].split("_"))
+        freq = list(map(int,id.split("__")[1].split("|")[0].split("_")))
         if(len(freq)>1):
-          f = map(add, f, freq)
+          f = list(map(add, f, freq))
         else:f = f+freq[0]
       if(id.count("|")!=0):
         id = id.split("__")[0]+"__"+"_".join(map(str,f))+"|"+id.split("|")[1]
@@ -1872,12 +1872,12 @@ def dfgdFG():
       out, ind ='', 0
   Write_out(out, nn_orf_filtered)
   out, ind ='', 0
-  print "\nTotal sequences:",number_seqs, "\tNumber passed with open reading frame:", number_accepted, "\tPercentage accepted:", number_accepted*100.0/number_seqs,"%"
+  print("\nTotal sequences:",number_seqs, "\tNumber passed with open reading frame:", number_accepted, "\tPercentage accepted:", number_accepted*100.0/number_seqs,"%")
   return()
 
 def Get_number_sequences(file):
   count = 0
-  c = commands.getoutput("wc -l "+file).split()
+  c = subprocess.getoutput("wc -l "+file).split()
   if(c[0] not in ['wc:',"ls:"]):
     fh=open(file,"r")
     for header,sequence in fasta_iterator(fh):
@@ -1888,7 +1888,7 @@ def Get_number_sequences(file):
 
 def Get_reduced_number_sequences_multi_constants(file):
   count = 0
-  c = commands.getoutput("wc -l "+file).split()
+  c = subprocess.getoutput("wc -l "+file).split()
   if(c[0]!="ls:" and c[0]!="0"):
     fh=open(file,"r")
     for header,sequence in fasta_iterator(fh):
@@ -1898,7 +1898,7 @@ def Get_reduced_number_sequences_multi_constants(file):
 
 def Count_raw_barcoded_sequences(file):
   count,bc,nbc = 0,{},0
-  c = commands.getoutput("wc -l "+file).split()
+  c = subprocess.getoutput("wc -l "+file).split()
   if(c[0]!="ls:" and c[0]!="0"):
     fh=open(file,"r")
     for l in fh:
@@ -1913,7 +1913,7 @@ def Count_raw_barcoded_sequences(file):
 
 def Get_reduced_number_sequences(file):
   count = 0
-  c = commands.getoutput("wc -l "+file).split()
+  c = subprocess.getoutput("wc -l "+file).split()
   if(c[0]!="ls:" and c[0]!="0"):
     fh=open(file,"r")
     for header,sequence in fasta_iterator(fh):
@@ -1944,7 +1944,7 @@ def Get_read_report(Seq_file1,Seq_file2,Tmp_file,Trim1, nn_orf_filtered,filterin
   if(method =="Multiplex_FORWARD_BARCODE_GROUPED"):Seq_file1,Seq_file2 = dir+"FASTQ_FILES/Sequences_"+barcode_group+"_1.fasta", dir+"FASTQ_FILES/Sequences_"+barcode_group+"_2.fasta"
   rc = {}
   barcoded_j,barcoded_v=1,0
-  print barcoded_j,barcoded_v
+  print(barcoded_j,barcoded_v)
   if(barcoded_j+barcoded_v==0):
     raw1,raw2,joined,gene_matching=Get_number_sequences(Seq_file1), Get_number_sequences(Seq_file2), Get_number_sequences(Tmp_file), Get_reduced_number_sequences_multi_constants(Trim1)
     orf = Get_reduced_number_sequences_multi_constants(nn_orf_filtered)
@@ -1953,7 +1953,7 @@ def Get_read_report(Seq_file1,Seq_file2,Tmp_file,Trim1, nn_orf_filtered,filterin
     out=out+dir+"\t"+id+"\t"+species+"\t"+gene+"\t"+str(orf*100.0/min([raw1,raw2]))+"\t"+str(raw1)+"\t"+str(raw2)+"\t"+str(joined)+"\t"+str(gene_matching)+"\t"+str(orf)+"\t"+str(number_unique_seqs)+"\n"
   else:
     n_barcodes,uniq_sequences, total_sequences_included_before_bc =  Count_barcodes(primer_tag_file)
-    print n_barcodes,uniq_sequences, total_sequences_included_before_bc
+    print(n_barcodes,uniq_sequences, total_sequences_included_before_bc)
     raw1,raw2,joined,gene_matching=Get_number_sequences(Seq_file1), Get_number_sequences(Seq_file2), Get_number_sequences(Tmp_file), Get_reduced_number_sequences_multi_constants(Trim1)
     count_bc_found,count_uniq_bcs = -1,-1
     orf = Get_reduced_number_sequences_multi_constants(nn_orf_filtered)
@@ -1965,7 +1965,7 @@ def Get_read_report(Seq_file1,Seq_file2,Tmp_file,Trim1, nn_orf_filtered,filterin
   fh=open(filtering_report,"w")
   fh.write(out)
   fh.close()
-  print out
+  print(out)
   return()
 
 def Get_read_report1(Seq_file1, Seq_file2, Tmp_file, Trim1, nn_orf_filtered,filtering_report,id, species, gene, dir,Trim2):
@@ -2182,7 +2182,7 @@ def Get_cluster_similarities_single(seqs,coclust, cluster,file_out,inv):
           t=t+1
       clust_seqs=sorted(clust_seqs, key=itemgetter(2), reverse=True)
       if(len(clust_seqs)>1):
-        if(len(clust_seqs)>500):print len(clust_seqs), total, ind
+        if(len(clust_seqs)>500):print(len(clust_seqs), total, ind)
         Get_similarity_single(clust_seqs,file_out,c)
   return()
 
@@ -2200,7 +2200,7 @@ def Get_clusters (file):
 
 def Get_cluster_sizes_single (file):
   (cluster)= Get_clusters(file+".bak.clstr")
-  print len(cluster)
+  print(len(cluster))
   sizes=[] 
   for c in cluster:
     tot=len(cluster[c])
@@ -2266,7 +2266,7 @@ def Get_similar_clusters(s_sizes, cluster, seqs,tmp_file):
   fh1.close()
   comp = 5
   for i in range(0,len(s_sizes)):
-    print len(s_sizes), i
+    print(len(s_sizes), i)
     clust=s_sizes[i]
     c1=clust[0]
     if (c1 not in inv):
@@ -2310,7 +2310,7 @@ def Get_similar_clusters(s_sizes, cluster, seqs,tmp_file):
             if (ind > comp or found ==1):
               break
   Write_output(out, tmp_file)
-  print out
+  print(out)
   return()
 
 def Get_coclustered (file):
@@ -2402,9 +2402,9 @@ def Decon_identical (seq_file, att_file, file_vertex, file_seqs, tmp_file,read_n
       mins=s
       for j in sub_same[i]:
         j1 = freq_id[j.split("__")[0]]
-        freq = map(int, j1.split(read_number_division)[1].split("|")[0].split("_"))
+        freq = list(map(int, j1.split(read_number_division)[1].split("|")[0].split("_")))
         if(total==0):total = freq
-        else:total = map(add,freq,total)
+        else:total = list(map(add,freq,total))
         inverse[j.split("__")[0]]=i
         out = out+">"+j+"||"+i+"\n"+seqs[j.split("__")[0]]+"\n"
         s=seqs[j.split("__")[0]]
@@ -2470,7 +2470,7 @@ def Print_vertices(all, inverse, same, file_vertex,length,read_number_division,i
     else:
       if(id in freq_id):
         id1 =freq_id[id]
-      else:print id
+      else:print(id)
       freq = sum(map(int, id1.split(read_number_division)[1].split("|")[0].split("_")))
       out = out +id1+"\t"+str(freq)+"\t"+all[id]+"\n"
     if (ind>300):
@@ -2595,7 +2595,7 @@ def Output_cluster_file (G, cluster_file):
         ind2=0
     if(tc>max_f):max_f,nvertmax = tc,nvert
   Write_output(out, cluster_file)
-  print file_vertex,"Maximum cluster:",max_f*100.0/t,"%", nvertmax , "vertices"
+  print(file_vertex,"Maximum cluster:",max_f*100.0/t,"%", nvertmax , "vertices")
   return()
 
 def Get_network_input(file_cluster, outfile,edge_file, checked_edges):
@@ -2616,7 +2616,7 @@ def Get_network_input(file_cluster, outfile,edge_file, checked_edges):
       for l in cluster[c]:
         out=out+l+"\n"
         ind = ind+1
-        if(int(l.split("\t")[2])>1000):print l
+        if(int(l.split("\t")[2])>1000):print(l)
     else:
       for l in cluster[c]:
         if(int(l.split("\t")[2])>1):
@@ -2690,13 +2690,13 @@ def Print_out(out, Output_trim):
 def Intialise_files(dir):
   dirs_to_add=["FASTQ_FILES/", "ORIENTATED_SEQUENCES/", "ORIENTATED_SEQUENCES/TMP/", "ORIENTATED_SEQUENCES/NETWORKS/"]
   for d in dirs_to_add:
-    c=commands.getoutput("ls "+dir+d)
-    if(c.count("No such file or directory")==1):commands.getoutput("mkdir "+dir+d)
+    c=subprocess.getoutput("ls "+dir+d)
+    if(c.count("No such file or directory")==1):subprocess.getoutput("mkdir "+dir+d)
   return()
 
 def CRAM_to_FASTQ(dir, source, id,pre_QC_bam):
   command0 = "samtools view -b -o "+pre_QC_bam+" "+source
-  print command0
+  print(command0)
   os.system(command0)
   return()
 
@@ -2716,8 +2716,8 @@ def QC_samples(dir,gene,id,source,length,species,barcode_group):
   reads1=pre+"_1.fastq"
   reads2=pre+"_2.fastq"
   if(1==1):
-    print reads1
-    print reads2
+    print(reads1)
+    print(reads2)
     if(1==1):
       threshold,length = "32","100"
       # command1 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads1 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_1 -m "+threshold+" -l "+length
@@ -2726,7 +2726,7 @@ def QC_samples(dir,gene,id,source,length,species,barcode_group):
       command2 = "java -jar "+bin_path+"QUASR_v7.01/qualityControl.jar -f "+reads2 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_2 -m "+threshold+" -l "+length
       command3 = "cat "+dir+"FASTQ_FILES/Sequences_"+id+"_1.qc.fq | perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "+dir+"FASTQ_FILES/Sequences_"+id+"_1.fasta"
       command4 = "cat "+dir+"FASTQ_FILES/Sequences_"+id+"_2.qc.fq | perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "+dir+"FASTQ_FILES/Sequences_"+id+"_2.fasta"
-      print command1
+      print(command1)
       os.system(command1)
       os.system(command2)
       os.system(command3)
@@ -2748,7 +2748,7 @@ command_source = sys.argv[11]
 command_source = command_source.split(",")
 if(len(sys.argv)>13):reverse_primer_group = sys.argv[13]
 else:reverse_primer_group = "OTHER"
-print "Reverse primer group: ",reverse_primer_group
+print("Reverse primer group: ",reverse_primer_group)
 ########################### Files for QC and filtering
 Seq_file1 = dir+"FASTQ_FILES/Sequences_"+id+"_1.fasta"
 Seq_file2 = dir+"FASTQ_FILES/Sequences_"+id+"_2.fasta"

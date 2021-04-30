@@ -254,7 +254,7 @@ class Alignment:
 	    midc = (tb+h) + S.gapCost(N)
 	    midj = 0
 
-	    for j in xrange(N+1):
+	    for j in range(N+1):
 		c = S.gapCost(j-1)
 		c = c + S.weight(A[1], B[j])
 		c = c + S.gapCost(N-j)
@@ -283,17 +283,17 @@ class Alignment:
 	midi = M/2
 	CC[0] = 0.0
 	t = g
-	for j in xrange(1, N+1):
+	for j in range(1, N+1):
 	    CC[j] = t = t+h
 	    DD[j] = t+g
 
 	t = tb
-	for i in xrange(1, midi+1):
+	for i in range(1, midi+1):
 	    s = CC[0]
 	    CC[0] = c = t = t+h
 	    e = t+g
 
-	    for j in xrange(1, N+1):
+	    for j in range(1, N+1):
 		c = c + g + h
 		e = e + h
 
@@ -324,17 +324,17 @@ class Alignment:
 
 	RR[N] = 0.0
 	t = g
-	for j in xrange(N-1, -1, -1):
+	for j in range(N-1, -1, -1):
 	    RR[j] = t = t+h
 	    SS[j] = t+g
 
 	t = te
-	for i in xrange(M-1, midi-1, -1):
+	for i in range(M-1, midi-1, -1):
 	    s = RR[N]
 	    RR[N] = c = t = t+h
 	    e = t+g
 
-	    for j in xrange(N-1, -1, -1):
+	    for j in range(N-1, -1, -1):
 		c = c + g + h
 		e = e + h
 		if c < e:
@@ -364,7 +364,7 @@ class Alignment:
 	midc = CC[0] + RR[0]
 	midj = 0
 	type = 1
-	for j in xrange(0, N+1):
+	for j in range(0, N+1):
 	    c = CC[j] + RR[j]
 	    if c <= midc:
 		if c < midc \
@@ -373,7 +373,7 @@ class Alignment:
 		    midc = c
 		    midj = j
 
-	for j in xrange(N, -1, -1):
+	for j in range(N, -1, -1):
 	    c = DD[j] + SS[j] - g
 	    if c < midc:
 		midc = c
@@ -400,7 +400,7 @@ class Alignment:
 	x, y = [], []
 	i, j, k, op = 0, 0, 0, 0
 
-	for k in xrange(len(S)):
+	for k in range(len(S)):
 	    s = S[k]
 	    if s == 0:
               if(i<len(A) and j<len(B)):
@@ -414,12 +414,12 @@ class Alignment:
 		    y.append(b)
 	    elif s < 0:
 		y = y + [GapSymbol]*(-s)
-		for q in xrange(i, i-s):
+		for q in range(i, i-s):
 		    x.append(A[q])
 		i = i - s
 	    elif s > 0:
 		x = x + [GapSymbol]*(s)
-		for q in xrange(j, j+s):
+		for q in range(j, j+s):
                     if(q<len(B)):
 		      y.append(B[q])
                     else:
@@ -481,19 +481,19 @@ class Alignment:
 	return left, both, right
 
 def Do_align(a,b):
-  a = map(None, a)
-  b = map(None, b)
+  a = list(a)
+  b = list(b)
   A = Alignment()
   c, x, y, s = A.align(a, b)
   return(x,y)
 
 def Get_position (a,b):
-  a = map(None, a)
-  b = map(None, b)
+  a = list(a)
+  b = list(b)
   A = Alignment()
   c, x, y, s = A.align(a, b)
   start=-1
-  print y
+  print(y)
   for i in range(0,len(y)):
     if (y[i]!=None):
       start = i
@@ -654,7 +654,7 @@ class Alignment:
 	    midc = (tb+h) + S.gapCost(N)
 	    midj = 0
 
-	    for j in xrange(N+1):
+	    for j in range(N+1):
 		c = S.gapCost(j-1)
 		c = c + S.weight(A[1], B[j])
 		c = c + S.gapCost(N-j)
@@ -683,17 +683,17 @@ class Alignment:
 	midi = M/2
 	CC[0] = 0.0
 	t = g
-	for j in xrange(1, N+1):
+	for j in range(1, N+1):
 	    CC[j] = t = t+h
 	    DD[j] = t+g
 
 	t = tb
-	for i in xrange(1, midi+1):
+	for i in range(1, midi+1):
 	    s = CC[0]
 	    CC[0] = c = t = t+h
 	    e = t+g
 
-	    for j in xrange(1, N+1):
+	    for j in range(1, N+1):
 		c = c + g + h
 		e = e + h
 
@@ -724,17 +724,17 @@ class Alignment:
 
 	RR[N] = 0.0
 	t = g
-	for j in xrange(N-1, -1, -1):
+	for j in range(N-1, -1, -1):
 	    RR[j] = t = t+h
 	    SS[j] = t+g
 
 	t = te
-	for i in xrange(M-1, midi-1, -1):
+	for i in range(M-1, midi-1, -1):
 	    s = RR[N]
 	    RR[N] = c = t = t+h
 	    e = t+g
 
-	    for j in xrange(N-1, -1, -1):
+	    for j in range(N-1, -1, -1):
 		c = c + g + h
 		e = e + h
 		if c < e:
@@ -764,7 +764,7 @@ class Alignment:
 	midc = CC[0] + RR[0]
 	midj = 0
 	type = 1
-	for j in xrange(0, N+1):
+	for j in range(0, N+1):
 	    c = CC[j] + RR[j]
 	    if c <= midc:
 		if c < midc \
@@ -773,7 +773,7 @@ class Alignment:
 		    midc = c
 		    midj = j
 
-	for j in xrange(N, -1, -1):
+	for j in range(N, -1, -1):
 	    c = DD[j] + SS[j] - g
 	    if c < midc:
 		midc = c
@@ -800,7 +800,7 @@ class Alignment:
 	x, y = [], []
 	i, j, k, op = 0, 0, 0, 0
 
-	for k in xrange(len(S)):
+	for k in range(len(S)):
 	    s = S[k]
 	    if s == 0:
               if(i<len(A) and j<len(B)):
@@ -814,12 +814,12 @@ class Alignment:
 		    y.append(b)
 	    elif s < 0:
 		y = y + [GapSymbol]*(-s)
-		for q in xrange(i, i-s):
+		for q in range(i, i-s):
 		    x.append(A[q])
 		i = i - s
 	    elif s > 0:
 		x = x + [GapSymbol]*(s)
-		for q in xrange(j, j+s):
+		for q in range(j, j+s):
                     if(q<len(B)):
 		      y.append(B[q])
                     else:
@@ -883,14 +883,14 @@ class Alignment:
 
 def printTestCase(A, a, b, x, y, c):
     hUE = hasUniqueElements
-    print "In-List 1: ", a
-    print "In-List 2: ", b
-    print "Out-List 1:", x
-    print "Out-List 2:", y
+    print("In-List 1: ", a)
+    print("In-List 2: ", b)
+    print("Out-List 1:", x)
+    print("Out-List 2:", y)
     # print "?", map(hUE, (x, y))
-    if map(hUE, (x, y)) == [1, 1]:
-	print "Partitions:", A.partition(x, y)
-    print "Cost:      ", c
+    if list(map(hUE, (x, y))) == [1, 1]:
+	print("Partitions:", A.partition(x, y))
+    print("Cost:      ", c)
     
 
 def testCase(note, a, b):
@@ -898,13 +898,13 @@ def testCase(note, a, b):
     c, x, y, s = A.align(a, b)
     c1, x1, y1, s1 = A.align(b, a)
 
-    print note
-    print
+    print(note)
+    print()
     printTestCase(A, a, b, x, y, c)
     if (c, x, y) != (c1, y1, x1):
-        print "Asymmetric behaviour:"
+        print("Asymmetric behaviour:")
         printTestCase(A, b, a, x1, y1, c1)        
-    print
+    print()
 
 
 def test():
@@ -913,13 +913,13 @@ def test():
     l3 = [1, 2, 3, 4, GapSymbol, GapSymbol]
     res = ["No", "Yes"]
 
-    print "Utility function"
-    print 
+    print("Utility function")
+    print() 
     for l in [l1, l2, l3]:
 	i = hasUniqueElements(l)
 	r = res[i]
-	print "%s has unique elements: %s" % (l, r) 
-    print 
+	print("%s has unique elements: %s" % (l, r)) 
+    print() 
 
     a = []
     b = []
@@ -947,20 +947,20 @@ def test():
 
     a = "accgtaccg"
     b = "agtaccccg"
-    a = map(None, a)
-    b = map(None, b)
+    a = list(a)
+    b = list(b)
     testCase("Strings", a, b)
 
     a = "ac"
     b = "g"
-    a = map(None, a)
-    b = map(None, b)
+    a = list(a)
+    b = list(b)
     testCase("Strings", a, b)
 
     a = "aaccgtacggt"
     b = "agtgg"
-    a = map(None, a)
-    b = map(None, b)
+    a = list(a)
+    b = list(b)
     testCase("Strings, more complex", a, b)
 
     # The last case should actually result in:
@@ -983,21 +983,21 @@ def test():
 	usage = string.split(sys.argv[0], os.sep)[-1]
 	msg = "Call %s <dir1> <dir2> " % usage
 	msg = msg + "for testing directory compare!"
-	print msg
+	print(msg)
 	raise SystemExit
 
 
 def printTestCase2(A, a, b, x, y, c, s):
     hUE = hasUniqueElements
-    print "In-List 1: ", string.join(a, '')
-    print "In-List 2: ", string.join(b, '')
-    print "Out-List 1:", x
-    print "Out-List 2:", y
-    print "Script:    ", s
+    print("In-List 1: ", string.join(a, ''))
+    print("In-List 2: ", string.join(b, ''))
+    print("Out-List 1:", x)
+    print("Out-List 2:", y)
+    print("Script:    ", s)
     # print "?", map(hUE, (x, y))
-    if map(hUE, (x, y)) == [1, 1]:
-	print "Partitions:", A.partition(x, y)
-    print "Cost:      ", c
+    if list(map(hUE, (x, y))) == [1, 1]:
+	print("Partitions:", A.partition(x, y))
+    print("Cost:      ", c)
     
 
 def testCase2(note, a, b):
@@ -1005,13 +1005,13 @@ def testCase2(note, a, b):
     c, x, y, s = A.align(a, b)
     c1, x1, y1, s1 = A.align(b, a)
 
-    print note
-    print 
+    print(note)
+    print() 
     printTestCase2(A, a, b, x, y, c, s)
     if (c, x, y) != (c1, y1, x1):
-        print "Asymmetric behaviour:"
+        print("Asymmetric behaviour:")
         printTestCase2(A, b, a, x1, y1, c1, s1)        
-    print
+    print()
 
 
 def test2():
@@ -1028,8 +1028,8 @@ def test2():
 
     a = "g"
     b = "xx"
-    a = map(None, a)
-    b = map(None, b)
+    a = list(a)
+    b = list(b)
     testCase2("Strings", a, b)
 
 
@@ -1037,19 +1037,19 @@ def test2():
 #  a = "A very fat cat"
 #  b = "A very fast cat"
 def Do_align (a,b):
-  a = map(None, a)
-  b = map(None, b)
+  a = list(a)
+  b = list(b)
   A = Alignment()
   c, x, y, s = A.align(a, b)
   return(x,y)
 
 def Get_position (a,b):
-  a = map(None, a)
-  b = map(None, b)
+  a = list(a)
+  b = list(b)
   A = Alignment()
   c, x, y, s = A.align(a, b)
   start=-1
-  print y
+  print(y)
   for i in range(0,len(y)):
     if (y[i]!=None):
       start = i

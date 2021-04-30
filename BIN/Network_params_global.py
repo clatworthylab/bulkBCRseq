@@ -19,7 +19,7 @@ import Functions
 from Functions import *
 import re
 import time
-import commands
+import subprocess
 import numpy as np
 from numpy import outer
 from operator import itemgetter, attrgetter
@@ -150,7 +150,7 @@ def Get_differential_stats(cluster_file, id, dir,network_statistics,gene,species
   gene_fs = [gene_f[0][1], gene_f[1][1]]
   out="#Id\tAnalysis\tN reads\tVertex Gini Index\tCluster Gini Index\tLargest Cluster (%)\t2nd Largest Cluster (%)\t% Vertices in largest cluster\tVertex Renyi\tCluster Renyi\tMax. vertex (%)\tTotal # edges\t# Edges in max. cluster\tMax. VJ Gene freq (%)\t2nd max. VJ Gene freq\n"
   out=out+id+"\tALL_REPERTOIRE_PARAMS\t"+str(totalreads)+"\t"+str(vgini)+"\t"+str(cgini)+"\t"+str(max_pop)+"\t"+str(max_1_pop)+"\t"+str(vertices_in_max_cluster)+"\t"+str(vrenyi)+"\t"+str(crenyi)+"\t"+str(max_vertex)+"\t"+str(total_e)+"\t"+str(max_c_e)+"\t"+str(gene_fs[0])+"\t"+str(gene_fs[1])+"\n"
-  print out
+  print(out)
   return()
 
 def Get_network_statistics(cluster_file, id, dir,network_statistics):

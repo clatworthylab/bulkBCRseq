@@ -21,7 +21,7 @@ import Functions
 from Functions import *
 import re
 import time
-import commands
+import subprocess
 import numpy as np
 from numpy import outer
 from operator import itemgetter, attrgetter, add
@@ -96,7 +96,7 @@ def Get_sequence_length_distributions(seq_file,seq_length_ditribution):
   fh=open(seq_length_ditribution,"w")
   fh.write(out)
   fh.close()
-  print seq_length_ditribution,"\t",mean*1.0/total
+  print(seq_length_ditribution,"\t",mean*1.0/total)
   return()
 
 def Get_equivalent(seqs,ids):
@@ -254,7 +254,7 @@ def Locate_CDR3_start_site_IGH(CDR3_prot,seq, shift,codon,cdr3_ends,cdr3_ends_ne
         nn_start = ind
         break
   else:
-    print CDR3_prot,"NOT FOUND" 
+    print(CDR3_prot,"NOT FOUND") 
   return(CDR3_prot_trim, passed,nn_start,nn)
 
 def Blast_match(out, refv,refj, tmp_file, out1,indent,seqs,lengthv,prots,codon,gene,cdr3_ends,cdr3_ends_near):
@@ -279,7 +279,7 @@ def Blast_match(out, refv,refj, tmp_file, out1,indent,seqs,lengthv,prots,codon,g
         addition = len(seqs[l[0]])-80 
         passesj[l[0]]= (l[1].upper(), int(l[6])+addition, int(l[7])+addition, int(l[8]), int(l[9]), int(l[3]), int(l[4]), int(l[5]))
       else:
-        print l[0]
+        print(l[0])
   fh.close()
   fh = open(tmp_file+"_vblast","r")
   for l in fh:
@@ -328,9 +328,9 @@ def Blast_match(out, refv,refj, tmp_file, out1,indent,seqs,lengthv,prots,codon,g
                 additional_mutations = min([additional_mutations, 20])
             else:CDR3_start, CDR3, additional_mutations, CDR3_found,CDR3_nn,nn_start = v_end_query,"-",v_end_query,"NO","-",v_end_query
             passesv[l[0]]= (v_gene, int(l[6]), int(l[7]), int(l[8]), int(l[9]), int(l[3]), mut, int(l[5]), end_diff, CDR3_start, CDR3, additional_mutations, CDR3_found,v_end_query,CDR3_nn,nn_start)
-          else: print l
+          else: print(l)
     else:
-      print l
+      print(l)
   fh.close()
   return(passesv,passesj)
 
@@ -404,7 +404,7 @@ def Get_region_boundaries(species,loc):
   elif(species=="LLAMA_GLAMA"):
     fh=open(loc+"llama.ndm.imgt","r")
     J_ref = loc+"llama.ndm.imgt.CDR3.end"
-  else:print "Reference kabat not found"
+  else:print("Reference kabat not found")
   for l in fh:
     l=l.strip().split()
     id = l[0]
@@ -458,10 +458,10 @@ def Identify_D_genes(annot_file, file_D_genes, refd,tmp_file,seq_file):
           batch_number=batch_number+1
           del seqs, out
           seqs, out,ind={},'',0
-          print "\r",batch_number, 
+          print("\r",batch_number, end=' ') 
           #if(batch_number>30):break
   fh.close()
-  print "\nTotal:",total,"Passed:", passed, "% Passed:", passed*100.0/total
+  print("\nTotal:",total,"Passed:", passed, "% Passed:", passed*100.0/total)
   os.system("rm "+tmp_file+" "+tmp_file+"_dblast")
   return()
 
@@ -526,13 +526,13 @@ def Assign_sequences(Seq_file,gene,annot_file, tmp_file,species,protein_file,ref
         del seqs,passesv,passesj
         seqs,passesv,passesj = {},{},{}
         ind , out,out1=0,'',''
-        print "\rBatch number:",batch_number, "\tSequences completed:",t,"\t% accepted", (t-failed)*100.0/t,"%",
+        print("\rBatch number:",batch_number, "\tSequences completed:",t,"\t% accepted", (t-failed)*100.0/t,"%", end=' ')
   if(len(seqs)>0):
     (passesv,passesj) = Blast_match(out, refv,refj, tmp_file, out1,indent,seqs,lengthv,prots,codon,gene,cdr3_ends,cdr3_ends_near)
     (failed)=Get_annotation(passesv,passesj, seqs, annot_file,lengthj,regions,failed, CDR3_end,prots,codon,gene)
   t2= time.time()
   fh.close()
-  print "\n",Seq_file+"\t"+gene+"\tV\t"+str(t)+"\t"+str(round((t2-t1),3))+"\t sec\t"+str(round((t2-t1)*100000.0/(60*t),3))+"\tmins/100,000\t"+str(failed)+"\tFAILED"
+  print("\n",Seq_file+"\t"+gene+"\tV\t"+str(t)+"\t"+str(round((t2-t1),3))+"\t sec\t"+str(round((t2-t1)*100000.0/(60*t),3))+"\tmins/100,000\t"+str(failed)+"\tFAILED")
   os.system("rm "+tmp_file+" "+tmp_file+"_jblast "+tmp_file+"_vblast")
   return()
 
@@ -738,7 +738,7 @@ def Get_network_statistics_per_chain(cluster_file, sample, dir,per_chain_reperto
     if(l[0]!="#"):
       l=l.strip().split()
       id = l[2]
-      chains, freq, id_short = id.split("|")[1].split("_"), map(int, id.split("__")[1].split("|")[0].split("_")), id.split("__")[0]
+      chains, freq, id_short = id.split("|")[1].split("_"), list(map(int, id.split("__")[1].split("|")[0].split("_"))), id.split("__")[0]
       t1 = t1+sum(freq)
       n = n+1
       if(len(chains_short)==0):
@@ -768,8 +768,8 @@ def Get_network_statistics_per_chain(cluster_file, sample, dir,per_chain_reperto
         sizesv[c] =sizesv[c]+[freq[i]]
         total_reads[index] =total_reads[index]+freq[i]
   fh.close()
-  print total_reads, t1, n
-  if(t1 != sum(total_reads)):print "ERROR IN COUNTING!!"
+  print(total_reads, t1, n)
+  if(t1 != sum(total_reads)):print("ERROR IN COUNTING!!")
   out="#Id\tIsotype\tN reads\tN vertices\tVertex Gini Index\tCluster Gini Index\tLargest Cluster (%)\t2nd Largest Cluster (%)\n"
   #out="#Id\tAnalysis\tN reads\tN vertices\tVertex Gini Index\tCluster Gini Index\tLargest Cluster (%)\t2nd Largest Cluster (%)\t% Vertices in largest cluster\tVertex Renyi\tCluster Renyi\tGene\tSpecies\n"
   for c1 in chains_short: 
@@ -894,7 +894,7 @@ def Get_ids(header_file, seq_file_all,id,seq_file):
       if(l[1]==id):
         index_used = int(l[0])
   fh.close()
-  print index_used
+  print(index_used)
   ids= {}
   if(index_used!=-1):
     fh=open(seq_file_all,"r")
@@ -911,7 +911,7 @@ def Get_ids(header_file, seq_file_all,id,seq_file):
   for header,seq in fasta_iterator(fh):
     ids[header.split(":")[0]]=int(header.split("__")[1])
   fh.close()
-  print "IDS read", len(ids)
+  print("IDS read", len(ids))
   return(ids)
 
 def Get_annotation_for_clusters(annot_file, ids):
@@ -927,7 +927,7 @@ def Get_annotation_for_clusters(annot_file, ids):
         c = ids[ids_find[l[0].split("__")[0]]]
         if(len(l)>=14):
           v,j = l[1],l[13]
-          if(j.count("J")==0):print l
+          if(j.count("J")==0):print(l)
           vj= l[1]+"\t"+l[13]
           cluster_annot[c][vj][l[0]].value=1
           if(len(l)>=20 and l[19].count("CDR")==0):
@@ -1004,7 +1004,7 @@ def Get_unique_protein_sequence_number(protein_file,id):
   for header,sequence in fasta_iterator(fh):
     seqs[sequence ]=1
   fh.close()
-  print id+"\t"+str(len(seqs))
+  print(id+"\t"+str(len(seqs)))
   return()
 
 def Get_CDR3_lengths(annot_file, CDR3_length_file,id,dir):
@@ -1028,7 +1028,7 @@ def Get_CDR3_lengths(annot_file, CDR3_length_file,id,dir):
   fh.write(out)
   fh.close()
   os.system("cp "+CDR3_length_file+" ~rbr1/OUTPUT/")
-  print tot,found, found*100.0/tot,"%"
+  print(tot,found, found*100.0/tot,"%")
   return()
 
 def Get_CDR3_lengths_of_interest(annot_file, CDR3_length_file,sample,dir):
@@ -1061,7 +1061,7 @@ def Get_CDR3_lengths_of_interest(annot_file, CDR3_length_file,sample,dir):
     for CDR in CDRs:
       if(sequence.count(CDR)!=0):
         aliases[header.split("_")[0]] = CDR
-        print len(aliases)
+        print(len(aliases))
         break
   fh.close()
 
@@ -1082,7 +1082,7 @@ def Get_gene_frequencies(annot_file, gene_freq_file,gene,id):
           else:genes[v]=f
           found = found+f
         else:
-          print l
+          print(l)
       elif(len(l)==9):
         if(l[0].count("__")!=0):
           f, v, j = sum(map(int,l[0].split("__")[1].split("|")[0].split("_"))), l[1].split("*")[0], l[3].split("*")[0]
@@ -1093,9 +1093,9 @@ def Get_gene_frequencies(annot_file, gene_freq_file,gene,id):
           else:genes[v]=f
           found = found+f
       else:
-        print l
+        print(l)
   fh.close()
-  print "TOTAL READS:",total,"FOUND READS:", found
+  print("TOTAL READS:",total,"FOUND READS:", found)
   out=''
   for g in genes:
     out=out+id+"\t"+g+"\t"+str(genes[g])+"\t"+g[0:5]+"\n"
@@ -1118,8 +1118,8 @@ def Write_out(out, file):
 def Intialise_files(dir):
   dirs_to_add=[dir, dir+"TMP/"]
   for d in dirs_to_add:
-    c=commands.getoutput("ls "+d)
-    if(c.count("No such file or directory")==1):commands.getoutput("mkdir "+d)
+    c=subprocess.getoutput("ls "+d)
+    if(c.count("No such file or directory")==1):subprocess.getoutput("mkdir "+d)
   return()
 
 ###########################
@@ -1203,7 +1203,7 @@ if(constant_region=="TRUE"):
   if(forward_primer_group=="ISO_DD"):isotyper_primer_set = "INNER_DD"
   else:isotyper_primer_set = "INNER"
 
-print "constant_region:",constant_region,"isotyper_primer_set:", isotyper_primer_set
+print("constant_region:",constant_region,"isotyper_primer_set:", isotyper_primer_set)
 
 ######################### Commands
 Intialise_files(dir)

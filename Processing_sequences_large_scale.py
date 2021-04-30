@@ -3,7 +3,7 @@
 import sys
 #from collections import defaultdict
 import os
-import commands
+import subprocess
 
 
 def Get_info(file):
