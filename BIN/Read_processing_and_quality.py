@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 from operator import itemgetter
 import subprocess
-from _functions import *
+from functions import *
 import sys
 import os
 
