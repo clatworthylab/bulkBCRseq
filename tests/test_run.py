@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+# @Author: Kelvin
+# @Date:   2021-04-29 20:57:15
+# @Last Modified by:   Kelvin
+# @Last Modified time: 2021-04-30 16:31:52
+
 import os
 from subprocess import call
 
@@ -39,8 +44,10 @@ class Tester:
             execute_ = 'Y'
         else:
             execute_ = 'N'
-        cmd1 = ['python', 'Processing_sequences_large_scale.py',
-                meta, str(opt), bsub_, verbose_, execute_]
+        cmd1 = [
+            'python', 'Processing_sequences_large_scale.py', meta,
+            str(opt), bsub_, verbose_, execute_
+        ]
         call(cmd1, env=env)
 
     def check_output(self):
@@ -51,7 +58,10 @@ class Tester:
 
 @pytest.fixture
 def tester(request):
-    return Tester(request.param, None, False, True, True, 'tests/output/', ['FASTQ_FILES', 'ORIENTATED_SEQUENCES', 'ORIENTATED_SEQUENCES/NETWORKS', 'ORIENTATED_SEQUENCES/TMP'])
+    return Tester(request.param, None, False, True, True, 'tests/output/', [
+        'FASTQ_FILES', 'ORIENTATED_SEQUENCES', 'ORIENTATED_SEQUENCES/NETWORKS',
+        'ORIENTATED_SEQUENCES/TMP'
+    ])
 
 
 class TestRun:
