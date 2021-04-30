@@ -12,17 +12,17 @@ env:
   cache-version: 'cache-v1'
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 720
+  tests:    
+    timeout-minutes: 360
     defaults:
       run:
         shell: bash -l {0}
     strategy:
       max-parallel: 5
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         python-version: [2.7]
+    runs-on: ${{ matrix.os }}
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       NOT_CRAN: true
