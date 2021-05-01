@@ -2881,8 +2881,9 @@ def print_out(out, Output_trim):
 
 def intialise_files(dir):
     dirs_to_add = [
-        "FASTQ_FILES/", "ORIENTATED_SEQUENCES/", "ORIENTATED_SEQUENCES/TMP/",
-        "ORIENTATED_SEQUENCES/NETWORKS/"
+        dir + "FASTQ_FILES/", dir + "ORIENTATED_SEQUENCES/",
+        dir + "ORIENTATED_SEQUENCES/TMP/",
+        dir + "ORIENTATED_SEQUENCES/NETWORKS/"
     ]
     for d in dirs_to_add:
         if not os.path.exists(d):
