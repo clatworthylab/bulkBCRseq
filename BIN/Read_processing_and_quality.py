@@ -3,7 +3,7 @@ import re
 import networkx as nx
 from operator import itemgetter, add
 import subprocess
-from ..functions import *
+from .functions import *
 import sys
 import os
 
