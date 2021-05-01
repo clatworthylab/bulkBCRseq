@@ -1,0 +1,69 @@
+name: test_py3
+
+on:
+  pull_request:
+    branches:
+      - "*"
+    branches-ignore:
+      - 'legacy'
+  push:
+    branches:
+      - "master"
+    branches-ignore:
+      - 'legacy'
+
+env:
+  cache-version: 'cache-v1'
+
+jobs:
+  tests:    
+    timeout-minutes: 360
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      max-parallel: 5
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.7, 3.8]
+    runs-on: ${{ matrix.os }}
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      NOT_CRAN: true
+      TZ: UTC
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+        
+    - name: Cache conda
+      uses: actions/cache@v1
+      env:
+        # Increase this value to reset cache if etc/example-environment.yml has not changed
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key:
+          ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+          hashFiles('environment.yml') }}
+            
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v2.0.1
+      with:
+        auto-activate-base: true
+        auto-update-conda : true
+        activate-environment: bulkBCRseq
+        channels: conda-forge, bioconda, anaconda, defaults
+        channel-priority: true
+        python-version: ${{ matrix.python-version }}
+        environment-file: environment.yml
+        use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
+    
+    - name: Test with pytest
+      run: |
+        pytest -rP tests -W ignore::DeprecationWarning -W ignore::PendingDeprecationWarning -W ignore::FutureWarning
