@@ -8,7 +8,8 @@ import os
 from Align import *
 # import Functions
 # from Functions import *
-from .functions import *
+from . import functions as fn
+from fn import *
 import re
 import time
 import subprocess
