@@ -2,15 +2,11 @@ name: test_py3
 
 on:
   pull_request:
-    branches:
-      - "*"
     branches-ignore:
       - 'legacy'
   push:
     branches:
       - "master"
-    branches-ignore:
-      - 'legacy'
 
 env:
   cache-version: 'cache-v1'
