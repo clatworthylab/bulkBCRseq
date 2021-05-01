@@ -14,12 +14,16 @@ lib_path = main_path + 'LIBRARY/'
 if not os.path.exists(bin_path):
     bin_path = os.getcwd() + '/BIN/'
     if not os.path.exists(bin_path):
-        raise OSError('Cannot locate path to BIN folder. You are currently in {}'.format(os.getcwd()))
+        raise OSError(
+            'Cannot locate path to BIN folder. You are currently in {}'.format(
+                os.getcwd()))
     sys.path.append(bin_path)
 if not os.path.exists(lib_path):
     lib_path = os.getcwd() + '/LIBRARY/'
     if not os.path.exists(lib_path):
-        raise OSError('Cannot locate path to LIBRARY folder. You are currently in {}'.format(os.getcwd()))
+        raise OSError(
+            'Cannot locate path to LIBRARY folder. You are currently in {}'.
+            format(os.getcwd()))
 
 
 def fasta_iterator(fh1):
@@ -2935,14 +2939,15 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
                         "QUASR_v7.01/qualityControl.jar -f " + reads2 +
                         " -o " + dir + "FASTQ_FILES/Sequences_" + id +
                         "_2 -m " + threshold + " -l " + length)
-            command3 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id + (
-                "_1.qc.fq | ",
-                "perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "
-            ) + dir + "FASTQ_FILES/Sequences_" + id + "_1.fasta")
-            command4 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id + (
-                "_2.qc.fq | ",
-                "perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "
-            ) + dir + "FASTQ_FILES/Sequences_" + id + "_2.fasta")
+            perl_cmd = ("perl -e '$i=0;while(<>)" +
+                        "{if(/^\@/&&$i==0){s/^\@/\>/;print;}" +
+                        "elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > ")
+            command3 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
+                        "_1.qc.fq | " + perl_cmd + dir +
+                        "FASTQ_FILES/Sequences_" + id + "_1.fasta")
+            command4 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
+                        "_2.qc.fq | " + perl_cmd + dir +
+                        "FASTQ_FILES/Sequences_" + id + "_2.fasta")
             print(command1)
             os.system(command1)
             os.system(command2)
