@@ -2885,16 +2885,8 @@ def intialise_files(dir):
         "ORIENTATED_SEQUENCES/NETWORKS/"
     ]
     for d in dirs_to_add:
-        process = subprocess.Popen(['ls', "{}{}".format(dir, d)],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        out, err = process.communicate()
-        c = out.decode('utf-8')
-        if (c.count("No such file or directory") == 1):
-            subprocess.Popen(['mkdir', "{}{}".format(dir, d)],
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-    return ()
+        if not os.path.exists(d):
+            os.makedirs(d)
 
 
 def cram_to_fastq(dir, source, id, pre_QC_bam):
