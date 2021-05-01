@@ -11,15 +11,14 @@ lib_path = main_path + 'LIBRARY/'
 if not os.path.exists(bin_path):
     # bin_path = os.getcwd() + '/BIN/'
     bin_path = '../../BIN/'
-    print(os.getcwd())
     if not os.path.exists(bin_path):
-        raise OSError('Cannot locate path to BIN folder')
+        raise OSError('Cannot locate path to BIN folder. You are currently in {}'.format(os.getcwd()))
     sys.path.append(bin_path)
 if not os.path.exists(lib_path):
     # lib_path = os.getcwd() + '/LIBRARY/'
     lib_path = '../../LIBRARY/'
     if not os.path.exists(lib_path):
-        raise OSError('Cannot locate path to LIBRARY folder')
+        raise OSError('Cannot locate path to LIBRARY folder. You are currently in {}'.format(os.getcwd()))
 
 
 class Tree(defaultdict):
