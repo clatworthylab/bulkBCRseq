@@ -3,10 +3,10 @@ name: test_py2_original
 on:
   pull_request:
     branches:
-      - "*"
+      - "legacy"
   push:
     branches:
-      - "master"
+      - "legacy"
 
 env:
   cache-version: 'cache-v1'
