@@ -10,13 +10,13 @@ bin_path = main_path + 'BIN/'
 lib_path = main_path + 'LIBRARY/'
 if not os.path.exists(bin_path):
     # bin_path = os.getcwd() + '/BIN/'
-    bin_path = '../BIN/'
+    bin_path = '../../BIN/'
     if not os.path.exists(bin_path):
         raise OSError('Cannot locate path to BIN folder')
     sys.path.append(bin_path)
 if not os.path.exists(lib_path):
     # lib_path = os.getcwd() + '/LIBRARY/'
-    lib_path = '../LIBRARY/'
+    lib_path = '../../LIBRARY/'
     if not os.path.exists(lib_path):
         raise OSError('Cannot locate path to LIBRARY folder')
 
