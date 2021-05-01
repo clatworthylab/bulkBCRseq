@@ -2,6 +2,17 @@
 import math
 import sys
 import os
+bin_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/'
+lib_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/'
+if not os.path.exists(bin_path):
+  bin_path = os.getcwd() + '/BIN/'
+if not os.path.exists(bin_path):
+  raise OSError('Cannot locate path to BIN folder')
+if not os.path.exists(lib_path):
+  lib_path = os.getcwd() + '/LIBRARY/'
+if not os.path.exists(lib_path):
+  raise OSError('Cannot locate path to LIBRARY folder')
+sys.path.append(bin_path)
 from collections import defaultdict 
 import numpy
 from numpy import *
@@ -43,7 +54,7 @@ def Deconvolute_same_array (tree):
   return (decon, inv)
 
 def Get_codons ():
-  fh = open("/lustre/scratch108/viruses/rbr1/REFERENCE_FILES/Codon_table2.txt","r")
+  fh = open(lib_path + "Codon_table2.txt","r")
   codon = Tree()
   for l in fh:
     l=l.strip()

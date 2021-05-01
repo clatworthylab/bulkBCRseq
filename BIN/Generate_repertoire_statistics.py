@@ -1,13 +1,24 @@
 #!/usr/bin/env python
 import math
 import sys
+import os
 from collections import defaultdict
-sys.path.append('BIN/')
+# sys.path.append('BIN/')
+bin_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/'
+lib_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/'
+if not os.path.exists(bin_path):
+  bin_path = os.getcwd() + '/BIN/'
+if not os.path.exists(bin_path):
+  raise OSError('Cannot locate path to BIN folder')
+if not os.path.exists(lib_path):
+  lib_path = os.getcwd() + '/LIBRARY/'
+if not os.path.exists(lib_path):
+  raise OSError('Cannot locate path to LIBRARY folder')
+sys.path.append(bin_path)
 import Align
 from Align import *
 import Functions
 from Functions import *
-import os
 import re
 import time
 import commands
@@ -123,7 +134,8 @@ def Blast_match_D(out, refd, tmp_file, seqs,passed, file_D_genes,batch_number):
   fh=open(tmp_file, "w")
   fh.write(out)
   fh.close() 
-  command1 = "/software/pubseq/bin/ncbi_blast/blastall -p blastn -a 1 -d "+refd+" -e 2 -i "+tmp_file+" -o "+tmp_file+"_dblast -b 1 -m 8 -W 4"
+  # command1 = "/software/pubseq/bin/ncbi_blast/blastall -p blastn -a 1 -d "+refd+" -e 2 -i "+tmp_file+" -o "+tmp_file+"_dblast -b 1 -m 8 -W 4"
+  command1 = bin_path+"blastall -p blastn -a 1 -d "+refd+" -e 2 -i "+tmp_file+" -o "+tmp_file+"_dblast -b 1 -m 8 -W 4"
   os.system(command1)
   fh = open(tmp_file+"_dblast","r")
   out=''
@@ -249,8 +261,8 @@ def Blast_match(out, refv,refj, tmp_file, out1,indent,seqs,lengthv,prots,codon,g
   fh=open(tmp_file, "w")
   fh.write(out)
   fh.close()
-  blast = "/software/pubseq/bin/ncbi_blast/blastall"
-  blast = "/usr/bin/blastall"
+  # blast = "/software/pubseq/bin/ncbi_blast/blastall"
+  blast = bin_path+"blastall"
   command1 = blast+" -p blastn -a 10 -d "+refv+" -e 1e-5 -i "+tmp_file+" -o "+tmp_file+"_vblast -b 1 -m 8 -W 10"
   command2 = blast+" -p blastn -a 10 -d "+refj+" -e 10 -i "+tmp_file+" -o "+tmp_file+"_jblast -b 1 -m 8 -W 4"
   os.system(command1)
@@ -384,14 +396,14 @@ def Get_annotation(passesv,passesj, seqs, out_file,lengthj,regions,failed,CDR3_e
 def Get_region_boundaries(species,loc):
   regions={}
   if(species=="HOMO_SAPIENS"):
-    fh=open(loc+"LIBRARY/human.ndm.imgt2","r")
-    J_ref = loc+"LIBRARY/human.ndm.imgt.CDR3.end"
+    fh=open(loc+"human.ndm.imgt2","r")
+    J_ref = loc+"human.ndm.imgt.CDR3.end"
   elif(species=="MUS_MUSCULUS"):
-    fh=open(loc+"LIBRARY/mouse.ndm.imgt","r")
-    J_ref = loc+"LIBRARY/mouse.ndm.imgt.CDR3.end"
+    fh=open(loc+"mouse.ndm.imgt","r")
+    J_ref = loc+"mouse.ndm.imgt.CDR3.end"
   elif(species=="LLAMA_GLAMA"):
-    fh=open(loc+"LIBRARY/llama.ndm.imgt","r")
-    J_ref = loc+"LIBRARY/llama.ndm.imgt.CDR3.end"
+    fh=open(loc+"llama.ndm.imgt","r")
+    J_ref = loc+"llama.ndm.imgt.CDR3.end"
   else:print "Reference kabat not found"
   for l in fh:
     l=l.strip().split()
@@ -938,8 +950,8 @@ def Get_annotation_for_clusters(annot_file, ids):
 def Get_primers_from_reference (gene,species,loc):
   #if(species=="HOMO_SAPIENS"):fh=open(loc+"LIBRARY/Primer_reference_"+species+"_"+gene+"V.txt","r") 
   #if(species=="MUS_MUSCULUS"):fh=open(loc+"LIBRARY/MUS_MUSCULUS_primers.txt","r")
-  if(species=="HOMO_SAPIENS"):fh=open(loc+"LIBRARY/Primers_HOMO_SAPIENS_IG_RBR_Constant_region_MPLX_table.txt", "r")
-  if(species=="MUS_MUSCULUS"):fh=open(loc+"LIBRARY/Primers_MUS_MUSCULUS_IG_RBR_Constant_region_MPLX_table.txt", "r")
+  if(species=="HOMO_SAPIENS"):fh=open(loc+"Primers_HOMO_SAPIENS_IG_RBR_Constant_region_MPLX_table.txt", "r")
+  if(species=="MUS_MUSCULUS"):fh=open(loc+"Primers_MUS_MUSCULUS_IG_RBR_Constant_region_MPLX_table.txt", "r")
   primer_reference={}
   for l in fh:
     if(l[0]!="#"):
@@ -1165,16 +1177,17 @@ pre_seq_file = dir.replace("ANNOTATIONS/","")+"TMP/Trimmed_orientated_all_"+id+"
 subsample_file = dir+"Subsample_file_"+id+".txt"
 overall_clonal_ids_file = dir+"Cluster_information_total_"+id+".txt"
 ########################## Reference files
-loc = "/nfs/users/nfs_k/kt16/BCRSeq/"
-refv = loc+"LIBRARY/Reference_nn_"+species+"_"+gene+"V.fasta"
-refd = loc+"LIBRARY/Reference_nn_"+species+"_"+gene+"D.fasta"
-refj = loc+"LIBRARY/Reference_nn_"+species+"_"+gene+"J.fasta"
-refvp= loc+"LIBRARY/Reference_protein_"+species+"_"+gene+"V.fasta"
-refjp= loc+"LIBRARY/Reference_protein_"+species+"_"+gene+"J.fasta"
-CDR3_end_file = loc+"LIBRARY/CDR3_end_"+species+"_imgt.txt"
-cRSS_file = loc+"LIBRARY/cRSS_IgHV_sequences.txt"
-cRSS_footprint_file = loc+"LIBRARY/cRSS_IGHV_footprint_motifs.txt"
-codon_file = loc+"LIBRARY/Codon_table2.txt"
+# loc = "/nfs/users/nfs_k/kt16/BCRSeq/"
+loc = lib_path
+refv = loc+"Reference_nn_"+species+"_"+gene+"V.fasta"
+refd = loc+"Reference_nn_"+species+"_"+gene+"D.fasta"
+refj = loc+"Reference_nn_"+species+"_"+gene+"J.fasta"
+refvp= loc+"Reference_protein_"+species+"_"+gene+"V.fasta"
+refjp= loc+"Reference_protein_"+species+"_"+gene+"J.fasta"
+CDR3_end_file = loc+"CDR3_end_"+species+"_imgt.txt"
+cRSS_file = loc+"cRSS_IgHV_sequences.txt"
+cRSS_footprint_file = loc+"cRSS_IGHV_footprint_motifs.txt"
+codon_file = loc+"Codon_table2.txt"
 ########################## Get commands
 command = command.split(",")
 

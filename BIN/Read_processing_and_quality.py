@@ -1,15 +1,25 @@
 #!/usr/bin/env python
 import math
 import sys
+import os
 from collections import defaultdict
 # sys.path.append('/lustre/scratch118/infgen/team146/rbr1/BCR_TCR_REPERTOIRE_FILTERING_PIPELINE/BIN/')
 # sys.path.append('/nfs/users/nfs_k/kt16/BCRSeq/BIN/')
-sys.path.append('/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/')
+# sys.path.append('/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/')
+bin_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/'
+lib_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/'
+if not os.path.exists(bin_path):
+  bin_path = os.getcwd() + '/BIN/'
+if not os.path.exists(bin_path):
+  raise OSError('Cannot locate path to BIN folder')
+if not os.path.exists(lib_path):
+  lib_path = os.getcwd() + '/LIBRARY/'
+if not os.path.exists(lib_path):
+  raise OSError('Cannot locate path to LIBRARY folder')
+sys.path.append(bin_path)
 import Functions
 from Functions import *
-import os
 import commands
-import sys
 from operator import itemgetter
 import networkx as nx
 import re
@@ -1563,7 +1573,8 @@ def Get_paired_reads_overlapping(file1, file2, outfile,gene,paired,id,method):
 def Get_codons ():
   # fh = open("/lustre/scratch118/infgen/team146/rbr1/BCR_TCR_REPERTOIRE_FILTERING_PIPELINE/LIBRARY/Codon_table2.txt","r")
   # fh = open("/nfs/users/nfs_k/kt16/BCRSeq/LIBRARY/Codon_table2.txt","r")
-  fh = open("/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/Codon_table2.txt","r")
+  # fh = open("/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/Codon_table2.txt","r")
+  fh = open(lib_path + "Codon_table2.txt","r")
   codon = {}
   for l in fh:
     l=l.strip()
@@ -1631,7 +1642,7 @@ def Blast_match_J_const(out, seqs, Trim1, Trim2, refj,e_value,indent):
   fh=open(Trim1+"_blast_J","w")
   fh.write(out)
   fh.close() 
-  command1 = "blastall -p blastn -a 10 -d "+refj+" -e "+str(e_value)+" -i "+Trim1+"_blast_J -o "+Trim1+"_blast_J_results -b 1 -m 8"
+  command1 = bin_path+"blastall -p blastn -a 10 -d "+refj+" -e "+str(e_value)+" -i "+Trim1+"_blast_J -o "+Trim1+"_blast_J_results -b 1 -m 8"
   commands.getoutput(command1)
   fh = open(Trim1+"_blast_J_results","r")
   out= ''
@@ -1653,7 +1664,7 @@ def Blast_match_J(out, seqs, Trim1, Trim2, refj,e_value):
   fh=open(Trim1+"_blast_J","w")
   fh.write(out)
   fh.close()
-  command1 = "blastall -p blastn -a 10 -d "+refj+" -e "+str(e_value)+" -i "+Trim1+"_blast_J -o "+Trim1+"_blast_J_results -b 1 -m 8 -W 4"
+  command1 = bin_path+"blastall -p blastn -a 10 -d "+refj+" -e "+str(e_value)+" -i "+Trim1+"_blast_J -o "+Trim1+"_blast_J_results -b 1 -m 8 -W 4"
   commands.getoutput(command1)
   fh = open(Trim1+"_blast_J_results","r")
   out,done='',{}
@@ -1672,7 +1683,7 @@ def Blast_match(V_region, ref, tmp_file,v_match):
   fh=open(tmp_file, "w")
   fh.write(V_region)
   fh.close()
-  command1 = "blastall -p blastn -a 10 -d "+ref+" -e 1 -i "+tmp_file+" -o "+tmp_file+"_blast -b 1 -m 8"
+  command1 = bin_path+"blastall -p blastn -a 10 -d "+ref+" -e 1 -i "+tmp_file+" -o "+tmp_file+"_blast -b 1 -m 8"
   commands.getoutput(command1)
   fh = open(tmp_file+"_blast","r")
   passes={}
@@ -1973,7 +1984,8 @@ def Get_read_report1(Seq_file1, Seq_file2, Tmp_file, Trim1, nn_orf_filtered,filt
 def Cluster_i (Reduced_file,tmp_file,diff):
   # cd_hit_directory = "/lustre/scratch118/infgen/team146/rbr1/BCR_TCR_REPERTOIRE_FILTERING_PIPELINE/BIN/cd-hit-v6.5.7-2011-12-16/"
   # cd_hit_directory = "/nfs/users/nfs_k/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
-  cd_hit_directory = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
+  # cd_hit_directory = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
+  cd_hit_directory = bin_path + "cd-hit-v4.5.7-2011-12-16/"
   command= cd_hit_directory+"cd-hit -i "+Reduced_file+" -o "+tmp_file+" -c "+str(diff)+" -d 180 -T 10  -M 0 -AL 40 "
   os.system(command)
   return()
@@ -2695,7 +2707,7 @@ def BAM_to_FASTQ(dir, source, id):
     if(source.count("cram")!=0):
       CRAM_to_FASTQ(dir, source, id,pre_QC_bam)
       source = pre_QC_bam
-    command1 = "BIN/bam2fastq-1.1.0/bam2fastq --force -o "+pre_QC_fastq+" "+source
+    command1 = bin_path+"bam2fastq-1.1.0/bam2fastq --force -o "+pre_QC_fastq+" "+source
     os.system(command1)
   return()
 
@@ -2708,8 +2720,10 @@ def QC_samples(dir,gene,id,source,length,species,barcode_group):
     print reads2
     if(1==1):
       threshold,length = "32","100"
-      command1 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads1 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_1 -m "+threshold+" -l "+length
-      command2 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads2 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_2 -m "+threshold+" -l "+length
+      # command1 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads1 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_1 -m "+threshold+" -l "+length
+      # command2 = "java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f "+reads2 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_2 -m "+threshold+" -l "+length
+      command1 = "java -jar "+bin_path+"QUASR_v7.01/qualityControl.jar -f "+reads1 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_1 -m "+threshold+" -l "+length
+      command2 = "java -jar "+bin_path+"QUASR_v7.01/qualityControl.jar -f "+reads2 +" -o "+dir+"FASTQ_FILES/Sequences_"+id+"_2 -m "+threshold+" -l "+length
       command3 = "cat "+dir+"FASTQ_FILES/Sequences_"+id+"_1.qc.fq | perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "+dir+"FASTQ_FILES/Sequences_"+id+"_1.fasta"
       command4 = "cat "+dir+"FASTQ_FILES/Sequences_"+id+"_2.qc.fq | perl -e '$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "+dir+"FASTQ_FILES/Sequences_"+id+"_2.fasta"
       print command1

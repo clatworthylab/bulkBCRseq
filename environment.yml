@@ -1,0 +1,14 @@
+name: bulkBCRseq
+channels:
+- conda-forge
+- bioconda
+- anaconda
+- defaults
+dependencies:
+- numpy
+- networkx
+- pip
+- pytest
+- blast
+- mafft
+- samtools
