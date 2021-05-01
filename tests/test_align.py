@@ -2,12 +2,12 @@
 # @Author: Kelvin
 # @Date:   2021-04-30 16:30:55
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-04-30 16:50:32
+# @Last Modified time: 2021-05-01 01:23:55
 
 import os
 import sys
 import string
-from BIN._functions.align import Alignment
+from align import Alignment
 
 import pytest
 
