@@ -366,7 +366,7 @@ def check_barcode_malbac(bc, tag):
     return (passes)
 
 
-def trim_sequences_bcr_tcr(Tmp_file, Fail_file, Output_trim, gene, paired,
+def trim_sequences_bcr_tcr(tmp_Tmp_file, Fail_file, Output_trim, gene, paired,
                            species, primer_file, primer_tag_file, tmp_file,
                            primer_tag_file_count, sample, ref_const,
                            reverse_primer_group):
@@ -382,7 +382,7 @@ def trim_sequences_bcr_tcr(Tmp_file, Fail_file, Output_trim, gene, paired,
         inside = 1
         print("J barcoded")
         single_j_barcoded_trimming_clustered(
-            forward, reverse, barcoded_j, barcoded_v, rc, Tmp_file, Fail_file,
+            forward, reverse, barcoded_j, barcoded_v, rc, tmp_Tmp_file, Fail_file,
             Output_trim, primer_tag_file, tmp_file, gene, paired, species,
             primer_file, primer_tag_file_count, threshold_barcode, ref_const,
             inside, v_ref)
@@ -573,11 +573,11 @@ def assess_gene_score(consensus, word_dict, threshold):
 
 
 def single_j_barcoded_trimming_clustered(
-        forward, reverse, barcoded_j, barcoded_v, rc, Tmp_file, Fail_file,
+        forward, reverse, barcoded_j, barcoded_v, rc, tmp_Tmp_file, Fail_file,
         Output_trim, primer_tag_file, tmp_file, gene, paired, species,
         primer_file, primer_tag_file_count, threshold_barcode, ref_const,
         inside, v_ref):
-    read_untrimmed_file_single(rc, Tmp_file, Fail_file, Output_trim, gene,
+    read_untrimmed_file_single(rc, tmp_Tmp_file, Fail_file, Output_trim, gene,
                                paired, species, primer_file, primer_tag_file,
                                tmp_file, primer_tag_file_count, forward,
                                reverse, v_ref)
@@ -783,14 +783,14 @@ def get_consensus_sequence_large(out_cluster, Fail_file, l1, ids, sum_u_freq,
     return (consensus, pass_consensus)
 
 
-def read_untrimmed_file_single(rc, Tmp_file, Fail_file, Output_trim, gene,
+def read_untrimmed_file_single(rc, tmp_Tmp_file, Fail_file, Output_trim, gene,
                                paired, species, primer_file, primer_tag_file,
                                tmp_file, primer_tag_file_count, forward,
                                reverse, v_ref):
     for f in [primer_tag_file_count]:
         fh = open(f, "w")
         fh.close()
-    fh = open(Tmp_file, "r")
+    fh = open(tmp_Tmp_file, "r")
     # seqs = Tree()
     minl, maxl = 110, 1000000
     if (gene == "HEAVY" or gene == "IGH"):
@@ -948,7 +948,7 @@ def read_untrimmed_file_single(rc, Tmp_file, Fail_file, Output_trim, gene,
     return ()
 
 
-def read_untrimmed_file(Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
+def read_untrimmed_file(tmp_Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
                         maxl, minl, js, vs, V_primer, V1, V2,
                         primer_tag_file_count, Fail_file, vidprimer, jidprimer,
                         inside, ref_const, universal_rev, reverse_primer_group,
@@ -992,7 +992,7 @@ def read_untrimmed_file(Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
     t, seqs1, total, ind, out = 0, Tree(
     ), 0, 0, "#ID\tJ_tag\tV_tag\tSequence\n"
     J_found, v_found = 0, 0
-    fh = open(Tmp_file, "r")
+    fh = open(tmp_Tmp_file, "r")
     for header, seq in fasta_iterator(fh):
         seq = seq.upper()
         seqs1[seq][header].value = 1
@@ -1286,7 +1286,7 @@ def get_mismatches_from_consensus(a, b):
 
 
 def read_untrimmed_file_double1(regions_J, J_primer, J1, J2, regions_V,
-                                V_primer, V1, V2, rc, Tmp_file, Fail_file,
+                                V_primer, V1, V2, rc, tmp_Tmp_file, Fail_file,
                                 Output_trim, gene, paired, species,
                                 primer_file, primer_tag_file, tmp_file, sample,
                                 J_primerfull, V_primerfull,
@@ -1294,7 +1294,7 @@ def read_untrimmed_file_double1(regions_J, J_primer, J1, J2, regions_V,
     for f in [primer_tag_file_count]:
         fh = open(f, "w")
         fh.close()
-    fh = open(Tmp_file, "r")
+    fh = open(tmp_Tmp_file, "r")
     (js, vs) = (len(J_primer), len(V_primer))
     # seqs = Tree()
     # (found, lost, total, ind, indf, indp, indw, indfw, fail, out, out1, out2,
@@ -2056,7 +2056,7 @@ def count_barcodes(primer_tag_file):
     return (n_barcodes, uniq_sequences, total_sequences_included_before_bc)
 
 
-def get_read_report(Seq_file1, Seq_file2, Tmp_file, trim1, nn_orf_filtered,
+def get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
                     filtering_report, id, species, gene, dir,
                     primer_tag_file_count, primer_file, method, barcode_group):
     if (method == "Multiplex_FORWARD_BARCODE_GROUPED"):
@@ -2068,7 +2068,7 @@ def get_read_report(Seq_file1, Seq_file2, Tmp_file, trim1, nn_orf_filtered,
     if (barcoded_j + barcoded_v == 0):
         raw1, raw2, joined, gene_matching = get_number_sequences(
             Seq_file1), get_number_sequences(Seq_file2), get_number_sequences(
-                Tmp_file), get_reduced_number_sequences_multi_constants(trim1)
+                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(trim1)
         orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
         number_unique_seqs = get_number_sequences(nn_orf_filtered)
         out = (
@@ -2086,7 +2086,7 @@ def get_read_report(Seq_file1, Seq_file2, Tmp_file, trim1, nn_orf_filtered,
         print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
         raw1, raw2, joined, gene_matching = get_number_sequences(
             Seq_file1), get_number_sequences(Seq_file2), get_number_sequences(
-                Tmp_file), get_reduced_number_sequences_multi_constants(trim1)
+                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(trim1)
         # count_bc_found, count_uniq_bcs = -1, -1
         orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
         number_unique_seqs = get_number_sequences(nn_orf_filtered)
@@ -2109,10 +2109,10 @@ def get_read_report(Seq_file1, Seq_file2, Tmp_file, trim1, nn_orf_filtered,
     return ()
 
 
-def get_read_report1(Seq_file1, Seq_file2, Tmp_file, trim1, nn_orf_filtered,
+def get_read_report1(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
                      filtering_report, id, species, gene, dir, trim2):
     raw1, raw2, joined = get_number_sequences(Seq_file1), get_number_sequences(
-        Seq_file2), get_number_sequences(Tmp_file)
+        Seq_file2), get_number_sequences(tmp_Tmp_file)
     primer_matching, orf = get_reduced_number_sequences(
         trim1), get_reduced_number_sequences(nn_orf_filtered)
     Jgene_filtered = get_reduced_number_sequences(trim2)
@@ -2969,7 +2969,7 @@ print("Reverse primer group: ", reverse_primer_group)
 # Files for QC and filtering
 Seq_file1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fasta"
 Seq_file2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fasta"
-Tmp_file = dir + "ORIENTATED_SEQUENCES/TMP/Untrimmed_" + id + ".fasta"
+tmp_Tmp_file = dir + "ORIENTATED_SEQUENCES/TMP/Untrimmed_" + id + ".fasta"
 trim1 = dir + "ORIENTATED_SEQUENCES/TMP/trimmed_orientated_all_" + id + ".fasta"
 trim2 = dir + "ORIENTATED_SEQUENCES/TMP/Filtered_J_" + id + ".fasta"
 trim3 = dir + "ORIENTATED_SEQUENCES/TMP/Filtered_reduced_" + id + ".fasta"
@@ -3019,9 +3019,9 @@ if (command_source.count("1") != 0):
 # Filtering and processing reads
 if (command_source.count("2") != 0):
     if (gene.count("IG") != 0):
-        get_paired_reads_overlapping(Seq_file1, Seq_file2, Tmp_file, gene,
+        get_paired_reads_overlapping(Seq_file1, Seq_file2, tmp_Tmp_file, gene,
                                      paired, id, method)
-        trim_sequences_bcr_tcr(Tmp_file, Fail_file, trim1, gene, paired,
+        trim_sequences_bcr_tcr(tmp_Tmp_file, Fail_file, trim1, gene, paired,
                                species, primer_file, primer_tag_file, tmp_file,
                                primer_tag_file_count, id, ref_const,
                                reverse_primer_group)
@@ -3030,7 +3030,7 @@ if (command_source.count("2") != 0):
         reduce_sequences(trim2, trim3, primer_file)
         orf_calculation_single(trim3, Filtered_out1, nn_orf_filtered, dir,
                                gene, refv, refj, refvp, refjp, tmp_file_orf)
-        get_read_report(Seq_file1, Seq_file2, Tmp_file, trim1, nn_orf_filtered,
+        get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
                         filtering_report, id, species, gene, dir,
                         primer_tag_file_count, primer_file, method,
                         barcode_group)
