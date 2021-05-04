@@ -2,41 +2,38 @@
 # @Author: Kelvin
 # @Date:   2021-04-30 16:27:57
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-04-30 16:51:00
+# @Last Modified time: 2021-05-04 12:22:28
 
 
 class Script:
-    k = 100
     """Operations transferring one list in another."""
 
     def __init__(self, g=1.5, h=1.0):
         self.s = []
         self.g = g
         self.h = h
-        # print
         self.ps("")
-        # pass
 
     def __str__(self):
-        """Temp."""
+        """Print s."""
         return str(self.s)
 
     def __getitem__(self, n):
-        """Temp."""
+        """Print  s[n]."""
         return self.s[n]
 
     def __len__(self):
-        """Temp."""
+        """Print len(s)."""
         return len(self.s)
 
-    def weight(self, x, y):
+    def weight(self, x, y, matrix):
         # atomic comparison function
         if x == y:
             return 0
         else:
             return 1
 
-    def gap_cost(self, k):
+    def gapCost(self, k):
         # k-symbol insert/delete cost
         # return self.g + self.h * k
         if k <= 0:
@@ -45,10 +42,8 @@ class Script:
             return self.g + self.h * k
 
     def delete(self, k):
-        # append "delete k" op
         S = self.s
         if len(S) > 0 and S[-1] != 0:
-            # if len(S) > 0 and S[-1] < 0:
             S[-1] = S[-1] - k
             self.ps("del.if " + str(k))
         else:
@@ -56,16 +51,7 @@ class Script:
             self.ps("del.else " + str(k))
 
     def insert(self, k):
-        # append "insert k" op
         S = self.s
-
-        #   if S[-1] < 0:
-        #       S[-1] = k
-        #       self.ps("ins.if " + str(k))
-        #   else:
-        #       S.append(k)
-        #       self.ps("ins.else " + str(k))
-
         try:
             if S[-1] < 0:
                 S[-1] = k
@@ -78,23 +64,19 @@ class Script:
             self.ps("ins.exc " + str(k))
 
     def replace(self):
-        # append "replace" op
         S = self.s
         S.append(0)
         self.ps("rep")
 
     def ps(self, note):
-        # print script
-        # S = self.s
-        # print "... %-10s %s" % (note, S)
         pass
 
 
 class Alignment:
-    def __init__(self, gap_symbol=None):
-        self.GapSymbol = gap_symbol
+    def __init__(self):
+        pass
 
-    def diff(self, A, B, M, N, S, tb, te, g, h):
+    def diff(self, A, B, M, N, S, tb, te, g, h, matrix):
         # returns the cost of an optimum
         # conversion between A[1..M] and B[1..N]
         # that begins (ends) with a delete
@@ -102,7 +84,6 @@ class Alignment:
         # such a conversion to the current script
 
         # variable setup
-
         N1 = N + 1
         CC = [0] * N1
         DD = [0] * N1
@@ -116,23 +97,23 @@ class Alignment:
 
         if N <= 0 and M > 0:
             S.delete(M)
-            return S.gap_cost(M)
+            return S.gapCost(M)
 
         if M <= 1:
             if M <= 0:
                 S.insert(N)
-                return S.gap_cost(N)
+                return S.gapCost(N)
 
             if tb > te:
                 tb = te
 
-            midc = (tb + h) + S.gap_cost(N)
+            midc = (tb + h) + S.gapCost(N)
             midj = 0
 
             for j in range(N + 1):
-                c = S.gap_cost(j - 1)
-                c = c + S.weight(A[1], B[j])
-                c = c + S.gap_cost(N - j)
+                c = S.gapCost(j - 1)
+                c = c + S.weight(A[1], B[j], matrix)
+                c = c + S.gapCost(N - j)
                 if c < midc:
                     midc = c
                     midj = j
@@ -154,8 +135,7 @@ class Alignment:
 
         # Forward phase:
         # Compute C(M/2,k) & D(M/2,k) for all k
-
-        midi = M / 2
+        midi = int(M / 2)
         CC[0] = 0.0
         t = g
         for j in range(1, N + 1):
@@ -181,7 +161,7 @@ class Alignment:
                 if c < d:
                     d = c
 
-                c = s + S.weight(A[i], B[j])
+                c = s + S.weight(A[i], B[j], matrix)
 
                 if e < c:
                     c = e
@@ -221,7 +201,7 @@ class Alignment:
                 if c < d:
                     d = c
 
-                c = s + S.weight(A[i + 1], B[j + 1])
+                c = s + S.weight(A[i + 1], B[j + 1], matrix)
 
                 if e < c:
                     c = e
@@ -234,8 +214,6 @@ class Alignment:
 
         SS[N] = RR[N]
 
-        # find optimal midpoint
-
         midc = CC[0] + RR[0]
         midj = 0
         type = 1
@@ -243,8 +221,8 @@ class Alignment:
             c = CC[j] + RR[j]
             if c <= midc:
                 if c < midc \
-                   or CC[j] != DD[j] \
-                   and RR[j] == SS[j]:
+                        or CC[j] != DD[j] \
+                        and RR[j] == SS[j]:
                     midc = c
                     midj = j
 
@@ -256,44 +234,43 @@ class Alignment:
                 type = 2
 
         # conquer: recursively around midpoint
-
         if type == 1:
-            self.diff(A, B, midi, midj, S, tb, g, g, h)
-            self.diff(A[midi:], B[midj:], M - midi, N - midj, S, g, te, g, h)
+            self.diff(A, B, midi, midj, S, tb, g, g, h, matrix)
+            self.diff(A[midi:], B[midj:], M - midi, N - midj, S, g, te, g, h,
+                      matrix)
         else:
-            self.diff(A, B, midi - 1, midj, S, tb, 0.0, g, h)
+            self.diff(A, B, midi - 1, midj, S, tb, 0.0, g, h, matrix)
             S.delete(2)
             self.diff(A[midi + 1:], B[midj:], M - midi - 1, N - midj, S, 0.0,
-                      te, g, h)
+                      te, g, h, matrix)
 
         # return the cost
-
         return midc
 
-    def do_align(self, A, B, S):
+    def do_align(self, A, B, S, GapSymbol=None):
         x, y = [], []
         # i, j, k, op = 0, 0, 0, 0
         i, j, k = 0, 0, 0
 
         for k in range(len(S)):
-            s = S[k]
+            s = int(S[k])
             if s == 0:
                 if (i < len(A) and j < len(B)):
                     a, i = A[i], i + 1
                     b, j = B[j], j + 1
-                    if a == b:
-                        x.append(a)
-                        y.append(b)
-                    else:
-                        x.append(a)
-                        y.append(b)
+                if a == b:
+                    x.append(a)
+                    y.append(b)
+                else:
+                    x.append(a)
+                    y.append(b)
             elif s < 0:
-                y = y + [self.GapSymbol] * (-s)
+                y = y + [GapSymbol] * (-s)
                 for q in range(i, i - s):
                     x.append(A[q])
                 i = i - s
             elif s > 0:
-                x = x + [self.GapSymbol] * (s)
+                x = x + [GapSymbol] * (s)
                 for q in range(j, j + s):
                     if (q < len(B)):
                         y.append(B[q])
@@ -303,7 +280,7 @@ class Alignment:
 
         return x, y
 
-    def align(self, A, B):
+    def align(self, A, B, matrix):
         # interface and top level of comparator
 
         if len(A) == len(B) == 0:
@@ -323,7 +300,7 @@ class Alignment:
         N = len(B) - 1
 
         # Call recursive function.
-        c = self.diff(A, B, M, N, S, G, G, G, H)
+        c = self.diff(A, B, M, N, S, G, G, G, H, matrix)
 
         # Removing dummy elements again.
         del A[0]
@@ -335,7 +312,7 @@ class Alignment:
 
         return c, x, y, S
 
-    def partition(self, x, y):
+    def partition(self, x, y, GapSymbol=None):
         # assert len(x) == len(y)
         left, both, right = [], [], []
 
@@ -344,13 +321,13 @@ class Alignment:
             if X == Y:
                 both.append(X)
                 continue
-            if self.GapSymbol not in (X, Y):
+            if GapSymbol not in (X, Y):
                 left.append(X)
                 right.append(Y)
             else:
-                if X == self.GapSymbol:
+                if X == GapSymbol:
                     right.append(Y)
-                elif Y == self.GapSymbol:
+                elif Y == GapSymbol:
                     left.append(X)
 
         return left, both, right

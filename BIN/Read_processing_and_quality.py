@@ -89,11 +89,8 @@ def reduce_sequences(trim2, trim3, primer_file):
                 out, ind = '', 0
         write_out(out, trim3)
     else:
-        command1 = ["cp", trim2, trim3]
-        subprocess.Popen(command1,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
-    return ()
+        command1 = "cp {} {}".format(trim2, trim3)
+        os.system(command1)
 
 
 def get_match(primer, seq):
@@ -1416,8 +1413,8 @@ def read_untrimmed_file_double1(regions_J, J_primer, J1, J2, regions_V,
 
 
 def get_sequences(file):
-    command = ["gunzip", file]
-    subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    command = "gunzip {}".format(file)
+    os.system(command)
     fh = open(file, "r")
     seqs = {}
     for header, sequence in fasta_iterator(fh):
@@ -1717,13 +1714,11 @@ def blast_match_j_const(out, seqs, trim1, trim2, refj, e_value, indent):
     fh = open(trim1 + "_blast_J", "w")
     fh.write(out)
     fh.close()
-    command1 = [
-        bin_path, 'blastall', '-p', 'blastn', '-a', '10', '-d',
-        '{}'.format(refj), '-e', '{}'.format(str(e_value)), '-i',
-        '{}_blast_J'.format(trim1), '-o', '{}_blast_J_results'.format(trim1),
-        '-b', '1', '-m', '8'
-    ]
-    subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    command1 = (bin_path + 'blastall -p blastn -a 10 -d {}'.format(refj) +
+                ' -e {}'.format(str(e_value)) +
+                ' -i {}_blast_J'.format(trim1) +
+                ' -o {}_blast_J_results'.format(trim1) + ' -b 1 -m 8')
+    os.system(command1)
     fh = open(trim1 + "_blast_J_results", "r")
     out = ''
     for l in fh:
@@ -1746,10 +1741,11 @@ def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
     fh = open(trim1 + "_blast_J", "w")
     fh.write(out)
     fh.close()
-    command1 = bin_path + "blastall -p blastn -a 10 -d " + refj + " -e " + str(
-        e_value
-    ) + " -i " + trim1 + "_blast_J -o " + trim1 + "_blast_J_results -b 1 -m 8 -W 4"
-    subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    command1 = (bin_path + "blastall -p blastn -a 10 -d {}".format(refj) +
+                " -e {}".format(str(e_value)) +
+                " -i {}_blast_J".format(trim1) +
+                " -o {}_blast_J_results".format(trim1) + " -b 1 -m 8 -W 4")
+    os.system(command1)
     fh = open(trim1 + "_blast_J_results", "r")
     out, done = '', {}
     for l in fh:
@@ -1773,7 +1769,7 @@ def blast_match(V_region, ref, tmp_file, v_match):
         "{}".format(ref), '-e', '1', '-i', "{}".format(tmp_file), '-o',
         '{}_blast'.format(tmp_file), '-b', '1', '-m', '8'
     ]
-    subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    os.system(command1)
     fh = open(tmp_file + "_blast", "r")
     passes = {}
     for l in fh:
@@ -2137,10 +2133,10 @@ def cluster_i(Reduced_file, tmp_file, diff):
     # cd_hit_directory = "/nfs/users/nfs_k/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
     # cd_hit_directory = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
     cd_hit_directory = bin_path + "cd-hit-v4.5.7-2011-12-16/"
-    command = cd_hit_directory + "cd-hit -i " + Reduced_file + " -o " + tmp_file + " -c " + str(
-        diff) + " -d 180 -T 10  -M 0 -AL 40 "
+    command = (cd_hit_directory + "cd-hit -i {}".format(Reduced_file) +
+               " -o {}".format(tmp_file) + " -c {}".format(str(diff)) +
+               " -d 180 -T 10  -M 0 -AL 40 ")
     os.system(command)
-    return ()
 
 
 def get_seqs_single(file):
@@ -2884,10 +2880,9 @@ def intialise_files(dir):
 
 
 def cram_to_fastq(dir, source, id, pre_QC_bam):
-    command0 = "samtools view -b -o " + pre_QC_bam + " " + source
+    command0 = ("samtools view -b -o {} {}".format(pre_QC_bam, source))
     print(command0)
     os.system(command0)
-    return ()
 
 
 def bam_to_fastq(dir, source, id):
@@ -2897,9 +2892,10 @@ def bam_to_fastq(dir, source, id):
         if (source.count("cram") != 0):
             cram_to_fastq(dir, source, id, pre_QC_bam)
             source = pre_QC_bam
-        command1 = bin_path + "bam2fastq-1.1.0/bam2fastq --force -o " + pre_QC_fastq + " " + source
+        command1 = (bin_path +
+                    "bam2fastq-1.1.0/bam2fastq --force -o {} {}".format(
+                        pre_QC_fastq, source))
         os.system(command1)
-    return ()
 
 
 def qc_samples(dir, gene, id, source, length, species, barcode_group):
@@ -2917,24 +2913,22 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
             # command2 = ("java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f " +
             #             reads2 + " -o " + dir + "FASTQ_FILES/Sequences_" + id +
             #             "_2 -m " + threshold + " -l " + length)
-            command1 = ("java -jar " + bin_path +
-                        "QUASR_v7.01/qualityControl.jar -f " + reads1 +
-                        " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_1 -m " + threshold + " -l " + length)
-            command2 = ("java -jar " + bin_path +
-                        "QUASR_v7.01/qualityControl.jar -f " + reads2 +
-                        " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_2 -m " + threshold + " -l " + length)
+            out_path_ = "{}{}".format(dir, pre)
+            command1 = (
+                "java -jar {}QUASR_v7.01/qualityControl.jar".format(bin_path) +
+                " -f {}".format(reads1) + " -o {}_1".format(out_path_) +
+                " -m {}".format(threshold) + " -l {}".format(length))
+            command2 = (
+                "java -jar {}QUASR_v7.01/qualityControl.jar".format(bin_path) +
+                " -f {}".format(reads2) + " -o {}_1".format(out_path_) +
+                " -m {}".format(threshold) + " -l {}".format(length))
             perl_cmd = ("perl -e '$i=0;while(<>)" +
                         "{if(/^\@/&&$i==0){s/^\@/\>/;print;}" +
                         "elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > ")
-            command3 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_1.qc.fq | " + perl_cmd + dir +
-                        "FASTQ_FILES/Sequences_" + id + "_1.fasta")
-            command4 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_2.qc.fq | " + perl_cmd + dir +
-                        "FASTQ_FILES/Sequences_" + id + "_2.fasta")
-            print(command1)
+            command3 = ("cat {}_1.qc.fq | ".format(out_path_) +
+                        "{}{}_1.fasta".format(perl_cmd, out_path_))
+            command4 = ("cat {}_2.qc.fq | ".format(out_path_) +
+                        "{}{}_2.fasta".format(perl_cmd, out_path_))
             os.system(command1)
             os.system(command2)
             os.system(command3)
