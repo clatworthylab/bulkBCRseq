@@ -591,7 +591,7 @@ def single_j_barcoded_trimming_clustered(
 def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Fail_file,
                           Output_trim, threshold):
     header_txt = (
-        '#ID\tnumber_of_reads\ttotal_reads_with_BC\tJ_barcode\tV_barcode\t'+
+        '#ID\tnumber_of_reads\ttotal_reads_with_BC\tJ_barcode\tV_barcode\t' +
         'bp_mismatches_to_consensus\tBC_accepted\tconsensus\tsequence\n')
     outs = ['', header_txt]
     files = [Output_trim, primer_tag_file]
