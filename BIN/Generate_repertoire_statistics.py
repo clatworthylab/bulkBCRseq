@@ -1140,6 +1140,7 @@ def Get_annotation_for_clusters(annot_file, ids):
                 c = ids[ids_find[l[0].split("__")[0]]]
                 if (len(l) >= 14):
                     # v, j = l[1], l[13]
+                    j = l[13]
                     if (j.count("J") == 0):
                         print(l)
                     vj = l[1] + "\t" + l[13]
