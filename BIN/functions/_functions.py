@@ -148,3 +148,13 @@ def do_align(a, b):
     A = Alignment()
     c, x, y, s = A.align(a, b)
     return (x, y)
+
+
+def translate(seq, codon):
+    p_seq = ""
+    for cod in range(0, int(len(seq) / 3 - 1)):
+        cod = cod * 3
+        c1 = seq[cod + 0] + seq[cod + 1] + seq[cod + 2]
+        if (c1 in codon):
+            p_seq = p_seq + str(codon[c1])
+    return (p_seq)
