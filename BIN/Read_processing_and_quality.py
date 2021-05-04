@@ -1629,16 +1629,6 @@ def get_paired_reads_overlapping(file1, file2, outfile, gene, paired, id,
     return ()
 
 
-def translate(seq, codon):
-    p_seq = ""
-    for cod in range(0, int(len(seq) / 3 - 1)):
-        cod = cod * 3
-        c1 = seq[cod + 0] + seq[cod + 1] + seq[cod + 2]
-        if (c1 in codon):
-            p_seq = p_seq + str(codon[c1])
-    return (p_seq)
-
-
 def calculate_orf_length(codon, sequence, type, gene, read):
     three_frames = [sequence[i:] for i in range(3)]
     three_frames_translated = [
