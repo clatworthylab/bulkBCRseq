@@ -96,11 +96,11 @@ class Script:
 
         try: 
             if S[-1] < 0:
-            S[-1] = k
-            self.ps("ins.if " + str(k))
+                S[-1] = k
+                self.ps("ins.if " + str(k))
             else: 
-            S.append(k)
-            self.ps("ins.if " + str(k))
+                S.append(k)
+                self.ps("ins.if " + str(k))
         except IndexError:
             S.append(k)
             self.ps("ins.exc " + str(k))
@@ -146,33 +146,33 @@ class Alignment:
 
         if N <= 0 and M > 0: 
             S.delete(M)
-            return S.gapCost(M)
+        return S.gapCost(M)
 
         if M <= 1:
             if M <= 0:
-            S.insert(N)
+                S.insert(N)
             return S.gapCost(N)
 
             if tb > te:
-            tb = te
+                tb = te
 
             midc = (tb + h) + S.gapCost(N)
             midj = 0
 
             for j in range(N + 1):
-            c = S.gapCost(j - 1)
-            c = c + S.weight(A[1], B[j])
-            c = c + S.gapCost(N - j)
-            if c < midc:
-                midc = c
-                midj = j
+                c = S.gapCost(j - 1)
+                c = c + S.weight(A[1], B[j])
+                c = c + S.gapCost(N - j)
+                if c < midc:
+                    midc = c
+                    midj = j
 
             if midj == 0:
-            S.insert(N) 
-            S.delete(1)
+                S.insert(N) 
+                S.delete(1)
             else:
-            if midj > 1: 
-                S.insert(midj - 1)
+                if midj > 1: 
+                    S.insert(midj - 1)
             S.replace()
             if midj < N:
                 S.insert(N - midj)
