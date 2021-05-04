@@ -2912,23 +2912,24 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
             #             "_1 -m " + threshold + " -l " + length)
             # command2 = ("java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f " +
             #             reads2 + " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-            #             "_2 -m " + threshold + " -l " + length)
-            out_path_ = "{}{}".format(dir, pre)
-            command1 = (
-                "java -jar {}QUASR_v7.01/qualityControl.jar".format(bin_path) +
-                " -f {}".format(reads1) + " -o {}_1".format(out_path_) +
-                " -m {}".format(threshold) + " -l {}".format(length))
-            command2 = (
-                "java -jar {}QUASR_v7.01/qualityControl.jar".format(bin_path) +
-                " -f {}".format(reads2) + " -o {}_1".format(out_path_) +
-                " -m {}".format(threshold) + " -l {}".format(length))
+            #             "_2 -m " + threshold + " -l " + length)            
+            command1 = ("java -jar " + bin_path +
+                        "QUASR_v7.01/qualityControl.jar -f " + reads1 +
+                        " -o " + dir + "FASTQ_FILES/Sequences_" + id +
+                        "_1 -m " + threshold + " -l " + length)
+            command2 = ("java -jar " + bin_path +
+                        "QUASR_v7.01/qualityControl.jar -f " + reads2 +
+                        " -o " + dir + "FASTQ_FILES/Sequences_" + id +
+                        "_2 -m " + threshold + " -l " + length)
             perl_cmd = ("perl -e '$i=0;while(<>)" +
                         "{if(/^\@/&&$i==0){s/^\@/\>/;print;}" +
                         "elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > ")
-            command3 = ("cat {}_1.qc.fq | ".format(out_path_) +
-                        "{}{}_1.fasta".format(perl_cmd, out_path_))
-            command4 = ("cat {}_2.qc.fq | ".format(out_path_) +
-                        "{}{}_2.fasta".format(perl_cmd, out_path_))
+            command3 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
+                        "_1.qc.fq | " + perl_cmd + dir +
+                        "FASTQ_FILES/Sequences_" + id + "_1.fasta")
+            command4 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
+                        "_2.qc.fq | " + perl_cmd + dir +
+                        "FASTQ_FILES/Sequences_" + id + "_2.fasta")
             os.system(command1)
             os.system(command2)
             os.system(command3)
