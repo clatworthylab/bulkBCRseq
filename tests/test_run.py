@@ -2,7 +2,7 @@
 # @Author: Kelvin
 # @Date:   2021-04-29 20:57:15
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-04-30 16:31:52
+# @Last Modified time: 2021-05-04 09:59:21
 
 import os
 from subprocess import call
@@ -54,6 +54,8 @@ class Tester:
         for f in self.sub:
             cmd2 = ['ls', self.base + f]
             call(cmd2)
+        cmd3 = ['head tests/output/ORIENTATED_SEQUENCES/NETWORKS/NN_Tmp_cluster_test1.txt']
+        call(cmd3)
 
 
 @pytest.fixture
