@@ -405,7 +405,7 @@ def Get_codons(codon_file):
 
 def Translate(seq, codon):
     p_seq = ""
-    for cod in range(0, len(seq) / 3 - 1):
+    for cod in range(0, int(len(seq) / 3 - 1)):
         cod = cod * 3
         for c in codon[seq[cod + 0]][seq[cod + 1]][seq[cod + 2]]:
             p_seq = p_seq + str(c)
