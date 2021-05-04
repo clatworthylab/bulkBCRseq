@@ -249,7 +249,7 @@ def Locate_CDR3_start_site_IGH(CDR3_prot, seq, shift, codon, cdr3_ends,
                                   CDR3_prot).group(0)) - cdr3_ends_near[trial]
                     CDR3_prot_trim = CDR3_prot[0:ind]
                     if (len(CDR3_prot_trim) > 0):
-                        if (len(options) < CDR3_prot_trim):
+                        if ((type(len(options)) is int) & (type(CDR3_prot_trim) is str)):
                             options = CDR3_prot_trim
                 if (len(options) > 0):
                     CDR3_prot_trim = options
