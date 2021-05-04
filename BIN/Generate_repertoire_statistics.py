@@ -27,12 +27,16 @@ lib_path = main_path + 'LIBRARY/'
 if not os.path.exists(bin_path):
     bin_path = os.getcwd() + '/BIN/'
     if not os.path.exists(bin_path):
-        raise OSError('Cannot locate path to BIN folder. You are currently in {}'.format(os.getcwd()))
+        raise OSError(
+            'Cannot locate path to BIN folder. You are currently in {}'.format(
+                os.getcwd()))
     sys.path.append(bin_path)
 if not os.path.exists(lib_path):
     lib_path = os.getcwd() + '/LIBRARY/'
     if not os.path.exists(lib_path):
-        raise OSError('Cannot locate path to LIBRARY folder. You are currently in {}'.format(os.getcwd()))
+        raise OSError(
+            'Cannot locate path to LIBRARY folder. You are currently in {}'.
+            format(os.getcwd()))
 
 
 def Reduce(seq):
@@ -585,7 +589,8 @@ def Assign_sequences(Seq_file, gene, annot_file, tmp_file, species,
     #     "/lustre/scratch108/viruses/rbr1/MISEQ/AUTOIMMUNITY_AAV_SLE_HEALTHY1",
     #     "/ORIENTATED_SEQUENCES/ANNOTATIONS/TMP/Incorrect_MERGE_ISO_50_H1.txt")
     head = (
-        "#ID\tIGHV\tFR1s\tFR1e\tCDR1s\tCDR1e\tFR2s\tFR2e\tCDR2s\tCDR2e\tFR3s\tFR3e\t",
+        "#ID\tIGHV\tFR1s\tFR1e\tCDR1s\tCDR1e\tFR2s\tFR2e\tCDR2s\tCDR2e\tFR3s\tFR3e\t"
+        +
         "IGHV_end\tIGHJ\tIGHJ_start\tCDR3s\tCDR3e\tCDR3_prot\tCDR3_nn\tV_mm\tJ_mm\tV_ins\tJ_ins\n"
     )
     (prots) = Get_protein_sequences(protein_file)
@@ -935,7 +940,7 @@ def Get_network_statistics_per_chain(cluster_file, sample, dir,
     if (t1 != sum(total_reads)):
         print("ERROR IN COUNTING!!")
     out = (
-        "#Id\tIsotype\tN reads\tN vertices\tVertex Gini Index\t",
+        "#Id\tIsotype\tN reads\tN vertices\tVertex Gini Index\t" +
         "Cluster Gini Index\tLargest Cluster (%)\t2nd Largest Cluster (%)\n")
     # out = (
     #     "#Id\tAnalysis\tN reads\tN vertices\tVertex Gini Index\tCluster Gini Index\tLargest Cluster (%)\t",
@@ -1032,15 +1037,15 @@ def Get_network_statistics(cluster_file, id, dir, network_statistics, gene,
                                 totalreads)
     (max_pop, max_1_pop) = Proportional_measures(c_sizes, totalreads)
     out = (
-        "#Id\tAnalysis\tN reads\tN vertices\tVertex Gini Index\tCluster Gini Index\tLargest Cluster (%)\t",
+        "#Id\tAnalysis\tN reads\tN vertices\tVertex Gini Index\tCluster Gini Index\tLargest Cluster (%)\t"
+        +
         "2nd Largest Cluster (%)\t% Vertices in largest cluster\tVertex Renyi\tCluster Renyi\tGene\tSpecies\n"
     )
-    out = out + str(id) + "\tOVERALL\t" + str(totalreads) + "\t" + str(
-        totalv) + "\t" + str(vgini) + "\t" + str(cgini) + "\t" + str(
-            max_pop) + "\t" + str(max_1_pop) + "\t" + str(
-                vertices_in_max_cluster * 100.0 /
-                totalv) + "\t" + str(vrenyi) + "\t" + str(
-                    crenyi) + "\t" + gene + "\t" + species + "\n"
+    out = (out + str(id) + "\tOVERALL\t" + str(totalreads) + "\t" +
+           str(totalv) + "\t" + str(vgini) + "\t" + str(cgini) + "\t" +
+           str(max_pop) + "\t" + str(max_1_pop) + "\t" +
+           str(vertices_in_max_cluster * 100.0 / totalv) + "\t" + str(vrenyi) +
+           "\t" + str(crenyi) + "\t" + gene + "\t" + species + "\n")
     fh = open(network_statistics, "a")
     fh.write(out)
     fh.close()
@@ -1208,7 +1213,8 @@ def Get_cluster_stats(annot_file, cluster_file, id, dir, network_statistics,
     cluster_annotation, CDR3s = Get_annotation_for_clusters(annot_file, ids)
     seqs = Get_max_sequences(seq_file, ids)
     out = (
-        "#Id\tAnalysis\tCluster ID\t% of Repertoire\tN Reads\tN Vertices\tV gene\tJ gene\tMean mutations in V\t",
+        "#Id\tAnalysis\tCluster ID\t% of Repertoire\tN Reads\tN Vertices\tV gene\tJ gene\tMean mutations in V\t"
+        +
         "Max Sequence Size (reads)\tMax Sequence ID\tGene\tSpecies\tSpecific Primer\tLargest vertex sequence\n"
     )
     if (len(sig_clust_info) > 0):
@@ -1227,19 +1233,17 @@ def Get_cluster_stats(annot_file, cluster_file, id, dir, network_statistics,
                 primer_sequence = primer_reference[max_vj.split("\t")[0]]
             else:
                 primer_sequence = "NA"
-            out = out + id + "\tCLUSTER_ANALYSIS\t" + str(c) + "\t" + str(
-                perc_network
-            ) + "\t" + str(number_reads) + "\t" + str(
-                number_vertices
-            ) + "\t" + max_vj + "\t" + str(mean_muts) + "\t" + str(
-                reads_in_max_seq
-            ) + "\t" + str(
-                max_seq
-            ) + "\t" + gene + "\t" + species + "\t" + primer_sequence + "\t" + seq + "\n"
+            out = (out + id + "\tCLUSTER_ANALYSIS\t" + str(c) + "\t" +
+                   str(perc_network) + "\t" + str(number_reads) + "\t" +
+                   str(number_vertices) + "\t" + max_vj + "\t" +
+                   str(mean_muts) + "\t" + str(reads_in_max_seq) + "\t" +
+                   str(max_seq) + "\t" + gene + "\t" + species + "\t" +
+                   primer_sequence + "\t" + seq + "\n")
     else:
-        out = out + id + "\tCLUSTER_ANALYSIS\tNO CLUSTERS LARGER THAN " + str(
-            threshold
-        ) + "% OF REPERTOIRE\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\t" + gene + "\t" + species + "\tNA\tNA\n"
+        out = (out + id + "\tCLUSTER_ANALYSIS\tNO CLUSTERS LARGER THAN " +
+               str(threshold) +
+               "% OF REPERTOIRE\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\t" + gene +
+               "\t" + species + "\tNA\tNA\n")
     fh = open(network_statistics, "a")
     fh.write(out)
     fh.close()
