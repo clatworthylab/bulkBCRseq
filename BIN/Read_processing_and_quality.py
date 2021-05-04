@@ -288,16 +288,12 @@ def get_consensus_sequence(u_seq, u_freq, tmp_file, threshold):
     fh.write(out)
     fh.close()
     if (len(u_seq) > 2000):
-        command1 = [
-            "mafft", "--retree", "2", "--parttree", "{}txt".format(tmp_file),
-            ">", "{}aligned".format(tmp_file)
-        ]
+        command1 = ("mafft --retree 2 --parttree " + "{}txt".format(tmp_file) +
+                    " > {}aligned".format(tmp_file))
     else:
-        command1 = [
-            "mafft", "--retree", "2", "{}txt".format(tmp_file), ">"
-            "{}aligned".format(tmp_file)
-        ]
-    subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command1 = ("mafft --retree 2 " + "{}txt".format(tmp_file) +
+                    " > {}aligned".format(tmp_file))
+    os.system(command1)
     fh = open(tmp_file + "aligned", "r")
     max_seqs = {}
     pfh = check_fasta_not_empty(fh)
@@ -382,10 +378,10 @@ def trim_sequences_bcr_tcr(tmp_Tmp_file, Fail_file, Output_trim, gene, paired,
         inside = 1
         print("J barcoded")
         single_j_barcoded_trimming_clustered(
-            forward, reverse, barcoded_j, barcoded_v, rc, tmp_Tmp_file, Fail_file,
-            Output_trim, primer_tag_file, tmp_file, gene, paired, species,
-            primer_file, primer_tag_file_count, threshold_barcode, ref_const,
-            inside, v_ref)
+            forward, reverse, barcoded_j, barcoded_v, rc, tmp_Tmp_file,
+            Fail_file, Output_trim, primer_tag_file, tmp_file, gene, paired,
+            species, primer_file, primer_tag_file_count, threshold_barcode,
+            ref_const, inside, v_ref)
     return ()
 
 
@@ -694,17 +690,12 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
     fh.close()
     if (len(u_seq) > 2000):
         # command1 = "mafft --retree 2 " + insert + " " + tmp_file + "txt > " + tmp_file + "aligned"
-        command1 = [
-            "mafft", "--retree", "2", "--parttree", "{}txt".format(tmp_file),
-            ">"
-            "{}aligned".format(tmp_file)
-        ]
+        command1 = ("mafft --retree 2 --parttree " + "{}txt".format(tmp_file) +
+                    " > {}aligned".format(tmp_file))
     else:
-        command1 = [
-            "mafft", "--retree", "2", "{}txt".format(tmp_file), ">"
-            "{}aligned".format(tmp_file)
-        ]
-    subprocess.Popen(command1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        command1 = ("mafft --retree 2 " + "{}txt".format(tmp_file) +
+                    " > {}aligned".format(tmp_file))
+    os.system(command1)
     fh = open(tmp_file + "aligned", "r")
     max_seqs = {}
     for header, sequence in fasta_iterator(fh):
@@ -2068,7 +2059,8 @@ def get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
     if (barcoded_j + barcoded_v == 0):
         raw1, raw2, joined, gene_matching = get_number_sequences(
             Seq_file1), get_number_sequences(Seq_file2), get_number_sequences(
-                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(trim1)
+                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(
+                    trim1)
         orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
         number_unique_seqs = get_number_sequences(nn_orf_filtered)
         out = (
@@ -2086,7 +2078,8 @@ def get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
         print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
         raw1, raw2, joined, gene_matching = get_number_sequences(
             Seq_file1), get_number_sequences(Seq_file2), get_number_sequences(
-                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(trim1)
+                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(
+                    trim1)
         # count_bc_found, count_uniq_bcs = -1, -1
         orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
         number_unique_seqs = get_number_sequences(nn_orf_filtered)
@@ -2109,8 +2102,9 @@ def get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
     return ()
 
 
-def get_read_report1(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
-                     filtering_report, id, species, gene, dir, trim2):
+def get_read_report1(Seq_file1, Seq_file2, tmp_Tmp_file, trim1,
+                     nn_orf_filtered, filtering_report, id, species, gene, dir,
+                     trim2):
     raw1, raw2, joined = get_number_sequences(Seq_file1), get_number_sequences(
         Seq_file2), get_number_sequences(tmp_Tmp_file)
     primer_matching, orf = get_reduced_number_sequences(
@@ -3030,9 +3024,9 @@ if (command_source.count("2") != 0):
         reduce_sequences(trim2, trim3, primer_file)
         orf_calculation_single(trim3, Filtered_out1, nn_orf_filtered, dir,
                                gene, refv, refj, refvp, refjp, tmp_file_orf)
-        get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
-                        filtering_report, id, species, gene, dir,
-                        primer_tag_file_count, primer_file, method,
+        get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1,
+                        nn_orf_filtered, filtering_report, id, species, gene,
+                        dir, primer_tag_file_count, primer_file, method,
                         barcode_group)
 
 # Clustering reads
