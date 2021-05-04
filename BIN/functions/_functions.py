@@ -11,18 +11,42 @@ lib_path = main_path + 'LIBRARY/'
 if not os.path.exists(bin_path):
     bin_path = os.getcwd() + '/BIN/'
     if not os.path.exists(bin_path):
-        raise OSError('Cannot locate path to BIN folder. You are currently in {}'.format(os.getcwd()))
+        raise OSError(
+            'Cannot locate path to BIN folder. You are currently in {}'.format(
+                os.getcwd()))
     sys.path.append(bin_path)
 if not os.path.exists(lib_path):
     lib_path = os.getcwd() + '/LIBRARY/'
     if not os.path.exists(lib_path):
-        raise OSError('Cannot locate path to LIBRARY folder. You are currently in {}'.format(os.getcwd()))
+        raise OSError(
+            'Cannot locate path to LIBRARY folder. You are currently in {}'.
+            format(os.getcwd()))
 
 
 class Tree(defaultdict):
     def __init__(self, value=None):
         super(Tree, self).__init__(Tree)
         self.value = value
+
+
+def fasta_iterator(fh1):
+    while True:
+        line = fh1.readline()
+        if line.startswith('>'):
+            break
+    while True:
+        header = line[1:-1].rstrip()
+        sequence = fh1.readline().rstrip()
+        while True:
+            line = fh1.readline()
+            if not line:
+                break
+            if line.startswith('>'):
+                break
+            sequence += line.rstrip()
+        yield (header, sequence)
+        if not line:
+            return
 
 
 def deconvolute_same_array(tree):
