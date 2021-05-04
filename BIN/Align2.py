@@ -527,7 +527,7 @@ def Get_position(a, b):
     A = Alignment()
     c, x, y, s = A.align(a, b)
     start = -1
-    print y
+    print(y)
     for i in range(0, len(y)):
         if (y[i] is not None):
             start = i
