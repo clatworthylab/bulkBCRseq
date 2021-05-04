@@ -1651,7 +1651,7 @@ def get_paired_reads_overlapping(file1, file2, outfile, gene, paired, id,
 
 def translate(seq, codon):
     p_seq = ""
-    for cod in range(0, (len(seq) / 3) - 1):
+    for cod in range(0, int(len(seq) / 3 - 1)):
         cod = cod * 3
         c1 = seq[cod + 0] + seq[cod + 1] + seq[cod + 2]
         if (c1 in codon):
@@ -2912,7 +2912,7 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
             #             "_1 -m " + threshold + " -l " + length)
             # command2 = ("java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f " +
             #             reads2 + " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-            #             "_2 -m " + threshold + " -l " + length)            
+            #             "_2 -m " + threshold + " -l " + length)
             command1 = ("java -jar " + bin_path +
                         "QUASR_v7.01/qualityControl.jar -f " + reads1 +
                         " -o " + dir + "FASTQ_FILES/Sequences_" + id +
