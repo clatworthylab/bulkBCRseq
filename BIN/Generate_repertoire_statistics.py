@@ -342,7 +342,7 @@ def Blast_match(out, refv, refj, tmp_file, out1, indent, seqs, lengthv, prots,
                     V_end_potential = v_end_query
                     if (l[0].split("__")[0] in prots):
                         CDR3_prot_potential = prots[l[0].split("__")[0]]
-                        shift = (V_end_potential / 3) - 5
+                        shift = int((V_end_potential / 3) - 5)
                         CDR3_prot_potential = CDR3_prot_potential[
                             shift:len(CDR3_prot_potential)]
                         if (gene == "IGH"):
