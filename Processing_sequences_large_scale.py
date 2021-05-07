@@ -59,10 +59,12 @@ def Get_info_concat(file):
             sample.append([lx[1]])
             directory.append(lx[2].strip('\n'))
             downsample.append(lx[3])
-        else:
+        elif len(lx) > 1:
             id.append(lx[0])
             sample.append([lx[1]])
             directory.append(lx[2].strip('\n'))
+        else:
+            break
     fh.close()
     if len(downsample) > 0:
         return (id, sample, directory, downsample)
@@ -142,7 +144,7 @@ elif (len(args) == 7):
             span = ''
         if (bsub_command == "Y"):
             bsub = ("bsub -P team205 -G teichlab " + queue +
-                    " -o logs/out_MERGING_" + id_ + " -J " + id + " " + mem +
+                    " -o logs/out_MERGING_" + id_ + " -J " + id_ + " " + mem +
                     " " + span + " ")
         if ("3.5" in command):
             command1 = ("python " + dir_source_code +
