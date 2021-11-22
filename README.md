@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5717959.svg)](https://doi.org/10.5281/zenodo.5717959)
+
 # bulk_BCR_analysis
 Bulk BCR-seq processing scripts use in Fitzpatrick et al., Nature (2020). Package belongs to Rachael Bashford-Rogers.
 
