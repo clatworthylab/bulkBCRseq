@@ -49,7 +49,7 @@ jobs:
           hashFiles('environment.yml') }}
             
     - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2.0.1
+      uses: conda-incubator/setup-miniconda@v2.1.1
       with:
         auto-activate-base: true
         auto-update-conda : true
