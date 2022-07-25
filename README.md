@@ -5,7 +5,7 @@ Bulk BCR-seq processing scripts use in Fitzpatrick et al., Nature (2020). Packag
 
 This repo is an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
 
-Requires python 2.7 (or 3.7 if using the python3 branch). Currently only works when cloned onto farm with all paths set up pointing to this folder properly.
+Requires python>=3.7 (or 2.7 if using the legacy branch).
 
 ## Citation
 Please cite the following papers:
@@ -20,18 +20,18 @@ Please cite the following papers:
 ## Pre-requisites:
 ```bash
 # create a conda virtual environment
-# sample for python 2 set up, switch to python 3 where appropriate
+# sample for python 3 set up, switch to python 2 where appropriate
 # install miniconda
 wget https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
 bash Miniconda2-latest-Linux-x86_64.sh
 eval "$(/path/to/miniconda2/bin/conda shell.bash hook)"
 conda init
-conda create --name py2 python=2.7 pip numpy pandas networkx
+conda create --name py3 python=3.7 pip numpy pandas networkx
 ```
 
 Usage instructions on Farm:
 ```bash
-conda activate py2
+conda activate py3
 ```
 ## Basic usage:
 ```bash
