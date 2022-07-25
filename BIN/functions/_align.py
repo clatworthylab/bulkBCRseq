@@ -1,62 +1,10 @@
 #!/usr/bin/env python
-
-
-"""align.py
-
-Pairwise sequence alignment 
-according to Myers & Miller, 1988,
-'Optimal alignment in linear space', 
-CABIOS, vol. 4, no. 1, pp 11-17.
-
-Attributes
-----------
-GapSymbol : TYPE
-    Description
+"""Summary
 """
 
 
-import os
-import sys
-import string
-
-
-GapSymbol = None
-
-
-# Utility function.
-
-
-def hasUniqueElements(L):
-    """Summary
-
-    Parameters
-    ----------
-    L : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    # Does the list have
-    # unique elements only?
-
-    d = {}
-    for e in L:
-        if e == GapSymbol:
-            continue
-        try:
-            f = d[e]
-            return 0
-        except KeyError:
-            d[e] = e
-        return 1
-
-
 class Script:
-
-    """Summary
+    """Operations transferring one list in another.
 
     Attributes
     ----------
@@ -64,14 +12,9 @@ class Script:
         Description
     h : TYPE
         Description
-    k : int
-        Description
     s : list
         Description
     """
-
-    k = 100
-    """Operations transferring one list in another."""
 
     def __init__(self, g=1.5, h=1.0):
         """Summary
@@ -86,12 +29,10 @@ class Script:
         self.s = []
         self.g = g
         self.h = h
-        # print
         self.ps("")
-        # pass
 
     def __str__(self):
-        """Summary
+        """Print s.
 
         Returns
         -------
@@ -101,7 +42,7 @@ class Script:
         return str(self.s)
 
     def __getitem__(self, n):
-        """Summary
+        """Print  s[n].
 
         Parameters
         ----------
@@ -116,7 +57,7 @@ class Script:
         return self.s[n]
 
     def __len__(self):
-        """Summary
+        """Print len(s).
 
         Returns
         -------
@@ -125,7 +66,7 @@ class Script:
         """
         return len(self.s)
 
-    def weight(self, x, y):
+    def weight(self, x, y, matrix):
         """Summary
 
         Parameters
@@ -133,6 +74,8 @@ class Script:
         x : TYPE
             Description
         y : TYPE
+            Description
+        matrix : TYPE
             Description
 
         Returns
@@ -153,6 +96,11 @@ class Script:
         ----------
         k : TYPE
             Description
+
+        Returns
+        -------
+        TYPE
+            Description
         """
         # k-symbol insert/delete cost
         # return self.g + self.h * k
@@ -169,10 +117,8 @@ class Script:
         k : TYPE
             Description
         """
-        # append "delete k" op
         S = self.s
         if len(S) > 0 and S[-1] != 0:
-            # if len(S) > 0 and S[-1] < 0:
             S[-1] = S[-1] - k
             self.ps("del.if " + str(k))
         else:
@@ -187,16 +133,7 @@ class Script:
         k : TYPE
             Description
         """
-        # append "insert k" op
         S = self.s
-
-        #   if S[-1] < 0:
-        #       S[-1] = k
-        #       self.ps("ins.if " + str(k))
-        #   else:
-        #       S.append(k)
-        #       self.ps("ins.else " + str(k))
-
         try:
             if S[-1] < 0:
                 S[-1] = k
@@ -210,7 +147,6 @@ class Script:
 
     def replace(self):
         """Summary"""
-        # append "replace" op
         S = self.s
         S.append(0)
         self.ps("rep")
@@ -223,9 +159,6 @@ class Script:
         note : TYPE
             Description
         """
-        # print script
-        # S = self.s
-        # print "... %-10s %s" % (note, S)
         pass
 
 
@@ -235,10 +168,9 @@ class Alignment:
 
     def __init__(self):
         """Summary"""
-        # self.GapSymbol = None
         pass
 
-    def diff(self, A, B, M, N, S, tb, te, g, h):
+    def diff(self, A, B, M, N, S, tb, te, g, h, matrix):
         """Summary
 
         Parameters
@@ -261,6 +193,8 @@ class Alignment:
             Description
         h : TYPE
             Description
+        matrix : TYPE
+            Description
 
         Returns
         -------
@@ -274,7 +208,6 @@ class Alignment:
         # such a conversion to the current script
 
         # variable setup
-
         N1 = N + 1
         CC = [0] * N1
         DD = [0] * N1
@@ -303,7 +236,7 @@ class Alignment:
 
             for j in range(N + 1):
                 c = S.gapCost(j - 1)
-                c = c + S.weight(A[1], B[j])
+                c = c + S.weight(A[1], B[j], matrix)
                 c = c + S.gapCost(N - j)
                 if c < midc:
                     midc = c
@@ -315,9 +248,9 @@ class Alignment:
             else:
                 if midj > 1:
                     S.insert(midj - 1)
-            S.replace()
-            if midj < N:
-                S.insert(N - midj)
+                S.replace()
+                if midj < N:
+                    S.insert(N - midj)
 
             return midc
 
@@ -326,8 +259,7 @@ class Alignment:
 
         # Forward phase:
         # Compute C(M/2,k) & D(M/2,k) for all k
-
-        midi = M / 2
+        midi = int(M / 2)
         CC[0] = 0.0
         t = g
         for j in range(1, N + 1):
@@ -353,7 +285,7 @@ class Alignment:
                 if c < d:
                     d = c
 
-                c = s + S.weight(A[i], B[j])
+                c = s + S.weight(A[i], B[j], matrix)
 
                 if e < c:
                     c = e
@@ -387,26 +319,24 @@ class Alignment:
                 if c < e:
                     e = c
 
-            c = RR[j] + g + h
-            d = SS[j] + h
+                c = RR[j] + g + h
+                d = SS[j] + h
 
-            if c < d:
-                d = c
+                if c < d:
+                    d = c
 
-            c = s + S.weight(A[i + 1], B[j + 1])
+                c = s + S.weight(A[i + 1], B[j + 1], matrix)
 
-            if e < c:
-                c = e
-            if d < c:
-                c = d
+                if e < c:
+                    c = e
+                if d < c:
+                    c = d
 
-            s = RR[j]
-            RR[j] = c
-            SS[j] = d
+                s = RR[j]
+                RR[j] = c
+                SS[j] = d
 
         SS[N] = RR[N]
-
-        # find optimal midpoint
 
         midc = CC[0] + RR[0]
         midj = 0
@@ -426,12 +356,13 @@ class Alignment:
                 type = 2
 
         # conquer: recursively around midpoint
-
         if type == 1:
-            self.diff(A, B, midi, midj, S, tb, g, g, h)
-            self.diff(A[midi:], B[midj:], M - midi, N - midj, S, g, te, g, h)
+            self.diff(A, B, midi, midj, S, tb, g, g, h, matrix)
+            self.diff(
+                A[midi:], B[midj:], M - midi, N - midj, S, g, te, g, h, matrix
+            )
         else:
-            self.diff(A, B, midi - 1, midj, S, tb, 0.0, g, h)
+            self.diff(A, B, midi - 1, midj, S, tb, 0.0, g, h, matrix)
             S.delete(2)
             self.diff(
                 A[midi + 1 :],
@@ -443,13 +374,13 @@ class Alignment:
                 te,
                 g,
                 h,
+                matrix,
             )
 
         # return the cost
-
         return midc
 
-    def do_align(self, A, B, S):
+    def do_align(self, A, B, S, GapSymbol=None):
         """Summary
 
         Parameters
@@ -460,6 +391,8 @@ class Alignment:
             Description
         S : TYPE
             Description
+        GapSymbol : None, optional
+            Description
 
         Returns
         -------
@@ -467,21 +400,21 @@ class Alignment:
             Description
         """
         x, y = [], []
-        i, j, k, op = 0, 0, 0, 0
+        # i, j, k, op = 0, 0, 0, 0
+        i, j, k = 0, 0, 0
 
         for k in range(len(S)):
-            s = S[k]
+            s = int(S[k])
             if s == 0:
                 if i < len(A) and j < len(B):
                     a, i = A[i], i + 1
                     b, j = B[j], j + 1
-                    if a == b:
-                        x.append(a)
-                        y.append(b)
-                    else:
-                        x.append(a)
-                        y.append(b)
-
+                if a == b:
+                    x.append(a)
+                    y.append(b)
+                else:
+                    x.append(a)
+                    y.append(b)
             elif s < 0:
                 y = y + [GapSymbol] * (-s)
                 for q in range(i, i - s):
@@ -498,7 +431,7 @@ class Alignment:
 
         return x, y
 
-    def align(self, A, B):
+    def align(self, A, B, matrix):
         """Summary
 
         Parameters
@@ -506,6 +439,8 @@ class Alignment:
         A : TYPE
             Description
         B : TYPE
+            Description
+        matrix : TYPE
             Description
 
         Returns
@@ -532,7 +467,7 @@ class Alignment:
         N = len(B) - 1
 
         # Call recursive function.
-        c = self.diff(A, B, M, N, S, G, G, G, H)
+        c = self.diff(A, B, M, N, S, G, G, G, H, matrix)
 
         # Removing dummy elements again.
         del A[0]
@@ -544,7 +479,7 @@ class Alignment:
 
         return c, x, y, S
 
-    def partition(self, x, y):
+    def partition(self, x, y, GapSymbol=None):
         """Summary
 
         Parameters
@@ -552,6 +487,8 @@ class Alignment:
         x : TYPE
             Description
         y : TYPE
+            Description
+        GapSymbol : None, optional
             Description
 
         Returns
@@ -577,274 +514,3 @@ class Alignment:
                     left.append(X)
 
         return left, both, right
-
-
-def printTestCase(A, a, b, x, y, c):
-    """Summary
-
-    Parameters
-    ----------
-    A : TYPE
-        Description
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-    x : TYPE
-        Description
-    y : TYPE
-        Description
-    c : TYPE
-        Description
-    """
-    hUE = hasUniqueElements
-    print("In-List 1: ", a)
-    print("In-List 2: ", b)
-    print("Out-List 1:", x)
-    print("Out-List 2:", y)
-    # print "?", map(hUE, (x, y))
-    if list(map(hUE, (x, y))) == [1, 1]:
-        print("Partitions:", A.partition(x, y))
-        print("Cost:      ", c)
-
-
-def testCase(note, a, b):
-    """Summary
-
-    Parameters
-    ----------
-    note : TYPE
-        Description
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-    """
-    A = Alignment()
-    c, x, y, s = A.align(a, b)
-    c1, x1, y1, s1 = A.align(b, a)
-
-    print(note)
-    print()
-    printTestCase(A, a, b, x, y, c)
-    if (c, x, y) != (c1, y1, x1):
-        print("Asymmetric behaviour:")
-        printTestCase(A, b, a, x1, y1, c1)
-    print()
-
-
-def test():
-    """Summary
-
-    Raises
-    ------
-    SystemExit
-        Description
-    """
-    l1 = [1, 2, 3, 4]
-    l2 = [1, 2, 1, 4]
-    l3 = [1, 2, 3, 4, GapSymbol, GapSymbol]
-    res = ["No", "Yes"]
-
-    print("Utility function")
-    print()
-    for l in [l1, l2, l3]:
-        i = hasUniqueElements(l)
-        r = res[i]
-        print("%s has unique elements: %s" % (l, r))
-    print()
-
-    a = []
-    b = []
-    testCase("Empty lists", a, b)
-
-    a = []
-    b = [1, 2, 3]
-    testCase("Empty list", a, b)
-
-    a = [1, 2, 3]
-    b = [1, 2, 3]
-    testCase("Same list", a, b)
-
-    a = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    b = [3, 4, 20, 21, 5, 6, 7, 10, 11]
-    testCase("Overlapping", a, b)
-
-    a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    b = [1, 3, 5, 7, 9]
-    testCase("Overlapping", a, b)
-
-    a = [1, 3, 5, 7, 9]
-    b = [2, 4, 6, 8, 10]
-    testCase("Non-overlapping", a, b)
-
-    a = "accgtaccg"
-    b = "agtaccccg"
-    a = list(a)
-    b = list(b)
-    testCase("Strings", a, b)
-
-    a = "ac"
-    b = "g"
-    a = list(a)
-    b = list(b)
-    testCase("Strings", a, b)
-
-    a = "aaccgtacggt"
-    b = "agtgg"
-    a = list(a)
-    b = list(b)
-    testCase("Strings, more complex", a, b)
-
-    # The last case should actually result in:
-    #
-    #      aaccgtacggt
-    #      !---!!--!!-
-    #      a   gt  gg
-    #
-    #      a   gt  gg
-    #      !---!!--!!-
-    #      aaccgtacggt
-
-    try:
-        d1 = sys.argv[1]
-        d2 = sys.argv[2]
-        a = os.listdir(d1)
-        b = os.listdir(d2)
-        testCase("Comparing directories %s and %s" % (d1, d2), a, b)
-    except IndexError:
-        usage = string.split(sys.argv[0], os.sep)[-1]
-        msg = "Call %s <dir1> <dir2> " % usage
-        msg = msg + "for testing directory compare!"
-        print(msg)
-        raise SystemExit
-
-
-def printTestCase2(A, a, b, x, y, c, s):
-    """Summary
-
-    Parameters
-    ----------
-    A : TYPE
-        Description
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-    x : TYPE
-        Description
-    y : TYPE
-        Description
-    c : TYPE
-        Description
-    s : TYPE
-        Description
-    """
-    hUE = hasUniqueElements
-    print("In-List 1: ", string.join(a, ""))
-    print("In-List 2: ", string.join(b, ""))
-    print("Out-List 1:", x)
-    print("Out-List 2:", y)
-    print("Script:    ", s)
-    # print "?", map(hUE, (x, y))
-    if list(map(hUE, (x, y))) == [1, 1]:
-        print("Partitions:", A.partition(x, y))
-        print("Cost:      ", c)
-
-
-def testCase2(note, a, b):
-    """Summary
-
-    Parameters
-    ----------
-    note : TYPE
-        Description
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-    """
-    A = Alignment()
-    c, x, y, s = A.align(a, b)
-    c1, x1, y1, s1 = A.align(b, a)
-
-    print(note)
-    print()
-    printTestCase2(A, a, b, x, y, c, s)
-    if (c, x, y) != (c1, y1, x1):
-        print("Asymmetric behaviour:")
-        printTestCase2(A, b, a, x1, y1, c1, s1)
-    print()
-
-
-def test2():
-    """Summary"""
-    l1 = [1, 2, 3, 4]
-    l2 = [1, 2, 1, 4]
-    l3 = [1, 2, 3, 4, GapSymbol, GapSymbol]
-    res = ["No", "Yes"]
-
-    # a = "A very fat cat"
-    # b = "A very fast cat"
-    # a = map(None, a)
-    # b = map(None, b)
-    # testCase2("Strings", a, b)
-
-    a = "g"
-    b = "xx"
-    a = list(a)
-    b = list(b)
-    testCase2("Strings", a, b)
-
-
-# if __name__ == '__main__':
-#  a = "A very fat cat"
-#  b = "A very fast cat"
-def Do_align(a, b):
-    """Summary
-
-    Parameters
-    ----------
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    a = list(a)
-    b = list(b)
-    A = Alignment()
-    c, x, y, s = A.align(a, b)
-    return (x, y)
-
-
-def Get_position(a, b):
-    """Summary
-
-    Parameters
-    ----------
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    a = list(a)
-    b = list(b)
-    A = Alignment()
-    c, x, y, s = A.align(a, b)
-    start = -1
-    print(y)
-    for i in range(0, len(y)):
-        if y[i] != None:
-            start = i
-            break
-    return start

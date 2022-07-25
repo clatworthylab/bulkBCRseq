@@ -4,6 +4,7 @@ channels:
 - bioconda
 - anaconda
 - defaults
+- yuxiang
 dependencies:
 - numpy
 - networkx
@@ -12,3 +13,7 @@ dependencies:
 - blast
 - mafft
 - samtools
+- bam2fastq
+- cd-hit
+- pip:
+  - pytest-cov

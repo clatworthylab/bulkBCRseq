@@ -1,0 +1,63 @@
+[tool.black]
+line-length = 80
+target-version = ['py38']
+include = '\.pyi?$'
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | foo.py           # also separately exclude a file named foo.py in
+                     # the root of the project
+)
+'''
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = false
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-module = false
+fail-under = 100
+exclude = ["setup.py", "docs", "build", "data", "bin", "orphan/*"]
+ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
+verbose = 2
+quiet = false
+whitelist-regex = []
+color = true
+
+
+[tool.coverage.run]
+parallel = true
+include = [
+    "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py",
+    "Processing_sequences_large_scale.py",
+
+]
+omit = [
+    "orphan/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
+
+# Configuration for pytest
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::DeprecationWarning",
+                  "ignore::PendingDeprecationWarning",
+                  "ignore::FutureWarning"
+                  ]
+testpaths=["tests"]

@@ -1,15 +1,15 @@
-name: test_py2_original
+name: test_py3
 
 on:
   pull_request:
-    branches:
+    branches-ignore:
       - "legacy"
   push:
     branches:
-      - "legacy"
+      - "master"
 
 env:
-  cache-version: 'cache-v1'
+  cache-version: "cache-v1"
 
 jobs:
   tests:    
@@ -21,7 +21,7 @@ jobs:
       max-parallel: 5
       matrix:
         os: [ubuntu-latest]
-        python-version: [2.7]
+        python-version: [3.7, 3.8, 3.9, "3.10"]
     runs-on: ${{ matrix.os }}
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -62,4 +62,21 @@ jobs:
     
     - name: Test with pytest
       run: |
-        pytest -rP tests -W ignore::DeprecationWarning -W ignore::PendingDeprecationWarning -W ignore::FutureWarning
+        pytest --cov=BIN --cov-report=xml
+
+    - name: Show coverage
+      run: |
+        coverage report
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        directory: ./coverage/reports/
+        env_vars: ${{ format('OS={0},PYTHON={1}', matrix.config.os, matrix.config.python-version) }}
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+        path_to_write_report: ./coverage/codecov_report.txt
+        verbose: true

@@ -1,0 +1,58 @@
+name: Code style checks
+
+on:
+  pull_request:
+    branches-ignore:
+      - "legacy"
+  push:
+    branches:
+      - "master"
+
+jobs:
+  black:
+    name: Check black compliance.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: Install black
+        run: python -m pip install black
+
+      - name: Run black
+        run: black --config pyproject.toml --check .
+
+  docstring:
+    name: Check docstring compliance.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: Install interrogate
+        run: python -m pip install interrogate
+
+      - name: Run interrogate
+        run: interrogate .
+  
+  # vulture:
+  #   name: Check for dead code.
+  #   runs-on: ubuntu-latest
+    
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+
+  #     - name: Scavenge
+  #       uses: anaynayak/python-vulture-action@v1.0
+  #       id: vulture
+  #       with:
+  #         vulture-args: . --exclude "orphan/orphan.py,orphan/IsoTyper_1.0.py" --min-confidence 90
