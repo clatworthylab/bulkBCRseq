@@ -48,11 +48,12 @@ testpaths = [
 [tool.coverage.run]
 parallel = true
 include = [
-    "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py"
+    "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py",
+    "Processing_sequences_large_scale.py",
+
 ]
 omit = [
-    "orphan/Isotyper_1.0.py",
-    "orphan/orphan.py",
+    "orphan/*",
 ]
 
 [tool.coverage.report]
