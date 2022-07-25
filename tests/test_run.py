@@ -9,35 +9,19 @@ import pytest
 
 class Tester:
 
-    """Summary
-
-    Attributes
-    ----------
-    base : TYPE
-        Description
-    bsub : TYPE
-        Description
-    execute : TYPE
-        Description
-    metadata : TYPE
-        Description
-    option : TYPE
-        Description
-    sub : TYPE
-        Description
-    verbose : TYPE
-        Description
-    """
+    """Summary"""
 
     __test__ = False
 
-    def __init__(self, option, metadata, bsub, verbose, execute, base, sub):
+    def __init__(
+        self, option: int, metadata, bsub, verbose, execute, base, sub
+    ):
         """Summary
 
         Parameters
         ----------
-        option : TYPE
-            Description
+        option : int
+            option to run the pipline.
         metadata : TYPE
             Description
         bsub : TYPE
