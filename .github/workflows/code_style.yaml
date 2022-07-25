@@ -55,4 +55,4 @@ jobs:
         uses: anaynayak/python-vulture-action@v1.0
         id: vulture
         with:
-          vulture-args: . --min-confidence 90 --exclude "orphan/orphan.py,orphan/IsoTyper_1.0.py"
+          vulture-args: . --exclude "orphan/orphan.py,orphan/IsoTyper_1.0.py" --min-confidence 90 
