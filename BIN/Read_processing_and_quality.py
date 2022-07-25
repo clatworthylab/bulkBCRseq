@@ -1,4 +1,105 @@
 #!/usr/bin/env python
+"""Summary
+
+Attributes
+----------
+att_file : TYPE
+    Description
+barcode_group : TYPE
+    Description
+bin_path : TYPE
+    Description
+checked_edges : TYPE
+    Description
+cluster_file : TYPE
+    Description
+command_source : TYPE
+    Description
+control : str
+    Description
+dir : TYPE
+    Description
+edge_lengths : float
+    Description
+Fail_file : TYPE
+    Description
+file_edges : TYPE
+    Description
+file_seqs : TYPE
+    Description
+file_vertex : TYPE
+    Description
+Filtered_out1 : TYPE
+    Description
+filtering_report : TYPE
+    Description
+gene : TYPE
+    Description
+id : TYPE
+    Description
+length : TYPE
+    Description
+lib_path : TYPE
+    Description
+main_path : str
+    Description
+method : TYPE
+    Description
+nn_orf_filtered : TYPE
+    Description
+paired : TYPE
+    Description
+plot_ids_file : TYPE
+    Description
+primer_file : TYPE
+    Description
+primer_tag_file : TYPE
+    Description
+primer_tag_file_count : TYPE
+    Description
+read_number_division : str
+    Description
+Reduced_file : TYPE
+    Description
+ref_const : TYPE
+    Description
+refj : TYPE
+    Description
+refjp : TYPE
+    Description
+refv : TYPE
+    Description
+refvp : TYPE
+    Description
+Seq_file1 : TYPE
+    Description
+Seq_file2 : TYPE
+    Description
+source : TYPE
+    Description
+species : TYPE
+    Description
+tmp_file : TYPE
+    Description
+tmp_file0 : TYPE
+    Description
+tmp_file_1 : TYPE
+    Description
+tmp_file_orf : TYPE
+    Description
+tmp_pre : TYPE
+    Description
+tmp_reduced_sequences : TYPE
+    Description
+tmp_Tmp_file : TYPE
+    Description
+trim1 : TYPE
+    Description
+trim2 : TYPE
+    Description
+trim3 : TYPE
+    Description
+"""
 import re
 import networkx as nx
 from operator import itemgetter, add
@@ -8,65 +109,98 @@ import sys
 import os
 
 # set up some default paths
-main_path = '/lustre/scratch117/cellgen/team297/kt16/BCRSeq/'
-bin_path = main_path + 'BIN/'
-lib_path = main_path + 'LIBRARY/'
+main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+bin_path = main_path + "BIN/"
+lib_path = main_path + "LIBRARY/"
 if not os.path.exists(bin_path):
-    bin_path = os.getcwd() + '/BIN/'
+    bin_path = os.getcwd() + "/BIN/"
     if not os.path.exists(bin_path):
         raise OSError(
-            'Cannot locate path to BIN folder. You are currently in {}'.format(
-                os.getcwd()))
+            "Cannot locate path to BIN folder. You are currently in {}".format(
+                os.getcwd()
+            )
+        )
     sys.path.append(bin_path)
 if not os.path.exists(lib_path):
-    lib_path = os.getcwd() + '/LIBRARY/'
+    lib_path = os.getcwd() + "/LIBRARY/"
     if not os.path.exists(lib_path):
         raise OSError(
-            'Cannot locate path to LIBRARY folder. You are currently in {}'.
-            format(os.getcwd()))
+            "Cannot locate path to LIBRARY folder. You are currently in {}".format(
+                os.getcwd()
+            )
+        )
 
 
 def check_type_of_priming(primer_file):
+    """Summary
+
+    Parameters
+    ----------
+    primer_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(primer_file, "r")
     const = "FALSE"
     for header, sequence in fasta_iterator(fh):
-        if (header.count("REV_CONST") != 0):
+        if header.count("REV_CONST") != 0:
             const = "TRUE"
     fh.close()
-    return (const)
+    return const
 
 
 def reduce_sequences(trim2, trim3, primer_file):
+    """Summary
+
+    Parameters
+    ----------
+    trim2 : TYPE
+        Description
+    trim3 : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    """
     # const = check_type_of_priming(primer_file)
     const = "TRUE"
     minl = 185  # change for shorter runs
-    if (const == "TRUE"):
+    if const == "TRUE":
         fh = open(trim3, "w")
         fh.close()
         fh = open(trim2, "r")
-        seqs, head = Tree(), ''
+        seqs, head = Tree(), ""
         for header, seq in fasta_iterator(fh):
-            if (len(seq) >= minl):
+            if len(seq) >= minl:
                 seq = seq.upper()
                 seqs[seq][header].value = 1
                 head = header.split("|")[1]
             else:
                 print(seq)
         fh.close()
-        out, ind, times = '', 0, len(head.split("_"))
+        out, ind, times = "", 0, len(head.split("_"))
         print("number of chains", times)
         for seq in seqs:
             f = [0] * times
             for id in seqs[seq]:
                 f1 = list(map(int, id.split("__")[1].split("|")[0].split("_")))
                 f = list(map(add, f, f1))
-            header = ">" + id.split("__")[0] + "__" + "_".join(map(
-                str, f)) + "|" + head
+            header = (
+                ">"
+                + id.split("__")[0]
+                + "__"
+                + "_".join(map(str, f))
+                + "|"
+                + head
+            )
             out = out + header + "\n" + seq + "\n"
             ind = ind + 1
-            if (ind > 500):
+            if ind > 500:
                 write_out(out, trim3)
-                out, ind = '', 0
+                out, ind = "", 0
         write_out(out, trim3)
     else:
         command1 = "cp {} {}".format(trim2, trim3)
@@ -74,65 +208,133 @@ def reduce_sequences(trim2, trim3, primer_file):
 
 
 def get_match(primer, seq):
+    """Summary
+
+    Parameters
+    ----------
+    primer : TYPE
+        Description
+    seq : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     loc = []
-    if (seq.count(primer) != 0):
+    if seq.count(primer) != 0:
         for m in re.finditer(primer, seq):
             loc = loc + [m.start()]
             # loc = seq.index(primer)
-    return (loc)
+    return loc
 
 
 def get_partial_match(seq, p1, p2, primer, chain):
+    """Summary
+
+    Parameters
+    ----------
+    seq : TYPE
+        Description
+    p1 : TYPE
+        Description
+    p2 : TYPE
+        Description
+    primer : TYPE
+        Description
+    chain : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     # offset = len(seq)
     loc, s = -1, -1
     l = len(primer)
-    if (seq.count(p1) != 0):
+    if seq.count(p1) != 0:
         pos = seq.index(p1)
-        seq1 = seq[pos:pos + l]
+        seq1 = seq[pos : pos + l]
         a = fuzzy_substring(seq1, primer)
-        if (chain == "V"):
-            if (pos < len(seq) / 2):
+        if chain == "V":
+            if pos < len(seq) / 2:
                 s = pos + (l)
             else:
                 loc = -1
         else:
             s = pos
-        if (a <= 3):
+        if a <= 3:
             loc = s
     else:
-        if (seq.count(p2) != 0):
+        if seq.count(p2) != 0:
             l = len(primer) / 2
             pos = seq.index(p2)
-            if (chain == "V"):
+            if chain == "V":
                 s = pos + (len(p2))
             else:
                 s = pos - (l)
-            if (s < 0):
+            if s < 0:
                 s = 0
-            seq1 = seq[s:pos + l]
+            seq1 = seq[s : pos + l]
             a = fuzzy_substring(seq1, primer)
-            if (a <= 3):
+            if a <= 3:
                 loc = s  # pos+len(p2)
-    return ([loc])
+    return [loc]
 
 
 def match_sequence_primers(primer, sequence, rc, P1, P2):
+    """Summary
+
+    Parameters
+    ----------
+    primer : TYPE
+        Description
+    sequence : TYPE
+        Description
+    rc : TYPE
+        Description
+    P1 : TYPE
+        Description
+    P2 : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     (p) = get_match(primer, sequence)
     # passed = 0
-    if (len(p) == 0):
+    if len(p) == 0:
         rc_sequence = reverse_comp(sequence, rc)
         (p) = get_match(primer, rc_sequence)
-        if (len(p) == 0):
+        if len(p) == 0:
             # print sequence, P1, P2,primer
             (p) = get_partial_match(sequence, P1, P2, primer, "J")
-            if (p == -1):
+            if p == -1:
                 (p) = get_partial_match(rc_sequence, P1, P2, primer, "J")
-                if (p != -1):
+                if p != -1:
                     sequence = rc_sequence
     return (sequence, p)
 
 
 def get_primers(rc, primer_file):
+    """Summary
+
+    Parameters
+    ----------
+    rc : TYPE
+        Description
+    primer_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(primer_file, "r")
     V_primer, J_primer, V1, V2, ja, jb = [], [], [], [], [], []
     barcoded_j, barcoded_v = 0, 0
@@ -140,52 +342,101 @@ def get_primers(rc, primer_file):
     universal_rev = []
     inside = 0
     for header, sequence in fasta_iterator(fh):
-        if (header.count("J") != 0 or header.count("REV_CONST") != 0):
-            if (header.count("REV_CONST") != 0):
+        if header.count("J") != 0 or header.count("REV_CONST") != 0:
+            if header.count("REV_CONST") != 0:
                 inside = 1
-            if (sequence.count("N") != 0):
+            if sequence.count("N") != 0:
                 barcoded_j = 1
             sequence = sequence.upper()
             J_primer.append(sequence)
             l = len(sequence)
-            ja.append(sequence[0:l / 2])
-            jb.append(sequence[l / 2:l])
+            ja.append(sequence[0 : l / 2])
+            jb.append(sequence[l / 2 : l])
             jidprimer.append(header)
-        elif (header.count("UNIVERSAL_REV") != 0):
+        elif header.count("UNIVERSAL_REV") != 0:
             universal_rev.append(sequence)
         else:
-            if (sequence.count("N") != 0):
+            if sequence.count("N") != 0:
                 barcoded_v = 1
             sequence = sequence.upper()
             V_primer.append(sequence)
             l = len(sequence)
-            V1.append(sequence[0:l / 2])
-            V2.append(sequence[l / 2:l])
+            V1.append(sequence[0 : l / 2])
+            V2.append(sequence[l / 2 : l])
             vidprimer.append(header)
     fh.close()
-    return (V_primer, J_primer, V1, V2, ja, jb, barcoded_j, barcoded_v,
-            vidprimer, jidprimer, inside, universal_rev)
+    return (
+        V_primer,
+        J_primer,
+        V1,
+        V2,
+        ja,
+        jb,
+        barcoded_j,
+        barcoded_v,
+        vidprimer,
+        jidprimer,
+        inside,
+        universal_rev,
+    )
 
 
 def check_location_of_primer_binding(primer_file):
+    """Summary
+
+    Parameters
+    ----------
+    primer_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(primer_file, "r")
     mode = "WITHIN"
     for header, sequence in fasta_iterator(fh):
-        if (header.count("REV_CONST") != 0):
+        if header.count("REV_CONST") != 0:
             mode = "OUTSIDE"
     fh.close()
-    return (mode)
+    return mode
 
 
-def filter_igj_genes(trim1, trim2, refj, control, primer_file, ref_const,
-                     primer_tag_file_count):
+def filter_igj_genes(
+    trim1, trim2, refj, control, primer_file, ref_const, primer_tag_file_count
+):
+    """Summary
+
+    Parameters
+    ----------
+    trim1 : TYPE
+        Description
+    trim2 : TYPE
+        Description
+    refj : TYPE
+        Description
+    control : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    ref_const : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     # mode = check_location_of_primer_binding(primer_file)
     mode = "WITHIN"
     fh = open(trim2, "w")
     fh.close()
-    if (control == "FALSE"):
-        if (mode == "WITHIN"):
-            out, ind, batch, batch_size = '', 0, 0, 100
+    if control == "FALSE":
+        if mode == "WITHIN":
+            out, ind, batch, batch_size = "", 0, 0, 100
             seqs, indent = {}, 120
             fh = open(trim1, "r")
             e_value = 10
@@ -193,44 +444,58 @@ def filter_igj_genes(trim1, trim2, refj, control, primer_file, ref_const,
             for header, sequence in fasta_iterator(fh):
                 inf = len(sequence) - indent
                 inf = 0
-                if (inf < 0):
+                if inf < 0:
                     10
-                out = out + ">" + header + "\n" + sequence[inf:len(sequence
-                                                                   )] + "\n"
+                out = (
+                    out
+                    + ">"
+                    + header
+                    + "\n"
+                    + sequence[inf : len(sequence)]
+                    + "\n"
+                )
                 seqs[header] = sequence
                 ind, batch = ind + 1, batch + 1
                 c = c + 1
-                if (batch >= batch_size):
+                if batch >= batch_size:
                     blast_match_j(out, seqs, trim1, trim2, refj, e_value)
-                    out, batch, seqs = '', 0, {}
+                    out, batch, seqs = "", 0, {}
             fh.close()
-            if (len(out) > 2):
+            if len(out) > 2:
                 blast_match_j(out, seqs, trim1, trim2, refj, e_value)
-                out, batch = '', 0
-        elif (mode == "OUTSIDE"):
-            out, ind, batch, batch_size = '', 0, 0, 500
+                out, batch = "", 0
+        elif mode == "OUTSIDE":
+            out, ind, batch, batch_size = "", 0, 0, 500
             seqs, indent = {}, 150
             fh = open(trim1, "r")
             e_value = 0.1
             for header, sequence in fasta_iterator(fh):
                 inf = len(sequence) - indent
-                if (inf < 0):
+                if inf < 0:
                     10
-                out = out + ">" + header + "\n" + sequence[inf:len(sequence
-                                                                   )] + "\n"
+                out = (
+                    out
+                    + ">"
+                    + header
+                    + "\n"
+                    + sequence[inf : len(sequence)]
+                    + "\n"
+                )
                 seqs[header] = [sequence, inf]
                 ind, batch = ind + 1, batch + 1
-                if (batch >= batch_size):
-                    blast_match_j_const(out, seqs, trim1, trim2, refj, e_value,
-                                        indent)
-                    out, batch, seqs = '', 0, {}
+                if batch >= batch_size:
+                    blast_match_j_const(
+                        out, seqs, trim1, trim2, refj, e_value, indent
+                    )
+                    out, batch, seqs = "", 0, {}
             fh.close()
-            if (len(seqs) > 0):
-                blast_match_j_const(out, seqs, trim1, trim2, refj, e_value,
-                                    indent)
-                out, batch = '', 0
-    if (control == "TRUE"):
-        out, ind, batch, batch_size = '', 0, 0, 500
+            if len(seqs) > 0:
+                blast_match_j_const(
+                    out, seqs, trim1, trim2, refj, e_value, indent
+                )
+                out, batch = "", 0
+    if control == "TRUE":
+        out, ind, batch, batch_size = "", 0, 0, 500
         e_value = 1e-80
         seqs, indent = {}, 0
         fh = open(trim1, "r")
@@ -238,44 +503,80 @@ def filter_igj_genes(trim1, trim2, refj, control, primer_file, ref_const,
             out = out + ">" + header + "\n" + sequence + "\n"
             seqs[header] = sequence
             ind, batch = ind + 1, batch + 1
-            if (batch >= batch_size):
+            if batch >= batch_size:
                 blast_match_j(out, seqs, trim1, trim2, refj, e_value)
-                out, batch = '', 0
+                out, batch = "", 0
         fh.close()
-        if (len(out) > 2):
+        if len(out) > 2:
             blast_match_j(out, seqs, trim1, trim2, refj, e_value)
     return ()
 
 
 def check_fasta_not_empty(fh):
+    """Summary
+
+    Parameters
+    ----------
+    fh : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     pfh = 0
     for l in fh:
         print(l)
-        if (len(l) != 0):
+        if len(l) != 0:
             pfh = 1
         break
-    return (pfh)
+    return pfh
 
 
 def get_consensus_sequence(u_seq, u_freq, tmp_file, threshold):
-    out = ''
+    """Summary
+
+    Parameters
+    ----------
+    u_seq : TYPE
+        Description
+    u_freq : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    threshold : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    out = ""
     for i in range(0, len(u_seq)):
         out = out + ">" + str(i) + "\n" + u_seq[i] + "\n"
     fh = open(tmp_file + "txt", "w")
     fh.write(out)
     fh.close()
-    if (len(u_seq) > 2000):
-        command1 = ("mafft --retree 2 --parttree " + "{}txt".format(tmp_file) +
-                    " > {}aligned".format(tmp_file))
+    if len(u_seq) > 2000:
+        command1 = (
+            "mafft --retree 2 --parttree "
+            + "{}txt".format(tmp_file)
+            + " > {}aligned".format(tmp_file)
+        )
     else:
-        command1 = ("mafft --retree 2 " + "{}txt".format(tmp_file) +
-                    " > {}aligned".format(tmp_file))
+        command1 = (
+            "mafft --retree 2 "
+            + "{}txt".format(tmp_file)
+            + " > {}aligned".format(tmp_file)
+        )
     os.system(command1)
     fh = open(tmp_file + "aligned", "r")
     max_seqs = {}
     pfh = check_fasta_not_empty(fh)
     fh.close()
-    if (pfh == 1):
+    if pfh == 1:
         fh = open(tmp_file + "aligned", "r")
         for header, sequence in fasta_iterator(fh):
             max_seqs[sequence.upper()] = int(header)
@@ -284,146 +585,279 @@ def get_consensus_sequence(u_seq, u_freq, tmp_file, threshold):
         base_dict = {}
         for b in range(0, len(bases)):
             base_dict[bases[b]] = b
-        consensus = ''
+        consensus = ""
         start = 0
         for i in range(0, len(sequence)):
             f = [0] * len(bases)
             for s in max_seqs:
                 f[base_dict[s[i]]] = f[base_dict[s[i]]] + u_freq[max_seqs[s]]
-            if (f[4] == 0):
+            if f[4] == 0:
                 start == 1
-            if (max(f) * 1.0 / sum(f) >= threshold):
-                if (bases[f.index(max(f))] != "-"):
+            if max(f) * 1.0 / sum(f) >= threshold:
+                if bases[f.index(max(f))] != "-":
                     consensus = consensus + bases[f.index(max(f))]
             else:
-                if (start == 1):
+                if start == 1:
                     for j in range(0, 5):
-                        if (f[j] != 0):
-                            consensus = consensus + "|" + bases[j] + ":" + str(
-                                '%s' % float('%.3g' % (f[j] * 1.0 / sum(f))))
+                        if f[j] != 0:
+                            consensus = (
+                                consensus
+                                + "|"
+                                + bases[j]
+                                + ":"
+                                + str(
+                                    "%s" % float("%.3g" % (f[j] * 1.0 / sum(f)))
+                                )
+                            )
                     consensus = consensus + "_"
                 else:
                     f = f[0:4]
-                    if (bases[f.index(max(f))] != "-"):
+                    if bases[f.index(max(f))] != "-":
                         consensus = consensus + bases[f.index(max(f))]
                     else:
                         for j in range(0, 4):
-                            if (f[j] != 0):
-                                consensus = consensus + "|" + bases[
-                                    j] + ":" + str(
-                                        '%s' % float('%.3g' %
-                                                     (f[j] * 1.0 / sum(f))))
+                            if f[j] != 0:
+                                consensus = (
+                                    consensus
+                                    + "|"
+                                    + bases[j]
+                                    + ":"
+                                    + str(
+                                        "%s"
+                                        % float("%.3g" % (f[j] * 1.0 / sum(f)))
+                                    )
+                                )
                             consensus = consensus + "_"
         # else:print "ERROR", u_freq, u_seq
     else:
         consensus = ""
-    return (consensus)
+    return consensus
 
 
 def check_barcode(seq_section, find, tag):
+    """Summary
+
+    Parameters
+    ----------
+    seq_section : TYPE
+        Description
+    find : TYPE
+        Description
+    tag : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     passes = 1
     for i in range(0, len(seq_section)):
-        if (tag[i] == "T"):
-            if (tag[i] != seq_section[i]):
+        if tag[i] == "T":
+            if tag[i] != seq_section[i]:
                 passes = 0
-    return (passes)
+    return passes
 
 
 def check_barcode_malbac(bc, tag):
+    """Summary
+
+    Parameters
+    ----------
+    bc : TYPE
+        Description
+    tag : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     passes = 1
     for i in range(0, len(bc)):
-        if (tag[i] != "N"):
-            if (tag[i] != bc[i]):
+        if tag[i] != "N":
+            if tag[i] != bc[i]:
                 passes = 0
                 break
-    return (passes)
+    return passes
 
 
-def trim_sequences_bcr_tcr(tmp_Tmp_file, Fail_file, Output_trim, gene, paired,
-                           species, primer_file, primer_tag_file, tmp_file,
-                           primer_tag_file_count, sample, ref_const,
-                           reverse_primer_group):
+def trim_sequences_bcr_tcr(
+    tmp_Tmp_file,
+    Fail_file,
+    Output_trim,
+    gene,
+    paired,
+    species,
+    primer_file,
+    primer_tag_file,
+    tmp_file,
+    primer_tag_file_count,
+    sample,
+    ref_const,
+    reverse_primer_group,
+):
+    """Summary
+
+    Parameters
+    ----------
+    tmp_Tmp_file : TYPE
+        Description
+    Fail_file : TYPE
+        Description
+    Output_trim : TYPE
+        Description
+    gene : TYPE
+        Description
+    paired : TYPE
+        Description
+    species : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    primer_tag_file : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+    sample : TYPE
+        Description
+    ref_const : TYPE
+        Description
+    reverse_primer_group : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     (rc) = init_rc()
     forward, reverse, barcoded_j, barcoded_v, v_ref = get_primers_split(
-        rc, primer_file)
+        rc, primer_file
+    )
     fh_out = open(Output_trim, "w")
     fh_out.close()
     fh_out = open(Fail_file, "w")
     fh_out.close()
     threshold_barcode = 0.80  # Certainty for accepting a barcode
-    if (barcoded_j == 1 and barcoded_v == 0):
+    if barcoded_j == 1 and barcoded_v == 0:
         inside = 1
         print("J barcoded")
         single_j_barcoded_trimming_clustered(
-            forward, reverse, barcoded_j, barcoded_v, rc, tmp_Tmp_file,
-            Fail_file, Output_trim, primer_tag_file, tmp_file, gene, paired,
-            species, primer_file, primer_tag_file_count, threshold_barcode,
-            ref_const, inside, v_ref)
+            forward,
+            reverse,
+            barcoded_j,
+            barcoded_v,
+            rc,
+            tmp_Tmp_file,
+            Fail_file,
+            Output_trim,
+            primer_tag_file,
+            tmp_file,
+            gene,
+            paired,
+            species,
+            primer_file,
+            primer_tag_file_count,
+            threshold_barcode,
+            ref_const,
+            inside,
+            v_ref,
+        )
     return ()
 
 
 def get_primers_split(rc, primer_file):
+    """Summary
+
+    Parameters
+    ----------
+    rc : TYPE
+        Description
+    primer_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(primer_file, "r")
     forward, reverse, v_ref = [], [], []
     barcoded_j, barcoded_v = 0, 0
     word_size = 8
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
-            if (len(l) > 2):
-                header, sequence, uni, BC, gene_specific = l[0], l[1], l[2], l[
-                    3], l[4]
+            if len(l) > 2:
+                header, sequence, uni, BC, gene_specific = (
+                    l[0],
+                    l[1],
+                    l[2],
+                    l[3],
+                    l[4],
+                )
                 gene_specific = gene_specific.upper()
                 words = []
                 for i in range(word_size, len(gene_specific)):
                     words.append(
-                        [gene_specific[i - word_size:i], i - word_size])
-                if header.count("J") != 0 or header.count(
-                        "REV_CONST") != 0 or header.count("REVERSE") != 0:
-                    if (header.count("REV_CONST") != 0):
+                        [gene_specific[i - word_size : i], i - word_size]
+                    )
+                if (
+                    header.count("J") != 0
+                    or header.count("REV_CONST") != 0
+                    or header.count("REVERSE") != 0
+                ):
+                    if header.count("REV_CONST") != 0:
                         inside = 1
-                    if (sequence.count("N") != 0):
+                    if sequence.count("N") != 0:
                         barcoded_j = 1
                     sequence = sequence.upper()
-                    if (header.count("HOUSEKEEPING") != 0):
+                    if header.count("HOUSEKEEPING") != 0:
                         clas = "HOUSEKEEPING"
                     else:
                         clas = "IMMUME_REC"
                     l = len(gene_specific)
-                    reverse = reverse + [[
-                        sequence, clas, uni, BC, gene_specific, header, words
-                    ]]
+                    reverse = reverse + [
+                        [sequence, clas, uni, BC, gene_specific, header, words]
+                    ]
                 else:
-                    if (sequence.count("N") != 0):
+                    if sequence.count("N") != 0:
                         barcoded_v = 1
                     sequence = sequence.upper()
-                    if (header.count("HOUSEKEEPING") != 0):
+                    if header.count("HOUSEKEEPING") != 0:
                         clas = "HOUSEKEEPING"
                     else:
                         clas = "IMMUNE_REC"
                     l = len(gene_specific)
-                    forward = forward + [[
-                        sequence, clas, uni, BC, gene_specific, header, words
-                    ]]
+                    forward = forward + [
+                        [sequence, clas, uni, BC, gene_specific, header, words]
+                    ]
             else:
                 header, sequence = l[0], l[1]
                 sequence = sequence.upper()
                 words = []
                 for i in range(word_size, len(sequence)):
-                    words.append([sequence[i - word_size:i], i - word_size])
-                if (header.count("J") != 0 or header.count("REV_CONST") != 0
-                        or header.count("REVERSE") != 0):
-                    if (header.count("CONST") != 0):
+                    words.append([sequence[i - word_size : i], i - word_size])
+                if (
+                    header.count("J") != 0
+                    or header.count("REV_CONST") != 0
+                    or header.count("REVERSE") != 0
+                ):
+                    if header.count("CONST") != 0:
                         inside = 1
-                    if (sequence.count("N") != 0):
+                    if sequence.count("N") != 0:
                         barcoded_j = 1
                     sequence = sequence.upper()
                     clas = "IMMUME_REC"
-                    reverse = reverse + [[
-                        sequence, clas, sequence, header, words
-                    ]]
-                elif (header.count("REF") == 0):
-                    if (sequence.count("N") != 0):
+                    reverse = reverse + [
+                        [sequence, clas, sequence, header, words]
+                    ]
+                elif header.count("REF") == 0:
+                    if sequence.count("N") != 0:
                         barcoded_v = 1
                     sequence = sequence.upper()
                     clas = "IMMUNE_REC"
@@ -438,27 +872,50 @@ def get_primers_split(rc, primer_file):
     return (forward, reverse, barcoded_j, barcoded_v, v_ref)
 
 
-def separate_sequences(primer_tag_file_count, primer_tag_file, Output_trim,
-                       ref_const):
+def separate_sequences(
+    primer_tag_file_count, primer_tag_file, Output_trim, ref_const
+):
+    """Summary
+
+    Parameters
+    ----------
+    primer_tag_file_count : TYPE
+        Description
+    primer_tag_file : TYPE
+        Description
+    Output_trim : TYPE
+        Description
+    ref_const : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(ref_const, "r")
     word_length = 8
     word_dict = {}
     for header, sequence in fasta_iterator(fh):
-        header, sequence = header.replace("|",
-                                          ",").split("*")[0], sequence.upper()
+        header, sequence = (
+            header.replace("|", ",").split("*")[0],
+            sequence.upper(),
+        )
         words = []
         for i in range(word_length, len(sequence)):
-            words.append([sequence[i - word_length:i], i - word_length])
+            words.append([sequence[i - word_length : i], i - word_length])
         word_dict[header] = words
     fh.close()
     region_primer_type = {}
     fh = open(primer_tag_file_count, "r")
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
             const_reg, seq_type, rev_primer = l[len(l) - 1], l[4], l[6]
             region_primer_type[l[0].split(":")[0]] = [
-                const_reg, seq_type, rev_primer
+                const_reg,
+                seq_type,
+                rev_primer,
             ]
     fh.close()
     fh = open(primer_tag_file, "r")
@@ -466,15 +923,15 @@ def separate_sequences(primer_tag_file_count, primer_tag_file, Output_trim,
     # seqs, classifications = Tree(), {}
     seqs = Tree()
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
-            if (l[6] == "YES"):
+            if l[6] == "YES":
                 consensus = l[7]
                 id = l[0].split("__")[0]
                 seqs[consensus][id].value = 1
     fh.close()
     print(len(seqs))
-    out, ind = '', 0
+    out, ind = "", 0
     seq_info, seq_uniq = {}, Tree()
     classes = {}
     threshold = 5
@@ -482,12 +939,12 @@ def separate_sequences(primer_tag_file_count, primer_tag_file, Output_trim,
         for id in seqs[s]:
             break
         scores = assess_gene_score(s, word_dict, threshold)
-        if (len(scores) > 0):
+        if len(scores) > 0:
             if (
-                    scores[0][0] > threshold
+                scores[0][0] > threshold
             ):  # for non-housekeeping genes, trimmed sequences to remove constant region
-                if (len(scores) == 1):
-                    if (len(scores[0][2]) > 50):
+                if len(scores) == 1:
+                    if len(scores[0][2]) > 50:
                         seq = scores[0][2]
                     else:
                         seq = s
@@ -505,68 +962,197 @@ def separate_sequences(primer_tag_file_count, primer_tag_file, Output_trim,
         classes_order[classes_all[i]] = i
     header = "_".join(classes_all)
     for s in seq_uniq:
-        if (len(seq_uniq[s]) > 0):
+        if len(seq_uniq[s]) > 0:
             f = [0] * len(classes_all)
             for id in seq_uniq[s]:
                 c = seq_info[id][2]
                 f[classes_order[c]] = f[classes_order[c]] + seq_info[id][0]
-            out = out + ">" + id.split("__")[0] + "__" + "_".join(map(
-                str, f)) + "|" + header + "\n" + s + "\n"
+            out = (
+                out
+                + ">"
+                + id.split("__")[0]
+                + "__"
+                + "_".join(map(str, f))
+                + "|"
+                + header
+                + "\n"
+                + s
+                + "\n"
+            )
             ind = ind + 1
-            if (ind > 100):
+            if ind > 100:
                 write_out(out, Output_trim)
-                out, ind = '', 0
+                out, ind = "", 0
     write_out(out, Output_trim)
     return ()
 
 
 def assess_gene_score(consensus, word_dict, threshold):
+    """Summary
+
+    Parameters
+    ----------
+    consensus : TYPE
+        Description
+    word_dict : TYPE
+        Description
+    threshold : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     scores, max_score = [], 0
     for hk in word_dict:
         w = word_dict[hk]
         score = [i for i in range(len(w)) if consensus.count(w[i][0]) != 0]
-        if (len(score) > threshold / 2):
-            if (len(score) >= max_score):
+        if len(score) > threshold / 2:
+            if len(score) >= max_score:
                 consensus1 = consensus
-                if (hk.count("HOUSEKEEPING") == 0
-                        and len(score) > threshold / 2):
+                if hk.count("HOUSEKEEPING") == 0 and len(score) > threshold / 2:
                     start = [
                         consensus.index(w[score[i]][0]) - w[score[i]][1]
                         for i in range(len(score))
                     ]
                     start = max(set(start), key=start.count)
                     consensus1 = consensus[0:start]
-                if (max_score == len(score)):
+                if max_score == len(score):
                     scores.append([len(score), hk, consensus1])
                 else:
                     scores = []
                     scores.append([len(score), hk, consensus1])
                 max_score = len(score)
-    return (scores)
+    return scores
 
 
 def single_j_barcoded_trimming_clustered(
-        forward, reverse, barcoded_j, barcoded_v, rc, tmp_Tmp_file, Fail_file,
-        Output_trim, primer_tag_file, tmp_file, gene, paired, species,
-        primer_file, primer_tag_file_count, threshold_barcode, ref_const,
-        inside, v_ref):
-    read_untrimmed_file_single(rc, tmp_Tmp_file, Fail_file, Output_trim, gene,
-                               paired, species, primer_file, primer_tag_file,
-                               tmp_file, primer_tag_file_count, forward,
-                               reverse, v_ref)
-    check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Fail_file,
-                          Output_trim, threshold_barcode)
-    separate_sequences(primer_tag_file_count, primer_tag_file, Output_trim,
-                       ref_const)
+    forward,
+    reverse,
+    barcoded_j,
+    barcoded_v,
+    rc,
+    tmp_Tmp_file,
+    Fail_file,
+    Output_trim,
+    primer_tag_file,
+    tmp_file,
+    gene,
+    paired,
+    species,
+    primer_file,
+    primer_tag_file_count,
+    threshold_barcode,
+    ref_const,
+    inside,
+    v_ref,
+):
+    """Summary
+
+    Parameters
+    ----------
+    forward : TYPE
+        Description
+    reverse : TYPE
+        Description
+    barcoded_j : TYPE
+        Description
+    barcoded_v : TYPE
+        Description
+    rc : TYPE
+        Description
+    tmp_Tmp_file : TYPE
+        Description
+    Fail_file : TYPE
+        Description
+    Output_trim : TYPE
+        Description
+    primer_tag_file : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    gene : TYPE
+        Description
+    paired : TYPE
+        Description
+    species : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+    threshold_barcode : TYPE
+        Description
+    ref_const : TYPE
+        Description
+    inside : TYPE
+        Description
+    v_ref : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    read_untrimmed_file_single(
+        rc,
+        tmp_Tmp_file,
+        Fail_file,
+        Output_trim,
+        gene,
+        paired,
+        species,
+        primer_file,
+        primer_tag_file,
+        tmp_file,
+        primer_tag_file_count,
+        forward,
+        reverse,
+        v_ref,
+    )
+    check_barcodes_malbac(
+        primer_tag_file_count,
+        primer_tag_file,
+        Fail_file,
+        Output_trim,
+        threshold_barcode,
+    )
+    separate_sequences(
+        primer_tag_file_count, primer_tag_file, Output_trim, ref_const
+    )
     return ()
 
 
-def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Fail_file,
-                          Output_trim, threshold):
+def check_barcodes_malbac(
+    primer_tag_file_count, primer_tag_file, Fail_file, Output_trim, threshold
+):
+    """Summary
+
+    Parameters
+    ----------
+    primer_tag_file_count : TYPE
+        Description
+    primer_tag_file : TYPE
+        Description
+    Fail_file : TYPE
+        Description
+    Output_trim : TYPE
+        Description
+    threshold : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     header_txt = (
-        '#ID\tnumber_of_reads\ttotal_reads_with_BC\tJ_barcode\tV_barcode\t' +
-        'bp_mismatches_to_consensus\tBC_accepted\tconsensus\tsequence\n')
-    outs = ['', header_txt]
+        "#ID\tnumber_of_reads\ttotal_reads_with_BC\tJ_barcode\tV_barcode\t"
+        + "bp_mismatches_to_consensus\tBC_accepted\tconsensus\tsequence\n"
+    )
+    outs = ["", header_txt]
     files = [Output_trim, primer_tag_file]
     for i in range(0, len(files)):
         fh = open(files[i], "w")
@@ -575,7 +1161,7 @@ def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Fail_file,
     fh = open(primer_tag_file_count, "r")
     seqs = Tree()
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
             v_tag, j_tag, sequence, header = l[2], l[1], l[3], l[0]
             seqs[j_tag + "\t" + v_tag][sequence][header].value = 1
@@ -584,7 +1170,7 @@ def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Fail_file,
     # min_depth = (1.0 / (1 - threshold))
     total_tags, ind, passed_seqs_total = 0, 0, 0
     fail_less_than_threshold = 0
-    outp = ''
+    outp = ""
     for t1 in seqs:
         # t, u_seq, u_freq, u_header = 0, [], [], []
         u_seq, u_freq, u_header = [], [], []
@@ -592,86 +1178,172 @@ def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Fail_file,
             f = 0
             for h in seqs[t1][s]:
                 f = f + int(h.split(":")[1])
-            total_tags, u_seq, u_freq, u_header, ind = total_tags + f, u_seq + [
-                s
-            ], u_freq + [f], u_header + [h], ind + 1
+            total_tags, u_seq, u_freq, u_header, ind = (
+                total_tags + f,
+                u_seq + [s],
+                u_freq + [f],
+                u_header + [h],
+                ind + 1,
+            )
         f = sum(u_freq)
         h = h.split(":")[0].split("__")[0] + "__" + str(sum(u_freq))
         # print t1, sum(u_freq), len(u_freq), u_freq
-        if (sum(u_freq) > 20):
+        if sum(u_freq) > 20:
             print("BC group size:\t", len(u_freq), t1.split())
-        if (len(u_freq) == 1):
+        if len(u_freq) == 1:
             passed_seqs_total = passed_seqs_total + f
-            outp = outp + h + "\t" + str(f) + "\t" + str(
-                f) + "\t" + t1 + "\t0\tYES\t" + s + "\t" + s + "\n"
-        elif (len(u_freq) < 500):
-            if (max(u_freq) > sum(u_freq) * threshold):
-                nz = [
-                    i for i in range(len(u_freq)) if u_freq[i] != max(u_freq)
-                ]
+            outp = (
+                outp
+                + h
+                + "\t"
+                + str(f)
+                + "\t"
+                + str(f)
+                + "\t"
+                + t1
+                + "\t0\tYES\t"
+                + s
+                + "\t"
+                + s
+                + "\n"
+            )
+        elif len(u_freq) < 500:
+            if max(u_freq) > sum(u_freq) * threshold:
+                nz = [i for i in range(len(u_freq)) if u_freq[i] != max(u_freq)]
                 passed_seqs_total = passed_seqs_total + f
                 consensus = u_seq[nz[0]]
-                outp = outp + "\t".join(
-                    map(str, [
-                        h,
-                        len(u_freq),
-                        sum(u_freq), t1, 0, "YES", consensus, consensus
-                    ])) + "\n"
-            elif (len(u_freq) > 15):  # clustering first then alignment
-                out_cluster, ids = '', {}
+                outp = (
+                    outp
+                    + "\t".join(
+                        map(
+                            str,
+                            [
+                                h,
+                                len(u_freq),
+                                sum(u_freq),
+                                t1,
+                                0,
+                                "YES",
+                                consensus,
+                                consensus,
+                            ],
+                        )
+                    )
+                    + "\n"
+                )
+            elif len(u_freq) > 15:  # clustering first then alignment
+                out_cluster, ids = "", {}
                 for i in range(0, len(u_seq)):
-                    out_cluster = out_cluster + ">" + u_header[
-                        i] + "\n" + u_seq[i] + "\n"
+                    out_cluster = (
+                        out_cluster + ">" + u_header[i] + "\n" + u_seq[i] + "\n"
+                    )
                     ids[u_header[i]] = [u_seq[i], u_freq[i]]
                 consensus, pass_consensus = get_consensus_sequence_large(
-                    out_cluster, Fail_file, len(u_seq[i]), ids, sum(u_freq),
-                    threshold, tmp_file)
-                if (consensus != '' and pass_consensus == 1):
-                    outp = outp + "\t".join(
-                        map(str, [
-                            h,
-                            len(u_freq),
-                            sum(u_freq), t1, 0, "YES", consensus, consensus
-                        ])) + "\n"
+                    out_cluster,
+                    Fail_file,
+                    len(u_seq[i]),
+                    ids,
+                    sum(u_freq),
+                    threshold,
+                    tmp_file,
+                )
+                if consensus != "" and pass_consensus == 1:
+                    outp = (
+                        outp
+                        + "\t".join(
+                            map(
+                                str,
+                                [
+                                    h,
+                                    len(u_freq),
+                                    sum(u_freq),
+                                    t1,
+                                    0,
+                                    "YES",
+                                    consensus,
+                                    consensus,
+                                ],
+                            )
+                        )
+                        + "\n"
+                    )
                     passed_seqs_total = passed_seqs_total + f
                 else:
                     fail_less_than_threshold = fail_less_than_threshold + 1
             else:
                 consensus, pass_consensus = get_consensus_sequence_cluster(
-                    u_seq, u_freq, tmp_file, threshold)
-                if (consensus.count("_") == 0 and pass_consensus == 1):
-                    outp = outp + "\t".join(
-                        map(str, [
-                            h,
-                            len(u_freq),
-                            sum(u_freq), t1, 0, "YES", consensus, consensus
-                        ])) + "\n"
+                    u_seq, u_freq, tmp_file, threshold
+                )
+                if consensus.count("_") == 0 and pass_consensus == 1:
+                    outp = (
+                        outp
+                        + "\t".join(
+                            map(
+                                str,
+                                [
+                                    h,
+                                    len(u_freq),
+                                    sum(u_freq),
+                                    t1,
+                                    0,
+                                    "YES",
+                                    consensus,
+                                    consensus,
+                                ],
+                            )
+                        )
+                        + "\n"
+                    )
                     passed_seqs_total = passed_seqs_total + f
                 else:
                     fail_less_than_threshold = fail_less_than_threshold + 1
-        if (ind > 200):
+        if ind > 200:
             write_out(outp, primer_tag_file)
-            outp, ind = '', 0
+            outp, ind = "", 0
     write_out(outp, primer_tag_file)
-    outp, ind = '', 0
+    outp, ind = "", 0
     print(total_tags, passed_seqs_total, fail_less_than_threshold)
     return ()
 
 
 def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
-    out = ''
+    """Summary
+
+    Parameters
+    ----------
+    u_seq : TYPE
+        Description
+    u_freq : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    threshold : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    out = ""
     for i in range(0, len(u_seq)):
         out = out + ">" + str(i) + "\n" + u_seq[i] + "\n"
     fh = open(tmp_file + "txt", "w")
     fh.write(out)
     fh.close()
-    if (len(u_seq) > 2000):
+    if len(u_seq) > 2000:
         # command1 = "mafft --retree 2 " + insert + " " + tmp_file + "txt > " + tmp_file + "aligned"
-        command1 = ("mafft --retree 2 --parttree " + "{}txt".format(tmp_file) +
-                    " > {}aligned".format(tmp_file))
+        command1 = (
+            "mafft --retree 2 --parttree "
+            + "{}txt".format(tmp_file)
+            + " > {}aligned".format(tmp_file)
+        )
     else:
-        command1 = ("mafft --retree 2 " + "{}txt".format(tmp_file) +
-                    " > {}aligned".format(tmp_file))
+        command1 = (
+            "mafft --retree 2 "
+            + "{}txt".format(tmp_file)
+            + " > {}aligned".format(tmp_file)
+        )
     os.system(command1)
     fh = open(tmp_file + "aligned", "r")
     max_seqs = {}
@@ -682,42 +1354,79 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
     base_dict = {}
     for b in range(0, len(bases)):
         base_dict[bases[b]] = b
-    consensus = ''
+    consensus = ""
     start, pass_consensus = 0, 1
     for i in range(0, len(sequence)):
         f = [0] * len(bases)
         for s in max_seqs:
-            if (s[i] not in base_dict):
+            if s[i] not in base_dict:
                 print(i, s[i], max_seqs)
             f[base_dict[s[i]]] = f[base_dict[s[i]]] + u_freq[max_seqs[s]]
-        if (f[4] == 0):
+        if f[4] == 0:
             start == 1
-        if (max(f) * 1.0 / sum(f) >= threshold):
-            if (bases[f.index(max(f))] != "-"):
+        if max(f) * 1.0 / sum(f) >= threshold:
+            if bases[f.index(max(f))] != "-":
                 consensus = consensus + bases[f.index(max(f))]
         else:
             pass_consensus = 0
-            if (start == 1):
+            if start == 1:
                 for j in range(0, 5):
-                    if (f[j] != 0):
-                        consensus = consensus + "|" + bases[j] + ":" + str(
-                            '%s' % float('%.3g' % (f[j] * 1.0 / sum(f))))
+                    if f[j] != 0:
+                        consensus = (
+                            consensus
+                            + "|"
+                            + bases[j]
+                            + ":"
+                            + str("%s" % float("%.3g" % (f[j] * 1.0 / sum(f))))
+                        )
                 consensus = consensus + "_"
             else:
                 f = f[0:4]
-                if (bases[f.index(max(f))] != "-"):
+                if bases[f.index(max(f))] != "-":
                     consensus = consensus + bases[f.index(max(f))]
                 else:
                     for j in range(0, 4):
-                        if (f[j] != 0):
-                            consensus = consensus + "|" + bases[j] + ":" + str(
-                                '%s' % float('%.3g' % (f[j] * 1.0 / sum(f))))
+                        if f[j] != 0:
+                            consensus = (
+                                consensus
+                                + "|"
+                                + bases[j]
+                                + ":"
+                                + str(
+                                    "%s" % float("%.3g" % (f[j] * 1.0 / sum(f)))
+                                )
+                            )
                         consensus = consensus + "_"
     return (consensus, pass_consensus)
 
 
-def get_consensus_sequence_large(out_cluster, Fail_file, l1, ids, sum_u_freq,
-                                 threshold, tmp_file):
+def get_consensus_sequence_large(
+    out_cluster, Fail_file, l1, ids, sum_u_freq, threshold, tmp_file
+):
+    """Summary
+
+    Parameters
+    ----------
+    out_cluster : TYPE
+        Description
+    Fail_file : TYPE
+        Description
+    l1 : TYPE
+        Description
+    ids : TYPE
+        Description
+    sum_u_freq : TYPE
+        Description
+    threshold : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(Fail_file, "w")
     fh.write(out_cluster)
     fh.close()
@@ -729,43 +1438,94 @@ def get_consensus_sequence_large(out_cluster, Fail_file, l1, ids, sum_u_freq,
         clust, id = l[0], l[2].replace("...", "").replace(">", "")
         cluster[clust][id].value = 1
     fh.close()
-    max_s, max_clust = 0, ''
+    max_s, max_clust = 0, ""
     for c in cluster:
         f = 0
         for id in cluster[c]:
             f = f + ids[id][1]
-        if (max_s < f):
+        if max_s < f:
             max_clust, max_s = c, f
-    consensus, pass_consensus = '', 0
-    if (sum_u_freq * threshold < max_s):
+    consensus, pass_consensus = "", 0
+    if sum_u_freq * threshold < max_s:
         seq_align, s_freq = [], []
         for id in cluster[max_clust]:
             seq_align.append(ids[id][0])
             s_freq.append(ids[id][1])
-        consensus = get_consensus_sequence(seq_align, s_freq, tmp_file,
-                                           threshold)
-        if (consensus.count("_") == 0 and len(consensus) > 3):
+        consensus = get_consensus_sequence(
+            seq_align, s_freq, tmp_file, threshold
+        )
+        if consensus.count("_") == 0 and len(consensus) > 3:
             pass_consensus = 1
         else:
             pass_consensus = 0
     return (consensus, pass_consensus)
 
 
-def read_untrimmed_file_single(rc, tmp_Tmp_file, Fail_file, Output_trim, gene,
-                               paired, species, primer_file, primer_tag_file,
-                               tmp_file, primer_tag_file_count, forward,
-                               reverse, v_ref):
+def read_untrimmed_file_single(
+    rc,
+    tmp_Tmp_file,
+    Fail_file,
+    Output_trim,
+    gene,
+    paired,
+    species,
+    primer_file,
+    primer_tag_file,
+    tmp_file,
+    primer_tag_file_count,
+    forward,
+    reverse,
+    v_ref,
+):
+    """Summary
+
+    Parameters
+    ----------
+    rc : TYPE
+        Description
+    tmp_Tmp_file : TYPE
+        Description
+    Fail_file : TYPE
+        Description
+    Output_trim : TYPE
+        Description
+    gene : TYPE
+        Description
+    paired : TYPE
+        Description
+    species : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    primer_tag_file : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+    forward : TYPE
+        Description
+    reverse : TYPE
+        Description
+    v_ref : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     for f in [primer_tag_file_count]:
         fh = open(f, "w")
         fh.close()
     fh = open(tmp_Tmp_file, "r")
     # seqs = Tree()
     minl, maxl = 110, 1000000
-    if (gene == "HEAVY" or gene == "IGH"):
+    if gene == "HEAVY" or gene == "IGH":
         minl = 120
-    if (gene == "KAPPA" or gene == "IGK"):
+    if gene == "KAPPA" or gene == "IGK":
         minl = 110
-    if (gene == "LAMBDA" or gene == "IGL"):
+    if gene == "LAMBDA" or gene == "IGL":
         (minl, maxl) = (90, 150)
     # J_found, v_found, tot, indexing = 0, 0, 0, 0
     seqs1, t = Tree(), 0
@@ -773,192 +1533,299 @@ def read_untrimmed_file_single(rc, tmp_Tmp_file, Fail_file, Output_trim, gene,
         seq = seq.upper()
         seqs1[seq][header].value = 1
         t = t + 1
-    out, ind = "#ID\tJ_tag\tV_tag\tSequence\ttype_rev\ttype_for\tprimer_rev\tprimer_for\n", 0
+    out, ind = (
+        "#ID\tJ_tag\tV_tag\tSequence\ttype_rev\ttype_for\tprimer_rev\tprimer_for\n",
+        0,
+    )
     total, pass_r, pass_f, pass_all = 0, 0, 0, 0
     for seq in seqs1:
         for header in seqs1[seq]:
             break
         header = header + ":" + str(len(seqs1[seq]))
         # number = len(seqs1[seq])
-        passes, j_tag, v_tag = 0, '', ''
-        type_rev, type_for = '', ''
-        primer_rev, primer_for = '', ''
+        passes, j_tag, v_tag = 0, "", ""
+        type_rev, type_for = "", ""
+        primer_rev, primer_for = "", ""
         total = total + 1
         for i in range(0, len(reverse)):
             pj = get_match(reverse[i][2], seq)
-            if (max(pj + [-1]) == -1 or len(pj) == 0):
+            if max(pj + [-1]) == -1 or len(pj) == 0:
                 seq = reverse_comp(seq, rc)
                 pj = get_match(reverse[i][2], seq)
-            if (max(pj + [-1]) != -1):
+            if max(pj + [-1]) != -1:
                 bc_len = len(reverse[i][3])  # len(reverse[i][2])/5
-                if (pj[0] > bc_len - 3):
-                    j_tag = seq[pj[0] - bc_len:pj[0]]
-                    if (len(j_tag) > bc_len / 2):
+                if pj[0] > bc_len - 3:
+                    j_tag = seq[pj[0] - bc_len : pj[0]]
+                    if len(j_tag) > bc_len / 2:
                         # print j_tag, seq[pj[0]-bc_len-5:pj[0]+bc_len], reverse[i][5]
-                        seq = seq[pj[0] + bc_len:len(seq)]
+                        seq = seq[pj[0] + bc_len : len(seq)]
                         # seq = reverse_comp(seq, rc)
                         type_rev, primer_rev = reverse[i][1], reverse[i][5]
                         passes = 1
                         break
-        if (passes != 1):
+        if passes != 1:
             for i in range(0, len(reverse)):
                 words = reverse[i][6]
                 p = []
                 for w in words:
                     pj = get_match(w[0], seq)
-                    if (max(pj + [-1]) != -1 and len(pj) > 0):
-                        if (pj[0] < len(seq) / 2):
+                    if max(pj + [-1]) != -1 and len(pj) > 0:
+                        if pj[0] < len(seq) / 2:
                             p = p + [max([0, pj[0] - w[1]])]
                         else:
                             pj[0] = -1
-                if (len(p) > 1):
+                if len(p) > 1:
                     pj = max(set(p), key=p.count)
                     bc_len = len(reverse[i][3])
-                    if (pj > min([bc_len - 3])):
-                        j_tag = seq[pj - bc_len:pj + 1]
-                        if (len(j_tag) > bc_len / 2):
-                            seq = seq[pj + bc_len:len(seq)]
+                    if pj > min([bc_len - 3]):
+                        j_tag = seq[pj - bc_len : pj + 1]
+                        if len(j_tag) > bc_len / 2:
+                            seq = seq[pj + bc_len : len(seq)]
                             seq = reverse_comp(seq, rc)
                             type_rev, primer_rev = reverse[i][1], reverse[i][5]
                             passes = 1
                             break
-            if (passes != 1):
+            if passes != 1:
                 seq = reverse_comp(seq, rc)
                 for i in range(0, len(reverse)):
                     words = reverse[i][6]
                     p = []
                     for w in words:
                         pj = get_match(w[0], seq)
-                        if (max(pj + [-1]) != -1 and len(pj) > 0):
-                            if (pj[0] < len(seq) / 2):
+                        if max(pj + [-1]) != -1 and len(pj) > 0:
+                            if pj[0] < len(seq) / 2:
                                 p = p + [max([0, pj[0] - w[1]])]
                             else:
                                 pj[0] = -1
-                    if (len(p) > 1):
+                    if len(p) > 1:
                         bc_len = len(reverse[i][3])
                         pj = max(set(p), key=p.count)
-                        if (pj > min([bc_len - 3])):
-                            j_tag = seq[pj - bc_len:pj + 1]
-                            if (len(j_tag) > bc_len / 2):
-                                seq = seq[pj + bc_len:len(seq)]
+                        if pj > min([bc_len - 3]):
+                            j_tag = seq[pj - bc_len : pj + 1]
+                            if len(j_tag) > bc_len / 2:
+                                seq = seq[pj + bc_len : len(seq)]
                                 seq = reverse_comp(seq, rc)
-                                type_rev, primer_rev = reverse[i][1], reverse[
-                                    i][5]
+                                type_rev, primer_rev = (
+                                    reverse[i][1],
+                                    reverse[i][5],
+                                )
                                 passes = 1
                                 break
-        if (passes == 1):
+        if passes == 1:
             pass_r = pass_r + 1
             for i in range(0, len(forward)):
                 pv = get_match(forward[i][0], seq)
-                if (max(pv + [-1]) != -1):
-                    v_tag = '-'
-                    seq = seq[pv[0] + len(forward[i][0]) - 1:len(seq)]
+                if max(pv + [-1]) != -1:
+                    v_tag = "-"
+                    seq = seq[pv[0] + len(forward[i][0]) - 1 : len(seq)]
                     type_for, primer_for = forward[i][1], forward[i][2]
                     passes = 2
                     break
-            if (passes != 2):
+            if passes != 2:
                 for i in range(0, len(forward)):
                     words = forward[i][3]
                     p = 0
                     for w in words:
                         pv = get_match(w[0], seq)
-                        if (max(pv + [-1]) != -1 and len(pv) > 0):
-                            if (pv[0] < len(seq) / 2):
+                        if max(pv + [-1]) != -1 and len(pv) > 0:
+                            if pv[0] < len(seq) / 2:
                                 p = p + 1
                             else:
                                 pv[0] = -1
-                    if (max(pv + [-1]) != -1 and len(pv) > 0 and p > 1):
-                        v_tag = '-'
-                        seq = seq[pv[0] + len(forward[i][2]) - 1:len(seq)]
+                    if max(pv + [-1]) != -1 and len(pv) > 0 and p > 1:
+                        v_tag = "-"
+                        seq = seq[pv[0] + len(forward[i][2]) - 1 : len(seq)]
                         type_for, primer_for = forward[i][1], forward[i][2]
                         passes = 2
                         break
-            if (passes != 2):
+            if passes != 2:
                 p = []
                 for i in range(0, len(v_ref)):
                     words = v_ref[i][3]
                     p1 = []
                     for w in words:
                         pv = get_match(w[0], seq)
-                        if (max(pv + [-1]) != -1 and len(pv) > 0):
-                            if (pv[0] < len(seq) / 2):
+                        if max(pv + [-1]) != -1 and len(pv) > 0:
+                            if pv[0] < len(seq) / 2:
                                 p = p + [pv[0]]
-                    if (len(p1) > 0):
+                    if len(p1) > 0:
                         p1 = p1 + [min(p1)]
-                if (len(p) >= 2):
+                if len(p) >= 2:
                     pv = min(p)
-                    v_tag = '-'
-                    seq = seq[pv:len(seq)]
+                    v_tag = "-"
+                    seq = seq[pv : len(seq)]
                     type_for, primer_for = v_ref[i][1], v_ref[i][2]
                     passes = 2
-        if (passes == 2):
+        if passes == 2:
             pass_f = pass_f + 1
-            if (len(seq) > minl and len(seq) < maxl):
-                if (seq.count("N") == 0):
+            if len(seq) > minl and len(seq) < maxl:
+                if seq.count("N") == 0:
                     # if(type_rev==type_for):
-                    out = out + "\t".join(
-                        map(str, [
-                            header, j_tag, v_tag, seq, type_rev, type_for,
-                            primer_rev, primer_for
-                        ])) + "\n"
+                    out = (
+                        out
+                        + "\t".join(
+                            map(
+                                str,
+                                [
+                                    header,
+                                    j_tag,
+                                    v_tag,
+                                    seq,
+                                    type_rev,
+                                    type_for,
+                                    primer_rev,
+                                    primer_for,
+                                ],
+                            )
+                        )
+                        + "\n"
+                    )
                     pass_all = pass_all + 1
                     ind = ind + 1
-                    if (ind > 200):
+                    if ind > 200:
                         write_out(out, primer_tag_file_count)
-                        out, ind = '', 0
+                        out, ind = "", 0
     fh.close()
     write_out(out, primer_tag_file_count)
-    out, ind = '', 0
-    print("\tTotal sequences:\t" + str(total) +
-          "\tNumber of REV primers found:\t" + str(pass_r) +
-          "\tNumber of FOR primers found:\t" + str(pass_f) +
-          "\tPassed sequences:\t" + str(pass_all))
+    out, ind = "", 0
+    print(
+        "\tTotal sequences:\t"
+        + str(total)
+        + "\tNumber of REV primers found:\t"
+        + str(pass_r)
+        + "\tNumber of FOR primers found:\t"
+        + str(pass_f)
+        + "\tPassed sequences:\t"
+        + str(pass_all)
+    )
     return ()
 
 
-def read_untrimmed_file(tmp_Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
-                        maxl, minl, js, vs, V_primer, V1, V2,
-                        primer_tag_file_count, Fail_file, vidprimer, jidprimer,
-                        inside, ref_const, universal_rev, reverse_primer_group,
-                        species):
-    if (inside == 1):
-        if (reverse_primer_group != "ISOTYPER"
-                and reverse_primer_group != "ISO"):
+def read_untrimmed_file(
+    tmp_Tmp_file,
+    J_primer,
+    rc,
+    J1,
+    J2,
+    regions_J,
+    sample,
+    maxl,
+    minl,
+    js,
+    vs,
+    V_primer,
+    V1,
+    V2,
+    primer_tag_file_count,
+    Fail_file,
+    vidprimer,
+    jidprimer,
+    inside,
+    ref_const,
+    universal_rev,
+    reverse_primer_group,
+    species,
+):
+    """Summary
+
+    Parameters
+    ----------
+    tmp_Tmp_file : TYPE
+        Description
+    J_primer : TYPE
+        Description
+    rc : TYPE
+        Description
+    J1 : TYPE
+        Description
+    J2 : TYPE
+        Description
+    regions_J : TYPE
+        Description
+    sample : TYPE
+        Description
+    maxl : TYPE
+        Description
+    minl : TYPE
+        Description
+    js : TYPE
+        Description
+    vs : TYPE
+        Description
+    V_primer : TYPE
+        Description
+    V1 : TYPE
+        Description
+    V2 : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+    Fail_file : TYPE
+        Description
+    vidprimer : TYPE
+        Description
+    jidprimer : TYPE
+        Description
+    inside : TYPE
+        Description
+    ref_const : TYPE
+        Description
+    universal_rev : TYPE
+        Description
+    reverse_primer_group : TYPE
+        Description
+    species : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    if inside == 1:
+        if reverse_primer_group != "ISOTYPER" and reverse_primer_group != "ISO":
             print("ISO_DD")
             print(ref_const)
             fh = open(ref_const, "r")
-            ref_words, word_length, length_into_constant_region, ref_seqs = Tree(
-            ), 10, 50, {}
+            ref_words, word_length, length_into_constant_region, ref_seqs = (
+                Tree(),
+                10,
+                50,
+                {},
+            )
             for header, seq in fasta_iterator(fh):
                 seq, header = seq.upper(), header.split("|")[0]
                 ref_seqs[header] = seq
-                for i in range(word_length,
-                               min([length_into_constant_region,
-                                    len(seq)])):
-                    ref_words[seq[i - word_length:i]][header].value = 1
+                for i in range(
+                    word_length, min([length_into_constant_region, len(seq)])
+                ):
+                    ref_words[seq[i - word_length : i]][header].value = 1
             fh.close()
-        if (reverse_primer_group == "ISOTYPER"
-                or reverse_primer_group == "ISO"):
+        if reverse_primer_group == "ISOTYPER" or reverse_primer_group == "ISO":
             print("IsoTyper primers")
-            fh = open((
-                "/nfs/users/nfs_r/rbr1/IMMUNOLOGY/NETWORK_METHODS/STANDARD_BCR_PROCESSING/LIBRARY/",
-                "Annealing_IsoTyper_constant_region_distinction_formatted_" +
-                species + ".txt"), "r")
+            fh = open(
+                (
+                    "/nfs/users/nfs_r/rbr1/IMMUNOLOGY/NETWORK_METHODS/STANDARD_BCR_PROCESSING/LIBRARY/",
+                    "Annealing_IsoTyper_constant_region_distinction_formatted_"
+                    + species
+                    + ".txt",
+                ),
+                "r",
+            )
             ref_words = Tree()
             for l in fh:
-                if (l[0] != "#"):
+                if l[0] != "#":
                     l = l.strip().split()
                     words = l[0].split(":")
                     id = l[1].split("*")[0]
-                    if (id.count("P") == 0):
+                    if id.count("P") == 0:
                         ref_words[words[0]][words[1]][id].value = 1
             fh.close()
         else:
             print("\t\t\t", reverse_primer_group)
     fh = open(primer_tag_file_count, "w")
     fh.close()
-    t, seqs1, total, ind, out = 0, Tree(
-    ), 0, 0, "#ID\tJ_tag\tV_tag\tSequence\n"
+    t, seqs1, total, ind, out = 0, Tree(), 0, 0, "#ID\tJ_tag\tV_tag\tSequence\n"
     J_found, v_found = 0, 0
     fh = open(tmp_Tmp_file, "r")
     for header, seq in fasta_iterator(fh):
@@ -966,16 +1833,17 @@ def read_untrimmed_file(tmp_Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
         seqs1[seq][header].value = 1
         t = t + 1
     # status = "STATUS\t" + sample + "\tNumber of sequences\t" + str(t)
-    fail, indf = '', 0
-    if (len(universal_rev) != 0):
+    fail, indf = "", 0
+    if len(universal_rev) != 0:
         universal_rev1, universal_rev2 = [], []
         for i in range(0, len(universal_rev)):
             universal_rev1 = universal_rev1 + [
-                universal_rev[i][0:(len(universal_rev[i]) / 2)]
+                universal_rev[i][0 : (len(universal_rev[i]) / 2)]
             ]
             universal_rev2 = universal_rev2 + [
-                universal_rev[i][(len(universal_rev[i]) /
-                                  2):(len(universal_rev[i]))]
+                universal_rev[i][
+                    (len(universal_rev[i]) / 2) : (len(universal_rev[i]))
+                ]
             ]
         induni = 0
     for seq in seqs1:
@@ -985,95 +1853,109 @@ def read_untrimmed_file(tmp_Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
         number = len(seqs1[seq])
         total = total + number
         # passes, j_tag, v_tag = 0, '', ''
-        passes, j_tag = 0, ''
+        passes, j_tag = 0, ""
         # j_ident_primer, v_ident_primer = '', ''
         # j_ident_primer = '', ''
         for i in range(0, js):
-            (seq, pj) = match_sequence_primers(J_primer[i], seq, rc, J1[i],
-                                               J2[i])
-            if (len(pj) != 0):
+            (seq, pj) = match_sequence_primers(
+                J_primer[i], seq, rc, J1[i], J2[i]
+            )
+            if len(pj) != 0:
                 pj = max(pj)
-                if (pj != -1 and pj + len(regions_J[J_primer[i]]) <= len(seq)
-                        and pj > 80):
+                if (
+                    pj != -1
+                    and pj + len(regions_J[J_primer[i]]) <= len(seq)
+                    and pj > 80
+                ):
                     passes = check_barcode(
-                        seq[pj:pj + len(regions_J[J_primer[i]])], J_primer[i],
-                        regions_J[J_primer[i]])
-                    if (passes == 1):
-                        j_tag = seq[pj:pj + len(regions_J[J_primer[i]])]
+                        seq[pj : pj + len(regions_J[J_primer[i]])],
+                        J_primer[i],
+                        regions_J[J_primer[i]],
+                    )
+                    if passes == 1:
+                        j_tag = seq[pj : pj + len(regions_J[J_primer[i]])]
                         # j_ident_primer = J_primer[i]
                         j_primer_id = jidprimer[i]
-                        seq, J_found = seq[0:pj +
-                                           len(J_primer[i])], J_found + number
+                        seq, J_found = (
+                            seq[0 : pj + len(J_primer[i])],
+                            J_found + number,
+                        )
                         break
-        if (passes == 0):
-            if (len(universal_rev) != 0):
+        if passes == 0:
+            if len(universal_rev) != 0:
                 for i in range(0, len(universal_rev)):
-                    (seq, pj) = match_sequence_primers(universal_rev[i], seq,
-                                                       rc, universal_rev1[i],
-                                                       universal_rev2[i])
+                    (seq, pj) = match_sequence_primers(
+                        universal_rev[i],
+                        seq,
+                        rc,
+                        universal_rev1[i],
+                        universal_rev2[i],
+                    )
                     bc = "NNNNANNNNANNNN"
-                    if (len(pj) != 0):
+                    if len(pj) != 0:
                         pj = max(pj)
-                        if (pj > len(bc)):
+                        if pj > len(bc):
                             # j_tag = seq[pj-(len(bc)):pj]+"_"+str(induni)
-                            j_tag = seq[pj - (len(bc)):pj] + "_UNI_REV"
+                            j_tag = seq[pj - (len(bc)) : pj] + "_UNI_REV"
                             # j_ident_primer = universal_rev[i]
                             j_primer_id = "UNI_REV"
-                            seq, J_found = seq[0:pj -
-                                               (len(bc))], J_found + number
+                            seq, J_found = (
+                                seq[0 : pj - (len(bc))],
+                                J_found + number,
+                            )
                             passes = 1
                             induni = induni + 1
                             break
-        gene_constant_region = ''
+        gene_constant_region = ""
         pass_constant = -1
         # print passes
-        if (inside == 1 and passes == 1):
-            if (reverse_primer_group in ["ISO_DD", "TCR"]):
+        if inside == 1 and passes == 1:
+            if reverse_primer_group in ["ISO_DD", "TCR"]:
                 score = {}
-                seq1 = seq[len(seq) - length_into_constant_region:len(seq)]
+                seq1 = seq[len(seq) - length_into_constant_region : len(seq)]
                 for w in ref_words:
-                    if (seq1.count(w) != 0):
+                    if seq1.count(w) != 0:
                         for id1 in ref_words[w]:
-                            if (id1 in score):
+                            if id1 in score:
                                 score[id1] = score[id1] + 1
                             else:
                                 score[id1] = 1
-                max_score, max_match = -1, ''
+                max_score, max_match = -1, ""
                 for i in score:
-                    if (score[i] > max_score):
+                    if score[i] > max_score:
                         max_score, max_match = score[i], i
                 pass_constant = 1
-                if (max_score < 4):
+                if max_score < 4:
                     passes = 0
                     pass_constant = 0
                 gene_constant_region = max_match
-            elif (reverse_primer_group == "ISOTYPER"):
+            elif reverse_primer_group == "ISOTYPER":
                 length_into_constant_region = 80
-                seq1 = seq[len(seq) - length_into_constant_region:len(seq)]
+                seq1 = seq[len(seq) - length_into_constant_region : len(seq)]
                 scores = {}
                 for w in ref_words:
-                    if (seq1.count(w) != 0):
+                    if seq1.count(w) != 0:
                         for w1 in ref_words[w]:
-                            if (seq1.count(w1) != 0):
+                            if seq1.count(w1) != 0:
                                 for region in ref_words[w][w1]:
-                                    if (region in scores):
+                                    if region in scores:
                                         scores[region] = scores[region] + 1
                                     else:
                                         scores[region] = 1
                 score = []
                 for r in scores:
-                    if (scores[r] > 5):
+                    if scores[r] > 5:
                         score.append([r, scores[r]])
-                if (len(score) == 0):
+                if len(score) == 0:
                     passes = 0
                     pass_constant = 0
-                elif (len(score) == 1):
+                elif len(score) == 1:
                     gene_constant_region = score[0][0]
                     passes = 1
                     pass_constant = 1
                 else:
                     score.sort(key=lambda x: x[1], reverse=True)
-                    if (score[0][1] > score[1][1]):
+                    if score[0][1] > score[1][1]:
                         gene_constant_region = score[0][0]
                         passes = 1
                         pass_constant = 1
@@ -1083,43 +1965,56 @@ def read_untrimmed_file(tmp_Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
                         passes = 0
             # else:
             #    print reverse_primer_group
-        if (passes == 1):
+        if passes == 1:
             sequence = seq
-            if (vs != 0):
+            if vs != 0:
                 for i in range(0, vs):
                     (pv) = get_match(V_primer[i], seq)
-                    if (pv == -1):
-                        (pv) = get_partial_match(seq, V1[i], V2[i],
-                                                 V_primer[i], "V")
-                        if (pv != -1):
+                    if pv == -1:
+                        (pv) = get_partial_match(
+                            seq, V1[i], V2[i], V_primer[i], "V"
+                        )
+                        if pv != -1:
                             # i_found = i
-                            sequence = seq[pv + len(V_primer[i]):len(seq)]
+                            sequence = seq[pv + len(V_primer[i]) : len(seq)]
                             break
-                    if (len(pv) != 0):
+                    if len(pv) != 0:
                         # i_found = i
                         pv = max(pv)
-                        sequence = seq[pv + len(V_primer[i]):len(seq)]
+                        sequence = seq[pv + len(V_primer[i]) : len(seq)]
                         break
             else:
                 pv = 0
                 i = 0
-                sequence = seq[0:len(seq)]
-            if (pv != -1):
-                if (len(sequence) > minl and len(sequence) < maxl):
-                    if (sequence.count("N") == 0):
-                        if (vs != 0):
+                sequence = seq[0 : len(seq)]
+            if pv != -1:
+                if len(sequence) > minl and len(sequence) < maxl:
+                    if sequence.count("N") == 0:
+                        if vs != 0:
                             vprimersub = vidprimer[i]
                         else:
                             vprimersub = "NA"
-                        out = (out + header + "\t" + j_tag + "\t-\t" +
-                               sequence + "\t" + j_primer_id + "\t" +
-                               vprimersub + "\t" + gene_constant_region + "\n")
+                        out = (
+                            out
+                            + header
+                            + "\t"
+                            + j_tag
+                            + "\t-\t"
+                            + sequence
+                            + "\t"
+                            + j_primer_id
+                            + "\t"
+                            + vprimersub
+                            + "\t"
+                            + gene_constant_region
+                            + "\n"
+                        )
                         ind = ind + 1
                         passes = 1
                         v_found = v_found + number
-                        if (ind > 10):
+                        if ind > 10:
                             write_out(out, primer_tag_file_count)
-                            out, ind = '', 0
+                            out, ind = "", 0
                     else:
                         fail = fail + ">" + header + "_N\n" + seq + "\n"
                 else:
@@ -1127,50 +2022,89 @@ def read_untrimmed_file(tmp_Tmp_file, J_primer, rc, J1, J2, regions_J, sample,
             else:
                 fail = fail + ">" + header + "_V_primer\n" + seq + "\n"
         else:
-            if (pass_constant == -1):
+            if pass_constant == -1:
                 fail = fail + ">" + header + "_J_primer\n" + seq + "\n"
-            elif (pass_constant == 0):
+            elif pass_constant == 0:
                 fail = fail + ">" + header + "_CONSTANT\n" + seq + "\n"
             else:
                 fail = fail + ">" + header + "_OTHER\n" + seq + "\n"
-        if (passes == 0):
+        if passes == 0:
             indf = indf + 1
-            if (indf > 500):
+            if indf > 500:
                 print_out(fail, Fail_file)
-                indf, fail = 0, ''
+                indf, fail = 0, ""
     fh.close()
     write_out(out, primer_tag_file_count)
     write_out(fail, Fail_file)
     del seqs1, out, fail
-    print(sample, "\tTotal:\t", total, "\t", t, "\tN J found:\t", J_found,
-          "\tN V found:\t", v_found, "\t% found:\t", v_found * 100.0 / total,
-          "%")
+    print(
+        sample,
+        "\tTotal:\t",
+        total,
+        "\t",
+        t,
+        "\tN J found:\t",
+        J_found,
+        "\tN V found:\t",
+        v_found,
+        "\t% found:\t",
+        v_found * 100.0 / total,
+        "%",
+    )
     return ()
 
 
 def get_barcodes_completed(primer_tag_file):
+    """Summary
+
+    Parameters
+    ----------
+    primer_tag_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(primer_tag_file, "r")
     bc_complete = {}
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
             tag = l[3] + "\t" + l[4]
             bc_complete[tag] = 1
     fh.close()
-    return (bc_complete)
+    return bc_complete
 
 
-def print_trimmed_sequences(Output_trim, primer_tag_file,
-                            primer_tag_file_count, inside, ref_const):
+def print_trimmed_sequences(
+    Output_trim, primer_tag_file, primer_tag_file_count, inside, ref_const
+):
+    """Summary
+
+    Parameters
+    ----------
+    Output_trim : TYPE
+        Description
+    primer_tag_file : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+    inside : TYPE
+        Description
+    ref_const : TYPE
+        Description
+    """
     constant_region, regions, uniq_bcs = {}, {}, {}
     print("inside", inside)
-    if (inside in [0, 1]):
+    if inside in [0, 1]:
         fh = open(primer_tag_file_count, "r")
         for l in fh:
-            if (l[0] != "#"):
+            if l[0] != "#":
                 l = l.strip().split()
                 const_reg = l[len(l) - 2].replace("REVERSE", "REV")
-                if (const_reg.count("VH") == 0):
+                if const_reg.count("VH") == 0:
                     bc = l[1] + ":" + l[2]
                     constant_region[l[0].split(":")[0]] = const_reg
                     regions[const_reg] = 1
@@ -1181,49 +2115,64 @@ def print_trimmed_sequences(Output_trim, primer_tag_file,
     fh = open(primer_tag_file, "r")
     unique_seqs, seqs = Tree(), {}
     passed, failed, uniq_failed = 0, 0, {}
-    if (inside in [0, 1]):
+    if inside in [0, 1]:
         for l in fh:
-            if (l[0] != "#"):
+            if l[0] != "#":
                 l = l.strip().split()
-                if (l[6] == "YES"):
+                if l[6] == "YES":
                     passed = passed + 1
                     consensus = l[7]
-                    if (consensus.count("human_BC_REV_CONST") != 0):
+                    if consensus.count("human_BC_REV_CONST") != 0:
                         print(l)
                     seqs[l[3] + ":" + l[4]] = [l[0], consensus]
                 else:
                     failed = failed + 1
-                    if (l[3] in uniq_failed):
+                    if l[3] in uniq_failed:
                         uniq_failed[l[3]] = uniq_failed[l[3]] + 1
                     else:
                         uniq_failed[l[3]] = 1
-    print("Passed:", passed, "Failed:", failed, "(",
-          failed * 100 / (failed + passed), "%)")
+    print(
+        "Passed:",
+        passed,
+        "Failed:",
+        failed,
+        "(",
+        failed * 100 / (failed + passed),
+        "%)",
+    )
     fh.close()
-    if (inside == 0):
+    if inside == 0:
         for bc in seqs:
             id = seqs[bc][0].split(":")[0].split("__")[0]
             unique_seqs[seqs[bc][1]][id].value = 1
         del seqs
-        out, ind = '', 0
+        out, ind = "", 0
         for seq in unique_seqs:
             f = len(unique_seqs[seq])
             for id in unique_seqs[seq]:
                 break
-            out = out + ">" + id.split("__")[0] + "__" + str(
-                f) + "\n" + seq + "\n"
+            out = (
+                out
+                + ">"
+                + id.split("__")[0]
+                + "__"
+                + str(f)
+                + "\n"
+                + seq
+                + "\n"
+            )
             ind = ind + 1
-            if (ind > 100):
+            if ind > 100:
                 write_out(out, Output_trim)
-                out, ind = '', 0
+                out, ind = "", 0
         write_out(out, Output_trim)
-    elif (inside == 1):
+    elif inside == 1:
         fh = open(ref_const, "r")
         word_size, ref_words = 10, {}
         for header, seq in fasta_iterator(fh):
             words, seq = [], seq.upper()
             for i in range(word_size, len(seq)):
-                words.append(seq[i - word_size:i])
+                words.append(seq[i - word_size : i])
             ref_words[header.split("|")[0]] = words
         for bc in seqs:
             seq, id = seqs[bc][1], seqs[bc][0]
@@ -1239,26 +2188,112 @@ def print_trimmed_sequences(Output_trim, primer_tag_file,
 
 
 def get_mismatches_from_consensus(a, b):
+    """Summary
+
+    Parameters
+    ----------
+    a : TYPE
+        Description
+    b : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     mm = 0
-    if (len(a) > 10 and len(b) > 10):
+    if len(a) > 10 and len(b) > 10:
         s1, s2 = do_align(a, b)
         for i in range(0, len(s1)):
-            if (s1[i] != s2[i]):
-                if (s1[i] is not None and s2[i] is not None):
+            if s1[i] != s2[i]:
+                if s1[i] is not None and s2[i] is not None:
                     mm = mm + 1
-                    if (mm > 4):
+                    if mm > 4:
                         break
     else:
         mm = 5
-    return (mm)
+    return mm
 
 
-def read_untrimmed_file_double1(regions_J, J_primer, J1, J2, regions_V,
-                                V_primer, V1, V2, rc, tmp_Tmp_file, Fail_file,
-                                Output_trim, gene, paired, species,
-                                primer_file, primer_tag_file, tmp_file, sample,
-                                J_primerfull, V_primerfull,
-                                primer_tag_file_count):
+def read_untrimmed_file_double1(
+    regions_J,
+    J_primer,
+    J1,
+    J2,
+    regions_V,
+    V_primer,
+    V1,
+    V2,
+    rc,
+    tmp_Tmp_file,
+    Fail_file,
+    Output_trim,
+    gene,
+    paired,
+    species,
+    primer_file,
+    primer_tag_file,
+    tmp_file,
+    sample,
+    J_primerfull,
+    V_primerfull,
+    primer_tag_file_count,
+):
+    """Summary
+
+    Parameters
+    ----------
+    regions_J : TYPE
+        Description
+    J_primer : TYPE
+        Description
+    J1 : TYPE
+        Description
+    J2 : TYPE
+        Description
+    regions_V : TYPE
+        Description
+    V_primer : TYPE
+        Description
+    V1 : TYPE
+        Description
+    V2 : TYPE
+        Description
+    rc : TYPE
+        Description
+    tmp_Tmp_file : TYPE
+        Description
+    Fail_file : TYPE
+        Description
+    Output_trim : TYPE
+        Description
+    gene : TYPE
+        Description
+    paired : TYPE
+        Description
+    species : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    primer_tag_file : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    sample : TYPE
+        Description
+    J_primerfull : TYPE
+        Description
+    V_primerfull : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     for f in [primer_tag_file_count]:
         fh = open(f, "w")
         fh.close()
@@ -1267,13 +2302,13 @@ def read_untrimmed_file_double1(regions_J, J_primer, J1, J2, regions_V,
     # seqs = Tree()
     # (found, lost, total, ind, indf, indp, indw, indfw, fail, out, out1, out2,
     #  fail) = ([], [], 0, 0, 0, 0, 0, 0, '', '', '', '', '')
-    (total, ind, indp, out) = (0, 0, 0, '')
+    (total, ind, indp, out) = (0, 0, 0, "")
     maxl = 1000000
-    if (gene == "HEAVY" or gene == "IGH"):
+    if gene == "HEAVY" or gene == "IGH":
         minl = 120
-    if (gene == "KAPPA" or gene == "IGK"):
+    if gene == "KAPPA" or gene == "IGK":
         minl = 110
-    if (gene == "LAMBDA" or gene == "IGL"):
+    if gene == "LAMBDA" or gene == "IGL":
         (minl, maxl) = (90, 150)
     # J_found, v_found, tot, indexing = 0, 0, 0, 0
     J_found, v_found, indexing = 0, 0, 0
@@ -1290,109 +2325,163 @@ def read_untrimmed_file_double1(regions_J, J_primer, J1, J2, regions_V,
         header = header + ":" + str(len(seqs1[seq]))
         number = len(seqs1[seq])
         (indexing, f, ind, total) = (indexing + 1, 0, ind + 1, total + number)
-        passes, j_tag, v_tag = 0, '', ''
+        passes, j_tag, v_tag = 0, "", ""
         for i in range(0, js):
-            (seq, pj) = match_sequence_primers(J_primer[i], seq, rc, J1[i],
-                                               J2[i])
-            if (max(pj + [-1]) != -1):
+            (seq, pj) = match_sequence_primers(
+                J_primer[i], seq, rc, J1[i], J2[i]
+            )
+            if max(pj + [-1]) != -1:
                 pj = pj[0]
-                if (pj + len(regions_J[J_primer[i]]) <= len(seq)):
+                if pj + len(regions_J[J_primer[i]]) <= len(seq):
                     passes = check_barcode(
-                        seq[pj:pj + len(regions_J[J_primer[i]])], J_primer[i],
-                        regions_J[J_primer[i]])
-                    if (passes == 1):
-                        j_tag = seq[pj:pj + len(regions_J[J_primer[i]])]
+                        seq[pj : pj + len(regions_J[J_primer[i]])],
+                        J_primer[i],
+                        regions_J[J_primer[i]],
+                    )
+                    if passes == 1:
+                        j_tag = seq[pj : pj + len(regions_J[J_primer[i]])]
                         seq = seq[0:pj]
                         break
-        if (passes == 1):
+        if passes == 1:
             J_found = J_found + number
             passes, pv = 0, -1
             for i in range(0, vs):
                 (pv) = get_match(V_primer[i], seq)
-                if (max(pv + [-1]) != -1):
+                if max(pv + [-1]) != -1:
                     pv = pv[0]
-                    if (pv - len(regions_V[V_primer[i]]) + len(V_primer[i]) >
-                            -1):
+                    if pv - len(regions_V[V_primer[i]]) + len(V_primer[i]) > -1:
                         passes = check_barcode(
-                            seq[pv - len(regions_V[V_primer[i]]) +
-                                len(V_primer[i]):pv + len(V_primer[i])],
-                            V_primer[i], regions_V[V_primer[i]])
-                        if (passes == 1):
+                            seq[
+                                pv
+                                - len(regions_V[V_primer[i]])
+                                + len(V_primer[i]) : pv
+                                + len(V_primer[i])
+                            ],
+                            V_primer[i],
+                            regions_V[V_primer[i]],
+                        )
+                        if passes == 1:
                             v_found = v_found + number
-                            v_tag = seq[pv - len(regions_V[V_primer[i]]) +
-                                        len(V_primer[i]):pv + len(V_primer[i])]
-                            sequence = seq[pv + len(V_primer[i]):len(seq)]
+                            v_tag = seq[
+                                pv
+                                - len(regions_V[V_primer[i]])
+                                + len(V_primer[i]) : pv
+                                + len(V_primer[i])
+                            ]
+                            sequence = seq[pv + len(V_primer[i]) : len(seq)]
                             break
-            if (passes == 0):
+            if passes == 0:
                 for i in range(0, vs):
                     (pv) = get_match(V1[i], seq)
-                    if (max(pv + [-1]) != -1):
+                    if max(pv + [-1]) != -1:
                         pv = pv[0]
-                        if (pv - len(regions_V[V_primer[i]]) > 0):
-                            bc = seq[pv - len(regions_V[V_primer[i]]):pv]
+                        if pv - len(regions_V[V_primer[i]]) > 0:
+                            bc = seq[pv - len(regions_V[V_primer[i]]) : pv]
                             tag = regions_V[V_primer[i]]
                             passes = check_barcode_malbac(bc, tag)
-                            if (passes == 1):
+                            if passes == 1:
                                 v_found = v_found + number
                                 v_tag = bc
-                                sequence = seq[pv + len(V_primer[i]):len(seq)]
+                                sequence = seq[pv + len(V_primer[i]) : len(seq)]
                                 break
                     else:
                         (pv) = get_match(V2[i], seq)
-                        if (max(pv + [-1]) != -1):
+                        if max(pv + [-1]) != -1:
                             pv = pv[0]
-                            if (pv - len(regions_V[V_primer[i]]) > 0):
-                                bc = seq[pv - len(V1[i]) -
-                                         len(regions_V[V_primer[i]]):pv -
-                                         len(V1[i])]
+                            if pv - len(regions_V[V_primer[i]]) > 0:
+                                bc = seq[
+                                    pv
+                                    - len(V1[i])
+                                    - len(regions_V[V_primer[i]]) : pv
+                                    - len(V1[i])
+                                ]
                                 tag = regions_V[V_primer[i]]
                                 passes = check_barcode_malbac(bc, tag)
-                                if (passes == 1):
+                                if passes == 1:
                                     v_found = v_found + number
                                     v_tag = bc
-                                    sequence = seq[pv + len(V2[i]):len(seq)]
+                                    sequence = seq[pv + len(V2[i]) : len(seq)]
                                     break
-            if (passes == 0):
+            if passes == 0:
                 for i in range(0, vs):
-                    pre_bc_region = V_primerfull[i][0:V_primerfull[i].index("N"
-                                                                            )]
-                    pre_bc_region2 = pre_bc_region[len(pre_bc_region) /
-                                                   2:len(pre_bc_region)]
+                    pre_bc_region = V_primerfull[i][
+                        0 : V_primerfull[i].index("N")
+                    ]
+                    pre_bc_region2 = pre_bc_region[
+                        len(pre_bc_region) / 2 : len(pre_bc_region)
+                    ]
                     pv = get_match(pre_bc_region2, seq)
-                    if (max(pv + [-1]) != -1):
+                    if max(pv + [-1]) != -1:
                         pv = pv[0]
-                        bc = seq[pv + len(pre_bc_region2) - 1:pv +
-                                 len(pre_bc_region2) +
-                                 len(regions_V[V_primer[i]]) - 1]
+                        bc = seq[
+                            pv
+                            + len(pre_bc_region2)
+                            - 1 : pv
+                            + len(pre_bc_region2)
+                            + len(regions_V[V_primer[i]])
+                            - 1
+                        ]
                         tag = regions_V[V_primer[i]]
                         passes = check_barcode_malbac(bc, tag)
-                        if (passes == 1):
+                        if passes == 1:
                             v_found = v_found + number
                             v_tag = bc
-                            sequence = seq[pv + len(pre_bc_region2) +
-                                           len(tag) +
-                                           len(V_primer[i]):len(seq)]
+                            sequence = seq[
+                                pv
+                                + len(pre_bc_region2)
+                                + len(tag)
+                                + len(V_primer[i]) : len(seq)
+                            ]
                             break
-            if (passes == 1):
-                if (len(sequence) > minl and len(sequence) < maxl):
-                    if (sequence.count("N") == 0):
-                        out = out + header + "\t" + j_tag + "\t" + v_tag + "\t" + sequence + "\t-\t-\t-\n"
+            if passes == 1:
+                if len(sequence) > minl and len(sequence) < maxl:
+                    if sequence.count("N") == 0:
+                        out = (
+                            out
+                            + header
+                            + "\t"
+                            + j_tag
+                            + "\t"
+                            + v_tag
+                            + "\t"
+                            + sequence
+                            + "\t-\t-\t-\n"
+                        )
                         indp = indp + number
                         ind = ind + 1
-                        if (ind > 200):
+                        if ind > 200:
                             write_out(out, primer_tag_file_count)
-                            out, ind = '', 0
+                            out, ind = "", 0
     fh.close()
     write_out(out, primer_tag_file_count)
-    out, ind = '', 0
-    status = status + "\tTotal sequences:\t" + str(
-        total) + "\tNumber of V primers found:\t" + str(
-            v_found) + "\tNumber of J primers found:\t" + str(
-                J_found) + "\tPassed sequences:\t" + str(indp)
+    out, ind = "", 0
+    status = (
+        status
+        + "\tTotal sequences:\t"
+        + str(total)
+        + "\tNumber of V primers found:\t"
+        + str(v_found)
+        + "\tNumber of J primers found:\t"
+        + str(J_found)
+        + "\tPassed sequences:\t"
+        + str(indp)
+    )
     return ()
 
 
 def get_sequences(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     command = "gunzip {}".format(file)
     os.system(command)
     fh = open(file, "r")
@@ -1403,20 +2492,42 @@ def get_sequences(file):
         seqs[header] = sequence
         # if(len(seqs)>100000):break ####### remove
     fh.close()
-    return (seqs)
+    return seqs
 
 
 def trim(s1, s2, l1, l2, indent, length):
+    """Summary
+
+    Parameters
+    ----------
+    s1 : TYPE
+        Description
+    s2 : TYPE
+        Description
+    l1 : TYPE
+        Description
+    l2 : TYPE
+        Description
+    indent : TYPE
+        Description
+    length : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     (i, p) = (indent, 0)
-    sample1 = s1[i:i + length]
+    sample1 = s1[i : i + length]
     # print sample1, "\t",s1, s2,"\n"
     index = s2.find(sample1)
     s1a, s2a = s1, s2
-    if (index != -1):
-        if (index > i):
-            s2a = s2a[index - i:l2]
+    if index != -1:
+        if index > i:
+            s2a = s2a[index - i : l2]
         else:
-            s1a = s1a[i - index:l1]
+            s1a = s1a[i - index : l1]
         min_len = min([len(s1), len(s2)])
         s1a = s1a[0:min_len]
         s2a = s2a[0:min_len]
@@ -1425,18 +2536,38 @@ def trim(s1, s2, l1, l2, indent, length):
 
 
 def join_reads(s1, s2, rc, length):
-    seq = ''
+    """Summary
+
+    Parameters
+    ----------
+    s1 : TYPE
+        Description
+    s2 : TYPE
+        Description
+    rc : TYPE
+        Description
+    length : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    seq = ""
     (s2) = reverse_comp(s2, rc)
     (l1, l2) = (len(s1), len(s2))
     failed = 1
     for i in range(0, 100):
         ind = (i * 5) + 5
-        if (ind < (l1 - length)):
+        if ind < (l1 - length):
             (s11, s22, p, overlap) = trim(s1, s2, l1, l2, ind, length)
-            if (p == 1):
-                seq = s1[0:s1.index(overlap)] + s2[
-                    (s2.index(overlap)):l2].lower()
-                if (len(seq) > 120):
+            if p == 1:
+                seq = (
+                    s1[0 : s1.index(overlap)]
+                    + s2[(s2.index(overlap)) : l2].lower()
+                )
+                if len(seq) > 120:
                     failed = 0
                     break
         # else:break
@@ -1444,42 +2575,133 @@ def join_reads(s1, s2, rc, length):
 
 
 def get_barcodes(barcode, barcode_file, rc):
+    """Summary
+
+    Parameters
+    ----------
+    barcode : TYPE
+        Description
+    barcode_file : TYPE
+        Description
+    rc : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     barcode = barcode.split(",")
     fh = open(barcode_file, "r")
     barcodes, allbarcodes, barcode_stem = [], [], []
     rc_barcodes = []
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
             allbarcodes.append(l[1])
-            if (l[0] in barcode):
+            if l[0] in barcode:
                 barcodes.append(l[1])
                 rc_barcodes.append(reverse_comp(l[1], rc))
-            elif (l[0] == "STEM"):
-                barcode_stem.append([
-                    l[1], l[1][0:len(l[1]) / 2], l[1][len(l[1]) / 2:len(l[1])]
-                ])
+            elif l[0] == "STEM":
+                barcode_stem.append(
+                    [
+                        l[1],
+                        l[1][0 : len(l[1]) / 2],
+                        l[1][len(l[1]) / 2 : len(l[1])],
+                    ]
+                )
     fh.close()
     return (barcodes, allbarcodes, barcode_stem, rc_barcodes)
 
 
-def split_reads_and_join(file1, file2, outfile, gene, paired, id, method,
-                         primer_file, barcode_group, other, dir):
-    split_reads_and_join_pre(file1, file2, outfile, gene, paired, id, method,
-                             primer_file, barcode_group, other, dir)
+def split_reads_and_join(
+    file1,
+    file2,
+    outfile,
+    gene,
+    paired,
+    id,
+    method,
+    primer_file,
+    barcode_group,
+    other,
+    dir,
+):
+    """Summary
+
+    Parameters
+    ----------
+    file1 : TYPE
+        Description
+    file2 : TYPE
+        Description
+    outfile : TYPE
+        Description
+    gene : TYPE
+        Description
+    paired : TYPE
+        Description
+    id : TYPE
+        Description
+    method : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    barcode_group : TYPE
+        Description
+    other : TYPE
+        Description
+    dir : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    split_reads_and_join_pre(
+        file1,
+        file2,
+        outfile,
+        gene,
+        paired,
+        id,
+        method,
+        primer_file,
+        barcode_group,
+        other,
+        dir,
+    )
     check_split(outfile, barcode_group, other)
     return ()
 
 
 def check_split(outfile, barcode_group, other):
+    """Summary
+
+    Parameters
+    ----------
+    outfile : TYPE
+        Description
+    barcode_group : TYPE
+        Description
+    other : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     rc = init_rc()
     barcode, barcode_file = other.split(",")[0], other.split(",")[1]
     barcodes, allbarcodes, barcode_stem, rc_barcodes = get_barcodes(
-        barcode, barcode_file, rc)
+        barcode, barcode_file, rc
+    )
     allbarcodes_rc = []
     for b in allbarcodes:
         allbarcodes_rc.append(reverse_comp(b, rc))
-    out, ind = '', 0
+    out, ind = "", 0
     outfile1 = outfile.replace(".fasta", "_CHECKED.fasta")
     fh = open(outfile1, "w")
     fh.close()
@@ -1490,146 +2712,273 @@ def check_split(outfile, barcode_group, other):
             p1 = len(get_match(allbarcodes[i], sequence))
             p2 = len(get_match(allbarcodes_rc[i], sequence))
             score.append(p1 + p2)
-        if (sum(score) == 1):
+        if sum(score) == 1:
             out = out + ">" + header + "\n" + sequence + "\n"
             ind = ind + 1
-            if (ind > 500):
+            if ind > 500:
                 write_out(out, outfile1)
-                out, ind = '', 0
+                out, ind = "", 0
     fh.close()
     write_out(out, outfile1)
     return ()
 
 
-def split_reads_and_join_pre(file1, file2, outfile, gene, paired, id, method,
-                             primer_file, barcode_group, other, dir):
+def split_reads_and_join_pre(
+    file1,
+    file2,
+    outfile,
+    gene,
+    paired,
+    id,
+    method,
+    primer_file,
+    barcode_group,
+    other,
+    dir,
+):
+    """Summary
+
+    Parameters
+    ----------
+    file1 : TYPE
+        Description
+    file2 : TYPE
+        Description
+    outfile : TYPE
+        Description
+    gene : TYPE
+        Description
+    paired : TYPE
+        Description
+    id : TYPE
+        Description
+    method : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    barcode_group : TYPE
+        Description
+    other : TYPE
+        Description
+    dir : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     rc = init_rc()
     file1 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_1.fasta"
     file2 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_2.fasta"
     print("\t", other)
     barcode, barcode_file = other.split(",")[0], other.split(",")[1]
     barcodes, allbarcodes, barcode_stem, rc_barcodes = get_barcodes(
-        barcode, barcode_file, rc)
+        barcode, barcode_file, rc
+    )
     (rc) = init_rc()
     (seqs1) = get_sequences(file1)
     (seqs2) = get_sequences(file2)
     print(len(seqs1), len(seqs2))
-    out, ind = '', 0
+    out, ind = "", 0
     fh = open(outfile, "w")
     fh.close()
     # tot, joining, total, length, primer_match = 0, 0, 0, 20, 0
     joining, total, length, primer_match = 0, 0, 20, 0
-    if (gene == "LAMBDA" or gene == "KAPPA" or gene == "IGK"):
+    if gene == "LAMBDA" or gene == "KAPPA" or gene == "IGK":
         length = 30
     count_joined, count_barcode, count_barcode_saved = 0, 0, 0
     for id in seqs1:
-        if (id in seqs2):
+        if id in seqs2:
             total = total + 1
             # s1, s2 = seqs1[id], seqs2[id]
             seq, failed = join_reads(seqs1[id], seqs2[id], rc, length)
-            if (failed == 0 and len(seq) > 150):
+            if failed == 0 and len(seq) > 150:
                 seq, joining = seq.upper(), joining + 1
                 count_joined = count_joined + 1
                 for primer in barcodes:
                     p = get_match(primer, seq)
-                    if (len(p) == 0):
+                    if len(p) == 0:
                         seq = reverse_comp(seq, rc)
                         p = get_match(primer, seq)
                         break
                     else:
                         break
-                if (len(p) != 0):
+                if len(p) != 0:
                     count_barcode = count_barcode + 1
                     out = out + ">" + id + "\n" + seq + "\n"
                     ind, primer_match = ind + 1, primer_match + 1
-                    if (ind > 200):
+                    if ind > 200:
                         write_out(out, outfile)
-                        out, ind = '', 0
+                        out, ind = "", 0
                 else:
                     for prim in barcode_stem:
                         p = get_match(prim[0], seq)
-                        if (len(p) == 0):
+                        if len(p) == 0:
                             seq = reverse_comp(seq, rc)
                             p = get_match(prim[0], seq)
-                        if (len(p) != 0):
+                        if len(p) != 0:
                             start = p[0] + len(prim[0]) - 3
                             start = p[0] + len(prim[0]) - 6
                             for i in range(0, len(barcodes)):
                                 bc_halves = [
-                                    barcodes[i][2:len(barcodes[i]) / 2],
-                                    barcodes[i][len(barcodes[i]) /
-                                                2:len(barcodes[i]) - 2]
+                                    barcodes[i][2 : len(barcodes[i]) / 2],
+                                    barcodes[i][
+                                        len(barcodes[i]) / 2 : len(barcodes[i])
+                                        - 2
+                                    ],
                                 ]
                                 bc_shift = [2, len(barcodes[i]) / 2]
-                                test = seq[start:start + len(barcodes[i]) + 10]
+                                test = seq[
+                                    start : start + len(barcodes[i]) + 10
+                                ]
                                 for j in range(0, len(bc_halves)):
-                                    if (test.count(bc_halves[j]) != 0):
-                                        p = test.index(
-                                            bc_halves[j]) - bc_shift[j]
-                                        sub_test = test[p:p + len(barcodes[i])]
+                                    if test.count(bc_halves[j]) != 0:
+                                        p = (
+                                            test.index(bc_halves[j])
+                                            - bc_shift[j]
+                                        )
+                                        sub_test = test[
+                                            p : p + len(barcodes[i])
+                                        ]
                                         a = fuzzy_substring(
-                                            sub_test, barcodes[i])
-                                        if (a <= 1):
+                                            sub_test, barcodes[i]
+                                        )
+                                        if a <= 1:
                                             count_barcode = count_barcode + 1
-                                            count_barcode_saved = count_barcode_saved + 1
-                                            out = out + ">" + id + "\n" + seq + "\n"
-                                            ind, primer_match = ind + 1, primer_match + 1
-                                            if (ind > 200):
+                                            count_barcode_saved = (
+                                                count_barcode_saved + 1
+                                            )
+                                            out = (
+                                                out
+                                                + ">"
+                                                + id
+                                                + "\n"
+                                                + seq
+                                                + "\n"
+                                            )
+                                            ind, primer_match = (
+                                                ind + 1,
+                                                primer_match + 1,
+                                            )
+                                            if ind > 200:
                                                 write_out(out, outfile)
-                                                out, ind = '', 0
+                                                out, ind = "", 0
     write_out(out, outfile)
     del out, ind
-    print(id + "\tTotal sequences:", total, "\tNumber of joined sequences:",
-          joining, "Number of barcodes matched:", primer_match, "% retained:",
-          primer_match * 100.0 / total, "IDs saved", count_barcode_saved)
+    print(
+        id + "\tTotal sequences:",
+        total,
+        "\tNumber of joined sequences:",
+        joining,
+        "Number of barcodes matched:",
+        primer_match,
+        "% retained:",
+        primer_match * 100.0 / total,
+        "IDs saved",
+        count_barcode_saved,
+    )
     return ()
 
 
-def get_paired_reads_overlapping(file1, file2, outfile, gene, paired, id,
-                                 method):
+def get_paired_reads_overlapping(
+    file1, file2, outfile, gene, paired, id, method
+):
+    """Summary
+
+    Parameters
+    ----------
+    file1 : TYPE
+        Description
+    file2 : TYPE
+        Description
+    outfile : TYPE
+        Description
+    gene : TYPE
+        Description
+    paired : TYPE
+        Description
+    id : TYPE
+        Description
+    method : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     (rc) = init_rc()
     (seqs1) = get_sequences(file1)
     (seqs2) = get_sequences(file2)
     print("Forward reads:", len(seqs1), "Reverse reads:", len(seqs2))
-    out, ind = '', 0
+    out, ind = "", 0
     fh = open(outfile, "w")
     fh.close()
     tot, f_joining, total, length, fail_no_pair = 0, 0, 0, 30, 0
-    if (method in ["5RACE"]):
+    if method in ["5RACE"]:
         length = 20
-    if (gene == "LAMBDA" or gene == "KAPPA" or gene == "IGK"):
+    if gene == "LAMBDA" or gene == "KAPPA" or gene == "IGK":
         length = 30
     for id in seqs1:
-        if (id in seqs2):
+        if id in seqs2:
             total = total + 1
             (seq, failed) = join_reads(seqs1[id], seqs2[id], rc, length)
-            if (failed == 0 and len(seq) > 180):
+            if failed == 0 and len(seq) > 180:
                 ind, tot = ind + 1, tot + 1
                 out = out + ">" + id + "\n" + seq + "\n"
             else:
                 seq2 = reverse_comp(seqs2[id], rc)
                 (seq, failed) = join_reads(seqs1[id], seq2, rc, length)
-                if (failed == 0 and len(seq) > 180):
+                if failed == 0 and len(seq) > 180:
                     ind, tot = ind + 1, tot + 1
                     out = out + ">" + id + "\n" + seq + "\n"
                 else:
                     f_joining = f_joining + 1
                     # print seqs1[id], seqs2[id]
-            if (ind > 100):
+            if ind > 100:
                 write_out(out, outfile)
-                out, ind = '', 0
+                out, ind = "", 0
         else:
             fail_no_pair = fail_no_pair + 1
     write_out(out, outfile)
     del out, ind
-    print(id + "\tTotal sequences:", total, "\tNumber of Failed sequences:",
-          f_joining, "\tPercentage sequences failed:",
-          f_joining * 100.0 / total, "%\tTotal remaining:", tot, "\tNo pairs:",
-          fail_no_pair)
+    print(
+        id + "\tTotal sequences:",
+        total,
+        "\tNumber of Failed sequences:",
+        f_joining,
+        "\tPercentage sequences failed:",
+        f_joining * 100.0 / total,
+        "%\tTotal remaining:",
+        tot,
+        "\tNo pairs:",
+        fail_no_pair,
+    )
     return ()
 
 
 def calculate_orf_length(codon, sequence, type, gene, read):
+    """Summary
+
+    Parameters
+    ----------
+    codon : TYPE
+        Description
+    sequence : TYPE
+        Description
+    type : TYPE
+        Description
+    gene : TYPE
+        Description
+    read : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     three_frames = [sequence[i:] for i in range(3)]
     three_frames_translated = [
         translate(frame, codon) for frame in three_frames
@@ -1638,33 +2987,63 @@ def calculate_orf_length(codon, sequence, type, gene, read):
     # found = 0
     for i in range(0, len(three_frames_translated)):
         frame = three_frames_translated[i]
-        if (frame.count("-") == 0):
+        if frame.count("-") == 0:
             accepted.append((frame, i))
     accepts = 1
-    if (len(accepted) == 0):
+    if len(accepted) == 0:
         accepts = 0
     return (accepted, accepts)
 
 
 def get_sequences_ref(file, word):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+    word : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file, "r")
     dict = Tree()
     for header, sequence in fasta_iterator(fh):
         for i in range(1, len(sequence) - word - 1):
-            dict[sequence[i:(i + word)]][header].value = 1
+            dict[sequence[i : (i + word)]][header].value = 1
     fh.close()
-    return (dict)
+    return dict
 
 
 def get_max_orf(ORF, word, dict):
+    """Summary
+
+    Parameters
+    ----------
+    ORF : TYPE
+        Description
+    word : TYPE
+        Description
+    dict : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     score = []
     codon = []
-    if (len(ORF) > 1):
+    if len(ORF) > 1:
         for si in ORF:
             s = si[0]
             sc = 0
             for i in range(1, len(s) - word):
-                if (s[i:(i + word)] in dict):
+                if s[i : (i + word)] in dict:
                     sc = sc + 1
             score.append(sc)
             codon.append(si[1])
@@ -1681,26 +3060,55 @@ def get_max_orf(ORF, word, dict):
 
 
 def blast_match_j_const(out, seqs, trim1, trim2, refj, e_value, indent):
+    """Summary
+
+    Parameters
+    ----------
+    out : TYPE
+        Description
+    seqs : TYPE
+        Description
+    trim1 : TYPE
+        Description
+    trim2 : TYPE
+        Description
+    refj : TYPE
+        Description
+    e_value : TYPE
+        Description
+    indent : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(trim1 + "_blast_J", "w")
     fh.write(out)
     fh.close()
-    command1 = (bin_path + 'blastall -p blastn -a 10 -d {}'.format(refj) +
-                ' -e {}'.format(str(e_value)) +
-                ' -i {}_blast_J'.format(trim1) +
-                ' -o {}_blast_J_results'.format(trim1) + ' -b 1 -m 8')
+    command1 = (
+        bin_path
+        + "blastall -p blastn -a 10 -d {}".format(refj)
+        + " -e {}".format(str(e_value))
+        + " -i {}_blast_J".format(trim1)
+        + " -o {}_blast_J_results".format(trim1)
+        + " -b 1 -m 8"
+    )
     os.system(command1)
     fh = open(trim1 + "_blast_J_results", "r")
-    out = ''
+    out = ""
     for l in fh:
         l = l.strip().split()
         header, gene = l[0].split("|")[1].split("_"), list(
-            map(int, l[0].split("|")[0].split("__")[1].split("_")))
+            map(int, l[0].split("|")[0].split("__")[1].split("_"))
+        )
         gene = header[gene.index(max(gene))]
-        if (l[1].count(gene[0:3]) != 0):
-            if (int(l[6]) < int(l[7]) and int(l[8]) < int(l[9])):
+        if l[1].count(gene[0:3]) != 0:
+            if int(l[6]) < int(l[7]) and int(l[8]) < int(l[9]):
                 j_end = int(l[7])
                 seq_j = seqs[l[0]][0]
-                seq_j = seq_j[0:j_end + seqs[l[0]][1]]
+                seq_j = seq_j[0 : j_end + seqs[l[0]][1]]
                 out = out + ">" + l[0] + "\n" + seq_j + "\n"
     fh.close()
     write_out(out, trim2)
@@ -1708,19 +3116,45 @@ def blast_match_j_const(out, seqs, trim1, trim2, refj, e_value, indent):
 
 
 def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
+    """Summary
+
+    Parameters
+    ----------
+    out : TYPE
+        Description
+    seqs : TYPE
+        Description
+    trim1 : TYPE
+        Description
+    trim2 : TYPE
+        Description
+    refj : TYPE
+        Description
+    e_value : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(trim1 + "_blast_J", "w")
     fh.write(out)
     fh.close()
-    command1 = (bin_path + "blastall -p blastn -a 10 -d {}".format(refj) +
-                " -e {}".format(str(e_value)) +
-                " -i {}_blast_J".format(trim1) +
-                " -o {}_blast_J_results".format(trim1) + " -b 1 -m 8 -W 4")
+    command1 = (
+        bin_path
+        + "blastall -p blastn -a 10 -d {}".format(refj)
+        + " -e {}".format(str(e_value))
+        + " -i {}_blast_J".format(trim1)
+        + " -o {}_blast_J_results".format(trim1)
+        + " -b 1 -m 8 -W 4"
+    )
     os.system(command1)
     fh = open(trim1 + "_blast_J_results", "r")
-    out, done = '', {}
+    out, done = "", {}
     for l in fh:
         l = l.strip().split()
-        if (l[0] not in done):
+        if l[0] not in done:
             out = out + ">" + l[0] + "\n" + seqs[l[0]] + "\n"
             done[l[0]] = 1
     fh.close()
@@ -1731,174 +3165,369 @@ def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
 
 
 def blast_match(V_region, ref, tmp_file, v_match):
+    """Summary
+
+    Parameters
+    ----------
+    V_region : TYPE
+        Description
+    ref : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    v_match : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(tmp_file, "w")
     fh.write(V_region)
     fh.close()
     command1 = [
-        bin_path, 'blastall', '-p', 'blastn', '-a', '10', '-d',
-        "{}".format(ref), '-e', '1', '-i', "{}".format(tmp_file), '-o',
-        '{}_blast'.format(tmp_file), '-b', '1', '-m', '8'
+        bin_path,
+        "blastall",
+        "-p",
+        "blastn",
+        "-a",
+        "10",
+        "-d",
+        "{}".format(ref),
+        "-e",
+        "1",
+        "-i",
+        "{}".format(tmp_file),
+        "-o",
+        "{}_blast".format(tmp_file),
+        "-b",
+        "1",
+        "-m",
+        "8",
     ]
     os.system(command1)
     fh = open(tmp_file + "_blast", "r")
     passes = {}
     for l in fh:
         l = l.strip().split()
-        if (int(l[3]) > v_match):
+        if int(l[3]) > v_match:
             passes[l[0]] = l[1]
-    return (passes)
+    return passes
 
 
-def orf_calculation_single(Output_trim, Filtered_out1, nn_orf_filtered,
-                           dir_ind, gene, ref, refj, ref_protein, refjp,
-                           tmp_file):
+def orf_calculation_single(
+    Output_trim,
+    Filtered_out1,
+    nn_orf_filtered,
+    dir_ind,
+    gene,
+    ref,
+    refj,
+    ref_protein,
+    refjp,
+    tmp_file,
+):
+    """Summary
+
+    Parameters
+    ----------
+    Output_trim : TYPE
+        Description
+    Filtered_out1 : TYPE
+        Description
+    nn_orf_filtered : TYPE
+        Description
+    dir_ind : TYPE
+        Description
+    gene : TYPE
+        Description
+    ref : TYPE
+        Description
+    refj : TYPE
+        Description
+    ref_protein : TYPE
+        Description
+    refjp : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    """
     # # Only when nn file is provided before
     # get_translation_of_nn_sequences_from_other_file(Filtered_out1, nn_orf_filtered,ref,refj, ref_protein,refjp)
-    get_protein_sequences(Output_trim, Filtered_out1, nn_orf_filtered, dir_ind,
-                          gene, ref, refj, ref_protein, refjp, tmp_file)
-    get_nucleotide_sequences(Output_trim, Filtered_out1, nn_orf_filtered,
-                             dir_ind, gene, ref, refj, ref_protein, refjp,
-                             tmp_file)
+    get_protein_sequences(
+        Output_trim,
+        Filtered_out1,
+        nn_orf_filtered,
+        dir_ind,
+        gene,
+        ref,
+        refj,
+        ref_protein,
+        refjp,
+        tmp_file,
+    )
+    get_nucleotide_sequences(
+        Output_trim,
+        Filtered_out1,
+        nn_orf_filtered,
+        dir_ind,
+        gene,
+        ref,
+        refj,
+        ref_protein,
+        refjp,
+        tmp_file,
+    )
 
 
-def get_translation_of_nn_sequences_from_other_file(Filtered_out1,
-                                                    nn_orf_filtered, ref, refj,
-                                                    ref_protein, refjp):
+def get_translation_of_nn_sequences_from_other_file(
+    Filtered_out1, nn_orf_filtered, ref, refj, ref_protein, refjp
+):
+    """Summary
+
+    Parameters
+    ----------
+    Filtered_out1 : TYPE
+        Description
+    nn_orf_filtered : TYPE
+        Description
+    ref : TYPE
+        Description
+    refj : TYPE
+        Description
+    ref_protein : TYPE
+        Description
+    refjp : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(Filtered_out1, "w")
     fh.close()
-    out, ind = '', 0
+    out, ind = "", 0
     (codon) = get_codons()
     # (word, v_match) = (4, 45)
-    (word) = (4)
+    (word) = 4
     (dict1) = get_sequences_ref(ref_protein, word)
     fh = open(nn_orf_filtered, "r")
     number_seqs, number_accepted, batch, indb = 0, 0, 1000, 0
     # V_region, seqs, ORFa, ORFb = '', Tree(), {}, {}
     seqs, ORFa = Tree(), {}
     batch_number, orf_fail, p_seq = 0, 0, {}
-    out = ''
+    out = ""
     for header, seq in fasta_iterator(fh):
-        if (seq.count("N") == 0):
+        if seq.count("N") == 0:
             seq = seq.replace("-", "")
             header = header.split("#")[0]
-            if (header.count("__") == 0):
+            if header.count("__") == 0:
                 freq = get_freq(header)
                 header = header.replace(":", "") + "__" + str(freq)
             (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene, 1)
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
-            if (accept1 == 0):
+            if accept1 == 0:
                 orf_fail = orf_fail + 1
-            if (accept1 != 0):
-                if (len(ORF1) > 1):
+            if accept1 != 0:
+                if len(ORF1) > 1:
                     min_score, found = 2, 0
                     (O1, score1, codon1) = get_max_orf(ORF1, word, dict1)
-                    if (score1 > min_score):
+                    if score1 > min_score:
                         min_score = score1
                         p_seq[header] = O1
-                        seq = seq[codon1:len(seq)]
+                        seq = seq[codon1 : len(seq)]
                         found = 1
-                    if (found == 1):
-                        number_accepted = number_accepted + 1  # int(header.split("__")[1])
+                    if found == 1:
+                        number_accepted = (
+                            number_accepted + 1
+                        )  # int(header.split("__")[1])
                 else:
                     p_seq[header] = ORF1[0][0]
-                    number_accepted = number_accepted + 1  # int(header.split("__")[1])
-                    seq = seq[ORF1[0][1]:len(seq)]
+                    number_accepted = (
+                        number_accepted + 1
+                    )  # int(header.split("__")[1])
+                    seq = seq[ORF1[0][1] : len(seq)]
                 seqs[seq][header].value = 1
                 indb = indb + 1
-                if (indb >= batch):
+                if indb >= batch:
                     batch_number = batch_number + 1
-                    out = ''
+                    out = ""
                     for id in p_seq:
                         out = out + ">" + id + "\n" + p_seq[id] + "\n"
                     write_out(out, Filtered_out1)
                     p_seq = {}
-                    out = ''
+                    out = ""
     fh.close()
     write_out(out, Filtered_out1)
-    out, ind = '', 0
+    out, ind = "", 0
     for id in p_seq:
         out = out + ">" + id + "\n" + p_seq[id] + "\n"
         ind = ind + 1
-        if (ind > 500):
+        if ind > 500:
             write_out(out, Filtered_out1)
-            out, ind = '', 0
+            out, ind = "", 0
     write_out(out, Filtered_out1)
     return ()
 
 
-def get_protein_sequences(Output_trim, Filtered_out1, nn_orf_filtered, dir_ind,
-                          gene, ref, refj, ref_protein, refjp, tmp_file):
+def get_protein_sequences(
+    Output_trim,
+    Filtered_out1,
+    nn_orf_filtered,
+    dir_ind,
+    gene,
+    ref,
+    refj,
+    ref_protein,
+    refjp,
+    tmp_file,
+):
+    """Summary
+
+    Parameters
+    ----------
+    Output_trim : TYPE
+        Description
+    Filtered_out1 : TYPE
+        Description
+    nn_orf_filtered : TYPE
+        Description
+    dir_ind : TYPE
+        Description
+    gene : TYPE
+        Description
+    ref : TYPE
+        Description
+    refj : TYPE
+        Description
+    ref_protein : TYPE
+        Description
+    refjp : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(Filtered_out1, "w")
     fh.close()
     fh = open(nn_orf_filtered, "w")
     fh.close()
     (codon) = get_codons()
     # (word, v_match) = (4, 45)
-    (word) = (4)
+    (word) = 4
     (dict1) = get_sequences_ref(ref_protein, word)
     fh = open(Output_trim, "r")
     number_seqs, number_accepted, batch, indb = 0, 0, 1000, 0
     # V_region, seqs, ORFa, ORFb = '', Tree(), {}, {}
     seqs, ORFa = Tree(), {}
     batch_number, orf_fail, p_seq = 0, 0, {}
-    out = ''
+    out = ""
     for header, seq in fasta_iterator(fh):
-        if (seq.count("N") == 0):
+        if seq.count("N") == 0:
             seq = seq.replace("-", "")
             header = header.split("#")[0]
-            if (header.count("__") == 0):
+            if header.count("__") == 0:
                 freq = get_freq(header)
                 header = header.replace(":", "") + "__" + str(freq)
             (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene, 1)
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
-            if (accept1 == 0):
+            if accept1 == 0:
                 orf_fail = orf_fail + 1
                 # if(int(header.split("__")[1])>100):
                 #  print header, ORF1, seq
-            if (accept1 != 0):
-                if (len(ORF1) > 1):
+            if accept1 != 0:
+                if len(ORF1) > 1:
                     min_score, found = 2, 0
                     (O1, score1, codon1) = get_max_orf(ORF1, word, dict1)
-                    if (score1 > min_score):
+                    if score1 > min_score:
                         min_score = score1
                         p_seq[header] = O1
-                        seq = seq[codon1:len(seq)]
+                        seq = seq[codon1 : len(seq)]
                         found = 1
-                    if (found == 1):
-                        number_accepted = number_accepted + 1  # int(header.split("__")[1])
+                    if found == 1:
+                        number_accepted = (
+                            number_accepted + 1
+                        )  # int(header.split("__")[1])
                 else:
                     p_seq[header] = ORF1[0][0]
-                    number_accepted = number_accepted + 1  # int(header.split("__")[1])
-                    seq = seq[ORF1[0][1]:len(seq)]
+                    number_accepted = (
+                        number_accepted + 1
+                    )  # int(header.split("__")[1])
+                    seq = seq[ORF1[0][1] : len(seq)]
                 seqs[seq][header].value = 1
                 indb = indb + 1
-                if (indb >= batch):
+                if indb >= batch:
                     batch_number = batch_number + 1
-                    out = ''
+                    out = ""
                     for id in p_seq:
                         out = out + ">" + id + "\n" + p_seq[id] + "\n"
                     write_out(out, Filtered_out1)
                     p_seq = {}
-                    out = ''
+                    out = ""
                     # break ############################
     fh.close()
     write_out(out, Filtered_out1)
-    out, ind = '', 0
+    out, ind = "", 0
     for id in p_seq:
         out = out + ">" + id + "\n" + p_seq[id] + "\n"
         ind = ind + 1
-        if (ind > 500):
+        if ind > 500:
             write_out(out, Filtered_out1)
-            out, ind = '', 0
+            out, ind = "", 0
     write_out(out, Filtered_out1)
     return ()
 
 
-def get_nucleotide_sequences(Output_trim, Filtered_out1, nn_orf_filtered,
-                             dir_ind, gene, ref, refj, ref_protein, refjp,
-                             tmp_file):
+def get_nucleotide_sequences(
+    Output_trim,
+    Filtered_out1,
+    nn_orf_filtered,
+    dir_ind,
+    gene,
+    ref,
+    refj,
+    ref_protein,
+    refjp,
+    tmp_file,
+):
+    """Summary
+
+    Parameters
+    ----------
+    Output_trim : TYPE
+        Description
+    Filtered_out1 : TYPE
+        Description
+    nn_orf_filtered : TYPE
+        Description
+    dir_ind : TYPE
+        Description
+    gene : TYPE
+        Description
+    ref : TYPE
+        Description
+    refj : TYPE
+        Description
+    ref_protein : TYPE
+        Description
+    refjp : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(nn_orf_filtered, "w")
     fh.close()
     fh = open(Filtered_out1, "r")
@@ -1906,17 +3535,17 @@ def get_nucleotide_sequences(Output_trim, Filtered_out1, nn_orf_filtered,
     for header, sequence in fasta_iterator(fh):
         ids[header] = 1
     fh.close()
-    out, ind = '', 0
+    out, ind = "", 0
     fh = open(Output_trim, "r")
     done = {}
     for header, sequence in fasta_iterator(fh):
-        if (header in ids):
+        if header in ids:
             out = out + ">" + header + "\n" + sequence + "\n"
             done[header] = 1
             ind = ind + 1
-            if (ind > 500):
+            if ind > 500:
                 write_out(out, nn_orf_filtered)
-                out, ind = '', 0
+                out, ind = "", 0
     write_out(out, nn_orf_filtered)
     fh.close()
     print(len(ids), len(done))
@@ -1924,50 +3553,86 @@ def get_nucleotide_sequences(Output_trim, Filtered_out1, nn_orf_filtered,
 
 
 def get_number_sequences(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     count = 0
-    process = subprocess.Popen(['wc', '-l', file],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     out, err = process.communicate()
-    c = out.decode('utf-8').split()
-    if (c[0] not in ['wc:', "ls:"]):
+    c = out.decode("utf-8").split()
+    if c[0] not in ["wc:", "ls:"]:
         fh = open(file, "r")
         for header, sequence in fasta_iterator(fh):
             count = count + 1
         fh.close()
     else:
         count = -1
-    return (count)
+    return count
 
 
 def get_reduced_number_sequences_multi_constants(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     count = 0
-    process = subprocess.Popen(['wc', '-l', file],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     out, err = process.communicate()
-    c = out.decode('utf-8').split()
-    if (c[0] != "ls:" and c[0] != "0"):
+    c = out.decode("utf-8").split()
+    if c[0] != "ls:" and c[0] != "0":
         fh = open(file, "r")
         for header, sequence in fasta_iterator(fh):
             count = count + sum(
-                map(int,
-                    header.split("__")[1].split("|")[0].split("_")))
+                map(int, header.split("__")[1].split("|")[0].split("_"))
+            )
         fh.close()
-    return (count)
+    return count
 
 
 def count_raw_barcoded_sequences(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     count, bc, nbc = 0, {}, 0
-    process = subprocess.Popen(['wc', '-l', file],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     out, err = process.communicate()
-    c = out.decode('utf-8').split()
-    if (c[0] != "ls:" and c[0] != "0"):
+    c = out.decode("utf-8").split()
+    if c[0] != "ls:" and c[0] != "0":
         fh = open(file, "r")
         for l in fh:
-            if (l[0] != "#"):
+            if l[0] != "#":
                 l = l.strip().split()
                 count = count + int(l[0].split(":")[1])
                 bc[l[1] + ":" + l[2]] = 1
@@ -1978,90 +3643,219 @@ def count_raw_barcoded_sequences(file):
 
 
 def get_reduced_number_sequences(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     count = 0
-    process = subprocess.Popen(['wc', '-l', file],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     out, err = process.communicate()
-    c = out.decode('utf-8').split()
-    if (c[0] != "ls:" and c[0] != "0"):
+    c = out.decode("utf-8").split()
+    if c[0] != "ls:" and c[0] != "0":
         fh = open(file, "r")
         for header, sequence in fasta_iterator(fh):
             count = count + int(header.split("__")[1])
         fh.close()
-    return (count)
+    return count
 
 
 def count_barcodes(primer_tag_file):
-    fh = open(primer_tag_file, 'r')
+    """Summary
+
+    Parameters
+    ----------
+    primer_tag_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    fh = open(primer_tag_file, "r")
     bc_uniq, bc_count, bc_failed = {}, 0, 0
     uniq_seq = 0
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
             bc = l[3] + ":" + l[4]
-            if (l[1] != "NA"):
+            if l[1] != "NA":
                 freq = int(l[1])  # int(l[0].split("__")[1])
                 uniq_seq = uniq_seq + 1
                 bc_uniq[bc] = 1
                 bc_count = bc_count + freq
-                if (l[6] != "YES"):
+                if l[6] != "YES":
                     bc_failed = bc_failed + 1
     fh.close()
-    n_barcodes, uniq_sequences, total_sequences_included_before_bc = len(
-        bc_uniq), uniq_seq, bc_count
+    n_barcodes, uniq_sequences, total_sequences_included_before_bc = (
+        len(bc_uniq),
+        uniq_seq,
+        bc_count,
+    )
     return (n_barcodes, uniq_sequences, total_sequences_included_before_bc)
 
 
-def get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
-                    filtering_report, id, species, gene, dir,
-                    primer_tag_file_count, primer_file, method, barcode_group):
-    if (method == "Multiplex_FORWARD_BARCODE_GROUPED"):
+def get_read_report(
+    Seq_file1,
+    Seq_file2,
+    tmp_Tmp_file,
+    trim1,
+    nn_orf_filtered,
+    filtering_report,
+    id,
+    species,
+    gene,
+    dir,
+    primer_tag_file_count,
+    primer_file,
+    method,
+    barcode_group,
+):
+    """Summary
+
+    Parameters
+    ----------
+    Seq_file1 : TYPE
+        Description
+    Seq_file2 : TYPE
+        Description
+    tmp_Tmp_file : TYPE
+        Description
+    trim1 : TYPE
+        Description
+    nn_orf_filtered : TYPE
+        Description
+    filtering_report : TYPE
+        Description
+    id : TYPE
+        Description
+    species : TYPE
+        Description
+    gene : TYPE
+        Description
+    dir : TYPE
+        Description
+    primer_tag_file_count : TYPE
+        Description
+    primer_file : TYPE
+        Description
+    method : TYPE
+        Description
+    barcode_group : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    if method == "Multiplex_FORWARD_BARCODE_GROUPED":
         Seq_file1 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_1.fasta"
         Seq_file2 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_2.fasta"
     # rc = {}
     barcoded_j, barcoded_v = 1, 0
     print(barcoded_j, barcoded_v)
-    if (barcoded_j + barcoded_v == 0):
-        raw1, raw2, joined, gene_matching = get_number_sequences(
-            Seq_file1), get_number_sequences(Seq_file2), get_number_sequences(
-                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(
-                    trim1)
+    if barcoded_j + barcoded_v == 0:
+        raw1, raw2, joined, gene_matching = (
+            get_number_sequences(Seq_file1),
+            get_number_sequences(Seq_file2),
+            get_number_sequences(tmp_Tmp_file),
+            get_reduced_number_sequences_multi_constants(trim1),
+        )
         orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
         number_unique_seqs = get_number_sequences(nn_orf_filtered)
         out = (
             "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
-            +
-            "N raw reads (2)\tN joined reads\tN reads gene matched\tN reads w/tORF\tUnique sequences\n"
+            + "N raw reads (2)\tN joined reads\tN reads gene matched\tN reads w/tORF\tUnique sequences\n"
         )
-        out = (out + dir + "\t" + id + "\t" + species + "\t" + gene + "\t" +
-               str(orf * 100.0 / min([raw1, raw2])) + "\t" + str(raw1) + "\t" +
-               str(raw2) + "\t" + str(joined) + "\t" + str(gene_matching) +
-               "\t" + str(orf) + "\t" + str(number_unique_seqs) + "\n")
+        out = (
+            out
+            + dir
+            + "\t"
+            + id
+            + "\t"
+            + species
+            + "\t"
+            + gene
+            + "\t"
+            + str(orf * 100.0 / min([raw1, raw2]))
+            + "\t"
+            + str(raw1)
+            + "\t"
+            + str(raw2)
+            + "\t"
+            + str(joined)
+            + "\t"
+            + str(gene_matching)
+            + "\t"
+            + str(orf)
+            + "\t"
+            + str(number_unique_seqs)
+            + "\n"
+        )
     else:
-        n_barcodes, uniq_sequences, total_sequences_included_before_bc = count_barcodes(
-            primer_tag_file)
+        (
+            n_barcodes,
+            uniq_sequences,
+            total_sequences_included_before_bc,
+        ) = count_barcodes(primer_tag_file)
         print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
-        raw1, raw2, joined, gene_matching = get_number_sequences(
-            Seq_file1), get_number_sequences(Seq_file2), get_number_sequences(
-                tmp_Tmp_file), get_reduced_number_sequences_multi_constants(
-                    trim1)
+        raw1, raw2, joined, gene_matching = (
+            get_number_sequences(Seq_file1),
+            get_number_sequences(Seq_file2),
+            get_number_sequences(tmp_Tmp_file),
+            get_reduced_number_sequences_multi_constants(trim1),
+        )
         # count_bc_found, count_uniq_bcs = -1, -1
         orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
         number_unique_seqs = get_number_sequences(nn_orf_filtered)
         out = (
             "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
-            +
-            "N raw reads (2)\tN joined reads\tN reads with BCs\tN uniq BCs\tN reads gene matched\t"
-            + "N reads w/t ORF\tUnique sequences\n")
+            + "N raw reads (2)\tN joined reads\tN reads with BCs\tN uniq BCs\tN reads gene matched\t"
+            + "N reads w/t ORF\tUnique sequences\n"
+        )
         orf_perc = str(orf * 100.0 / min([raw1, raw2]))
-        if (min([raw1, raw2]) == -1):
+        if min([raw1, raw2]) == -1:
             orf_perc = "NA"
-        out = (out + dir + "\t" + id + "\t" + species + "\t" + gene + "\t" +
-               orf_perc + "\t" + str(raw1) + "\t" + str(raw2) + "\t" +
-               str(joined) + "\t" + str(n_barcodes) + "\t" +
-               str(uniq_sequences) + "\t" + str(gene_matching) + "\t" +
-               str(orf) + "\t" + str(number_unique_seqs) + "\n")
+        out = (
+            out
+            + dir
+            + "\t"
+            + id
+            + "\t"
+            + species
+            + "\t"
+            + gene
+            + "\t"
+            + orf_perc
+            + "\t"
+            + str(raw1)
+            + "\t"
+            + str(raw2)
+            + "\t"
+            + str(joined)
+            + "\t"
+            + str(n_barcodes)
+            + "\t"
+            + str(uniq_sequences)
+            + "\t"
+            + str(gene_matching)
+            + "\t"
+            + str(orf)
+            + "\t"
+            + str(number_unique_seqs)
+            + "\n"
+        )
     fh = open(filtering_report, "w")
     fh.write(out)
     fh.close()
@@ -2069,23 +3863,89 @@ def get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1, nn_orf_filtered,
     return ()
 
 
-def get_read_report1(Seq_file1, Seq_file2, tmp_Tmp_file, trim1,
-                     nn_orf_filtered, filtering_report, id, species, gene, dir,
-                     trim2):
-    raw1, raw2, joined = get_number_sequences(Seq_file1), get_number_sequences(
-        Seq_file2), get_number_sequences(tmp_Tmp_file)
+def get_read_report1(
+    Seq_file1,
+    Seq_file2,
+    tmp_Tmp_file,
+    trim1,
+    nn_orf_filtered,
+    filtering_report,
+    id,
+    species,
+    gene,
+    dir,
+    trim2,
+):
+    """Summary
+
+    Parameters
+    ----------
+    Seq_file1 : TYPE
+        Description
+    Seq_file2 : TYPE
+        Description
+    tmp_Tmp_file : TYPE
+        Description
+    trim1 : TYPE
+        Description
+    nn_orf_filtered : TYPE
+        Description
+    filtering_report : TYPE
+        Description
+    id : TYPE
+        Description
+    species : TYPE
+        Description
+    gene : TYPE
+        Description
+    dir : TYPE
+        Description
+    trim2 : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    raw1, raw2, joined = (
+        get_number_sequences(Seq_file1),
+        get_number_sequences(Seq_file2),
+        get_number_sequences(tmp_Tmp_file),
+    )
     primer_matching, orf = get_reduced_number_sequences(
-        trim1), get_reduced_number_sequences(nn_orf_filtered)
+        trim1
+    ), get_reduced_number_sequences(nn_orf_filtered)
     Jgene_filtered = get_reduced_number_sequences(trim2)
     out = (
         "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
-        +
-        "N raw reads (2)\tN joined reads\tN reads primer matched\tJ filtered\tN reads w/t ORF\n"
+        + "N raw reads (2)\tN joined reads\tN reads primer matched\tJ filtered\tN reads w/t ORF\n"
     )
-    out = (out + dir + "\t" + id + "\t" + species + "\t" + gene + "\t" +
-           str(orf * 100.0 / min([raw1, raw2])) + "\t" + str(raw1) + "\t" +
-           str(raw2) + "\t" + str(joined) + "\t" + str(primer_matching) +
-           "\t" + str(Jgene_filtered) + "\t" + str(orf) + "\n")
+    out = (
+        out
+        + dir
+        + "\t"
+        + id
+        + "\t"
+        + species
+        + "\t"
+        + gene
+        + "\t"
+        + str(orf * 100.0 / min([raw1, raw2]))
+        + "\t"
+        + str(raw1)
+        + "\t"
+        + str(raw2)
+        + "\t"
+        + str(joined)
+        + "\t"
+        + str(primer_matching)
+        + "\t"
+        + str(Jgene_filtered)
+        + "\t"
+        + str(orf)
+        + "\n"
+    )
     # outx = ("Directory:\t" + dir + "\nSample:\t" + file + "\nSpecies:\t" +
     #         species + "\nGene:\t" + gene + "\nNumber of raw reads:\t" +
     #         str(raw1) + " (read 1)\t" + str(raw2) + " (read 2)\n")
@@ -2102,28 +3962,71 @@ def get_read_report1(Seq_file1, Seq_file2, tmp_Tmp_file, trim1,
 
 
 def cluster_i(Reduced_file, tmp_file, diff):
+    """Summary
+
+    Parameters
+    ----------
+    Reduced_file : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    diff : TYPE
+        Description
+    """
     # cd_hit_directory = "/nfs/users/nfs_k/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
     # cd_hit_directory = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
     cd_hit_directory = bin_path + "cd-hit-v4.5.7-2011-12-16/"
-    command = (cd_hit_directory + "cd-hit -i {}".format(Reduced_file) +
-               " -o {}".format(tmp_file) + " -c {}".format(str(diff)) +
-               " -d 180 -T 10  -M 0 -AL 40 ")
+    command = (
+        cd_hit_directory
+        + "cd-hit -i {}".format(Reduced_file)
+        + " -o {}".format(tmp_file)
+        + " -c {}".format(str(diff))
+        + " -d 180 -T 10  -M 0 -AL 40 "
+    )
     os.system(command)
 
 
 def get_seqs_single(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file, "r")
     seqs = {}
     for header, sequence in fasta_iterator(fh):
         seqs[header.split("__")[0]] = sequence
     fh.close()
-    return (seqs)
+    return seqs
 
 
 def get_similarity_single(clust_seqs, file_out, c):
+    """Summary
+
+    Parameters
+    ----------
+    clust_seqs : TYPE
+        Description
+    file_out : TYPE
+        Description
+    c : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     done = Tree()
     total = len(clust_seqs)
-    out = ''
+    out = ""
     ind1 = 0
     mismatch = 1
     for i1 in range(0, total - 1):
@@ -2133,39 +4036,80 @@ def get_similarity_single(clust_seqs, file_out, c):
         l1 = read1[2]
         done[id1] = 1
         for i2 in range(i1 + 1, total):
-            if (i1 < i2):
+            if i1 < i2:
                 read2 = clust_seqs[i2]
                 id2 = read2[0]
                 seq2 = read2[1]
                 l2 = read2[2]
-                if (id2 not in done):
+                if id2 not in done:
                     (s1, s2, p1) = trim_sequences(seq1, seq2, l1, l2)
-                    if (p1 == 1):
-                        if (s1 == s2):
-                            out = out + "0\t" + id1 + "\t" + id2 + "\t" + c + "\t" + str(
-                                l1) + "\t" + str(l2) + "\n"
+                    if p1 == 1:
+                        if s1 == s2:
+                            out = (
+                                out
+                                + "0\t"
+                                + id1
+                                + "\t"
+                                + id2
+                                + "\t"
+                                + c
+                                + "\t"
+                                + str(l1)
+                                + "\t"
+                                + str(l2)
+                                + "\n"
+                            )
                             ind1 = ind1 + 1
                         else:
                             (p, mm) = get_diff(s1, s2, mismatch)
-                            if (p == 1 and mm <= mismatch):
-                                out = out + str(
-                                    mm
-                                ) + "\t" + id1 + "\t" + id2 + "\t" + c + "\t" + str(
-                                    l1) + "\t" + str(l2) + "\n"
+                            if p == 1 and mm <= mismatch:
+                                out = (
+                                    out
+                                    + str(mm)
+                                    + "\t"
+                                    + id1
+                                    + "\t"
+                                    + id2
+                                    + "\t"
+                                    + c
+                                    + "\t"
+                                    + str(l1)
+                                    + "\t"
+                                    + str(l2)
+                                    + "\n"
+                                )
                                 ind1 = ind1 + 1
-                if (ind1 >= 100):
+                if ind1 >= 100:
                     write_output(out, file_out)
                     ind1 = 0
-                    out = ''
+                    out = ""
     write_output(out, file_out)
     del out
     return ()
 
 
 def get_similarity(clust_seqs, file_out, c, seqs2):
+    """Summary
+
+    Parameters
+    ----------
+    clust_seqs : TYPE
+        Description
+    file_out : TYPE
+        Description
+    c : TYPE
+        Description
+    seqs2 : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     done = Tree()
     total = len(clust_seqs)
-    out = ''
+    out = ""
     ind1 = 0
     mismatch = 3
     # red = 8
@@ -2177,94 +4121,167 @@ def get_similarity(clust_seqs, file_out, c, seqs2):
         seq3 = seqs2[id1]
         (l1, l3) = (len(seq1), len(seq3))
         for i2 in range(i1 + 1, total):
-            if (i1 < i2):
+            if i1 < i2:
                 read2 = clust_seqs[i2]
                 id2 = read2[0]
                 seq2 = read2[1]
                 seq4 = seqs2[id2]
                 (l2, l4) = (len(seq2), len(seq4))
-                if (id2 not in done):
+                if id2 not in done:
                     (s1, s2, p1) = trim_sequences(seq1, seq2, l1, l2)
                     (s3, s4, p2) = trim_sequences(seq3, seq4, l3, l4)
                     sa = s1 + s3
                     sb = s2 + s4
-                    if (p1 == 1 and p2 == 1):
-                        if (sa == sb):
-                            out = out + "0\t" + id1 + "\t" + id2 + "\t" + c + "\t" + str(
-                                l1) + "\t" + str(l2) + "\n"
+                    if p1 == 1 and p2 == 1:
+                        if sa == sb:
+                            out = (
+                                out
+                                + "0\t"
+                                + id1
+                                + "\t"
+                                + id2
+                                + "\t"
+                                + c
+                                + "\t"
+                                + str(l1)
+                                + "\t"
+                                + str(l2)
+                                + "\n"
+                            )
                         else:
                             (p, mm) = get_diff(sa, sb, mismatch)
-                            if (p == 1 and mm <= mismatch):
-                                out = out + str(
-                                    mm
-                                ) + "\t" + id1 + "\t" + id2 + "\t" + c + "\t" + str(
-                                    l1) + "\t" + str(l2) + "\n"
+                            if p == 1 and mm <= mismatch:
+                                out = (
+                                    out
+                                    + str(mm)
+                                    + "\t"
+                                    + id1
+                                    + "\t"
+                                    + id2
+                                    + "\t"
+                                    + c
+                                    + "\t"
+                                    + str(l1)
+                                    + "\t"
+                                    + str(l2)
+                                    + "\n"
+                                )
                                 ind1 = ind1 + 1
-                if (ind1 >= 1000):
+                if ind1 >= 1000:
                     write_output(out, file_out)
                     ind1 = 0
-                    out = ''
+                    out = ""
     write_output(out, file_out)
     del out
     return ()
 
 
 def get_diff(s1, s2, mismatch):
+    """Summary
+
+    Parameters
+    ----------
+    s1 : TYPE
+        Description
+    s2 : TYPE
+        Description
+    mismatch : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     p = 1
     (mm) = do_counting(s1, s2, mismatch)
-    if (mm > mismatch):
+    if mm > mismatch:
         p = 0
     return (p, mm)
 
 
 def do_counting(s1, s2, mismatch):
+    """Summary
+
+    Parameters
+    ----------
+    s1 : TYPE
+        Description
+    s2 : TYPE
+        Description
+    mismatch : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     i1 = 0
     i2 = 0
     mm = 0
     l = min([len(s1), len(s2)])
     for i in range(0, l - 2):
-        if (s1[i1] == s2[i2]):
+        if s1[i1] == s2[i2]:
             i1 = i1 + 1
             i2 = i2 + 1
         else:
             mm = mm + 1
             i2 = i2 + 1
             i1 = i1 + 1
-        if (mm > mismatch + 1):
+        if mm > mismatch + 1:
             break
-    return (mm)
+    return mm
 
 
 def trim_sequences(s1, s2, l1, l2):
+    """Summary
+
+    Parameters
+    ----------
+    s1 : TYPE
+        Description
+    s2 : TYPE
+        Description
+    l1 : TYPE
+        Description
+    l2 : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     p = 0
     i = 15
-    sample1 = s1[i:i + 25]
+    sample1 = s1[i : i + 25]
     index = s2.find(sample1)
-    if (index != -1):
-        if (index > i):
-            if (index - i <= 20):
-                s2 = s2[index - i:l2]
+    if index != -1:
+        if index > i:
+            if index - i <= 20:
+                s2 = s2[index - i : l2]
         else:
-            if (i - index <= 20):
-                s1 = s1[i - index:l1]
+            if i - index <= 20:
+                s1 = s1[i - index : l1]
         min_len = min([len(s1), len(s2)])
-        if ((max([len(s1), len(s2)]) - min_len) < 25):
+        if (max([len(s1), len(s2)]) - min_len) < 25:
             s1 = s1[0:min_len]
             s2 = s2[0:min_len]
             p = 1
     else:
         i = l1 - 50
-        sample1 = s1[i:i + 25]
+        sample1 = s1[i : i + 25]
         index = s2.find(sample1)
-        if (index != -1):
-            if (index > i):
-                if (index - i <= 20):
-                    s2 = s2[index - i:l2]
+        if index != -1:
+            if index > i:
+                if index - i <= 20:
+                    s2 = s2[index - i : l2]
             else:
-                if (i - index <= 20):
-                    s1 = s1[i - index:l1]
+                if i - index <= 20:
+                    s1 = s1[i - index : l1]
             min_len = min([len(s1), len(s2)])
-            if ((max([len(s1), len(s2)]) - min_len) < 25):
+            if (max([len(s1), len(s2)]) - min_len) < 25:
                 s1 = s1[0:min_len]
                 s2 = s2[0:min_len]
                 p = 1
@@ -2276,6 +4293,20 @@ def trim_sequences(s1, s2, l1, l2):
 
 
 def write_output(out, file):
+    """Summary
+
+    Parameters
+    ----------
+    out : TYPE
+        Description
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file, "a")
     fh.write(out)
     fh.close()
@@ -2283,34 +4314,72 @@ def write_output(out, file):
 
 
 def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
+    """Summary
+
+    Parameters
+    ----------
+    seqs : TYPE
+        Description
+    coclust : TYPE
+        Description
+    cluster : TYPE
+        Description
+    file_out : TYPE
+        Description
+    inv : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file_out, "w")
     fh.close()
     ind = 0
     total = len(cluster)
     t = 0
     for c in cluster:
-        if (c not in inv):
+        if c not in inv:
             ind = ind + 1
             clust_seqs = []
             t = 0
             for id in cluster[c]:
-                clust_seqs.append((id, seqs[id.split("__")[0]],
-                                   len(seqs[id.split("__")[0]])))
+                clust_seqs.append(
+                    (id, seqs[id.split("__")[0]], len(seqs[id.split("__")[0]]))
+                )
                 t = t + 1
             for c1 in coclust[c]:
                 for id in cluster[c1]:
-                    clust_seqs.append((id, seqs[id.split("__")[0]],
-                                       len(seqs[id.split("__")[0]])))
+                    clust_seqs.append(
+                        (
+                            id,
+                            seqs[id.split("__")[0]],
+                            len(seqs[id.split("__")[0]]),
+                        )
+                    )
                     t = t + 1
             clust_seqs = sorted(clust_seqs, key=itemgetter(2), reverse=True)
-            if (len(clust_seqs) > 1):
-                if (len(clust_seqs) > 500):
+            if len(clust_seqs) > 1:
+                if len(clust_seqs) > 500:
                     print(len(clust_seqs), total, ind)
                 get_similarity_single(clust_seqs, file_out, c)
     return ()
 
 
 def get_clusters(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file, "r")
     cluster = Tree()
     for l in fh:
@@ -2320,23 +4389,51 @@ def get_clusters(file):
         id = id.replace(">", "")
         cluster[l[0]][id].value = 1
     fh.close()
-    return (cluster)
+    return cluster
 
 
 def get_cluster_sizes_single(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     (cluster) = get_clusters(file + ".bak.clstr")
     print(len(cluster))
     sizes = []
     for c in cluster:
         tot = len(cluster[c])
         t = (c, tot)
-        if (tot > 50):
+        if tot > 50:
             sizes.append(t)
     s = sorted(sizes, key=itemgetter(1), reverse=True)
     return (s, cluster)
 
 
 def get_vaguely_similar_seqs(s1, s2, mis):
+    """Summary
+
+    Parameters
+    ----------
+    s1 : TYPE
+        Description
+    s2 : TYPE
+        Description
+    mis : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     l1 = len(s1)
     l2 = len(s2)
     trim = 15
@@ -2344,13 +4441,13 @@ def get_vaguely_similar_seqs(s1, s2, mis):
     p = 0
     for i in range(0, mis):
         pos = trim + (i * seg_length)
-        seg = s1[pos:pos + seg_length]
+        seg = s1[pos : pos + seg_length]
         index = s2.find(seg)
-        if (index != -1):
-            if (index > pos):
-                s2 = s2[index - pos:l2]
+        if index != -1:
+            if index > pos:
+                s2 = s2[index - pos : l2]
             else:
-                s1 = s1[pos - index:l1]
+                s1 = s1[pos - index : l1]
             min_len = min([len(s1), len(s2)])
             s1 = s1[0:min_len]
             s2 = s2[0:min_len]
@@ -2360,35 +4457,69 @@ def get_vaguely_similar_seqs(s1, s2, mis):
 
 
 def count_diffs(s1, s2, mis):
+    """Summary
+
+    Parameters
+    ----------
+    s1 : TYPE
+        Description
+    s2 : TYPE
+        Description
+    mis : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     i1 = 0
     i2 = 0
     mm = 0
     p = 1
     for i in range(0, len(s2) - 1):
-        if (s1[i1] == s2[i2]):
+        if s1[i1] == s2[i2]:
             i1 = i1 + 1
             i2 = i2 + 1
         else:
-            if (s1[i1 + 1] == s2[i2]):
+            if s1[i1 + 1] == s2[i2]:
                 i1 = i1 + 1
                 mm = mm + 1
             else:
-                if (s1[i1] == s2[i2 + 1]):
+                if s1[i1] == s2[i2 + 1]:
                     i2 = i2 + 1
                     mm = mm + 1
                 else:
                     mm = mm + 1
-        if (mm > mis):
+        if mm > mis:
             p = 0
             break
     return (mm, p)
 
 
 def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
+    """Summary
+
+    Parameters
+    ----------
+    s_sizes : TYPE
+        Description
+    cluster : TYPE
+        Description
+    seqs : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     coclust = Tree()
     inv = {}
     mis = 5
-    out = ''
+    out = ""
     indw = 0
     fh1 = open(tmp_file, "w")
     fh1.close()
@@ -2397,18 +4528,18 @@ def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
         print(len(s_sizes), i)
         clust = s_sizes[i]
         c1 = clust[0]
-        if (c1 not in inv):
-            s1 = ''
+        if c1 not in inv:
+            s1 = ""
             coclust[c1][c1].value = 1
             inv[c1] = c1
             seqs1 = []
             ind = 0
             for id in cluster[c1]:
-                if (id in seqs):
+                if id in seqs:
                     s1 = seqs[id]
                     seqs1.append(s1)
                     ind = ind + 1
-                    if (ind > comp):
+                    if ind > comp:
                         break
             for i2 in range(i + 1, len(s_sizes)):
                 clust2 = s_sizes[i2]
@@ -2416,27 +4547,28 @@ def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
                 ind = 0
                 found = 0
                 for id in cluster[c2]:
-                    if (id in seqs):
+                    if id in seqs:
                         # Get difference with c1 sequences
                         # If sequence is different > X% then move onto next cluster
                         # If sequence is less different than Y% then co-cluster the clusters
                         p = 0
                         ind = ind + 1
                         for s1 in seqs1:
-                            (s1, s2,
-                             p) = get_vaguely_similar_seqs(s1, seqs[id], mis)
-                            if (p == 1):
+                            (s1, s2, p) = get_vaguely_similar_seqs(
+                                s1, seqs[id], mis
+                            )
+                            if p == 1:
                                 (mm, q) = count_diffs(s1, s2, mis)
-                                if (q == 1):
+                                if q == 1:
                                     out = out + c1 + "\t" + c2 + "\n"
                                     indw = indw + 1
-                                    if (indw > 100):
+                                    if indw > 100:
                                         write_output(out, tmp_file)
-                                        out = ''
+                                        out = ""
                                         indw = 0
                                     found = 1
                                     break
-                        if (ind > comp or found == 1):
+                        if ind > comp or found == 1:
                             break
     write_output(out, tmp_file)
     print(out)
@@ -2444,6 +4576,18 @@ def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
 
 
 def get_coclustered(file):
+    """Summary
+
+    Parameters
+    ----------
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     inv = {}
     coclust = Tree()
     fh = open(file, "r")
@@ -2457,6 +4601,26 @@ def get_coclustered(file):
 
 
 def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
+    """Summary
+
+    Parameters
+    ----------
+    att_file : TYPE
+        Description
+    file_seqs : TYPE
+        Description
+    file_edges : TYPE
+        Description
+    file_vertex : TYPE
+        Description
+    seq_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(seq_file, "r")
     freq_id = {}
     for header, sequence in fasta_iterator(fh):
@@ -2468,7 +4632,7 @@ def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
     for l in fh1:
         l = l.strip()
         l1 = l.split()
-        if (int(l1[0]) == 1 or int(l1[0]) == 2):
+        if int(l1[0]) == 1 or int(l1[0]) == 2:
             id1, id2 = l1[1].split("__")[0], l1[2].split("__")[0]
             id1, id2 = freq_id[id1], freq_id[id2]
             edges[id2][id1].value = 1
@@ -2479,30 +4643,68 @@ def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
 
 
 def get_inverse_ids(file_seqs, file_vertex, freq_id):
+    """Summary
+
+    Parameters
+    ----------
+    file_seqs : TYPE
+        Description
+    file_vertex : TYPE
+        Description
+    freq_id : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file_seqs, "r")
     inverse, raw = {}, {}
     ind = 0
     for l in fh:
-        if (l[0] == ">"):
+        if l[0] == ">":
             l = l.strip()
             l = l.replace(">", "")
             l = l.split("||")
-            inverse[freq_id[l[0].split("__")[0]]] = freq_id[l[1].split("__")
-                                                            [0]]
+            inverse[freq_id[l[0].split("__")[0]]] = freq_id[l[1].split("__")[0]]
             raw[l[1].split("__")[0]] = 1
             ind = ind + 1
     fh.close()
     fh = open(file_vertex, "r")
     for l in fh:
         l = l.strip().split()
-        if (l[0].split("__")[0] in raw):
+        if l[0].split("__")[0] in raw:
             raw[l[0].split("__")[0]] = l[0]
     fh.close()
     return (inverse, raw)
 
 
-def decon_identical(seq_file, att_file, file_vertex, file_seqs, tmp_file,
-                    read_number_division):
+def decon_identical(
+    seq_file, att_file, file_vertex, file_seqs, tmp_file, read_number_division
+):
+    """Summary
+
+    Parameters
+    ----------
+    seq_file : TYPE
+        Description
+    att_file : TYPE
+        Description
+    file_vertex : TYPE
+        Description
+    file_seqs : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    read_number_division : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(seq_file, "r")
     all, seqs, freq_id = {}, {}, {}
     for header, sequence in fasta_iterator(fh):
@@ -2516,12 +4718,12 @@ def decon_identical(seq_file, att_file, file_vertex, file_seqs, tmp_file,
         l = l.strip()
         l1 = l.split()
         cluster = l1[3]
-        if (l1[0] == "0"):
+        if l1[0] == "0":
             same1[cluster][l1[2]][l1[1]].value = 1
             same1[cluster][l1[1]][l1[2]].value = 1
     fh1.close()
     # same, inverse, inv, out, ind, length = {}, {}, {}, '', 0, {}
-    same, inverse, out, ind, length = {}, {}, '', 0, {}
+    same, inverse, out, ind, length = {}, {}, "", 0, {}
     fh = open(file_seqs, "w")
     fh1.close()
     j = header
@@ -2541,143 +4743,319 @@ def decon_identical(seq_file, att_file, file_vertex, file_seqs, tmp_file,
                 freq = list(
                     map(
                         int,
-                        j1.split(read_number_division)[1].split("|")[0].split(
-                            "_")))
-                if (total == 0):
+                        j1.split(read_number_division)[1]
+                        .split("|")[0]
+                        .split("_"),
+                    )
+                )
+                if total == 0:
                     total = freq
                 else:
                     total = list(map(add, freq, total))
                 inverse[j.split("__")[0]] = i
-                out = out + ">" + j + "||" + i + "\n" + seqs[j.split("__")
-                                                             [0]] + "\n"
+                out = (
+                    out
+                    + ">"
+                    + j
+                    + "||"
+                    + i
+                    + "\n"
+                    + seqs[j.split("__")[0]]
+                    + "\n"
+                )
                 s = seqs[j.split("__")[0]]
-                if (len(s) < len(mins)):
+                if len(s) < len(mins):
                     mins = s
                 ind = ind + 1
-                if (ind > 100):
+                if ind > 100:
                     write_output(out, file_seqs)
                     out = ""
                     ind = 0
             same[i] = total
             length[i] = mins
-    info = ''
-    if (len(freq_id[j.split("__")[0]].split(read_number_division)[1].split(
-            "|")) >= 2):
-        info = "|" + freq_id[j.split("__")[0]].split(
-            read_number_division)[1].split("|")[1]
+    info = ""
+    if (
+        len(freq_id[j.split("__")[0]].split(read_number_division)[1].split("|"))
+        >= 2
+    ):
+        info = (
+            "|"
+            + freq_id[j.split("__")[0]]
+            .split(read_number_division)[1]
+            .split("|")[1]
+        )
     write_output(out, file_seqs)
     del seqs
-    print_vertices(all, inverse, same, file_vertex, length,
-                   read_number_division, info, freq_id)
+    print_vertices(
+        all,
+        inverse,
+        same,
+        file_vertex,
+        length,
+        read_number_division,
+        info,
+        freq_id,
+    )
     return ()
 
 
 def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
+    """Summary
+
+    Parameters
+    ----------
+    file_edges : TYPE
+        Description
+    inverse : TYPE
+        Description
+    edges : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    raw : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(tmp_file, "w")
     fh.close()
-    edge, ind = '', 0
+    edge, ind = "", 0
     for id1 in edges:
         ida = id1
-        if (id1 in inverse):
+        if id1 in inverse:
             ida = inverse[id1]
-            if (ida.split("__")[0] in raw):
+            if ida.split("__")[0] in raw:
                 ida = raw[ida.split("__")[0]]
         for id2 in edges[id1]:
             idb = id2
-            if (id2 in inverse):
+            if id2 in inverse:
                 idb = inverse[id2]
-                if (idb.split("__")[0] in raw):
+                if idb.split("__")[0] in raw:
                     idb = raw[idb.split("__")[0]]
-            if (ida != idb):
-                edge = edge + ida + "\t" + idb + "\t" + str(
-                    1) + "\t" + id1 + "\t" + id2 + "\n"
+            if ida != idb:
+                edge = (
+                    edge
+                    + ida
+                    + "\t"
+                    + idb
+                    + "\t"
+                    + str(1)
+                    + "\t"
+                    + id1
+                    + "\t"
+                    + id2
+                    + "\n"
+                )
                 ind = ind + 1
-                if (ind > 300):
+                if ind > 300:
                     write_output(edge, tmp_file)
-                    edge = ''
+                    edge = ""
                     ind = 0
     write_output(edge, tmp_file)
     del edges
     return ()
 
 
-def print_vertices(all, inverse, same, file_vertex, length,
-                   read_number_division, info, freq_id):
-    out = ''
+def print_vertices(
+    all, inverse, same, file_vertex, length, read_number_division, info, freq_id
+):
+    """Summary
+
+    Parameters
+    ----------
+    all : TYPE
+        Description
+    inverse : TYPE
+        Description
+    same : TYPE
+        Description
+    file_vertex : TYPE
+        Description
+    length : TYPE
+        Description
+    read_number_division : TYPE
+        Description
+    info : TYPE
+        Description
+    freq_id : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    out = ""
     # total = 0
     fh = open(file_vertex, "w")
     fh.close()
     ind = 0
     for id in all:
         ind = ind + 1
-        if (id in inverse):
-            if (id in same):
-                id1 = id.split(
-                    read_number_division)[0] + read_number_division + "_".join(
-                        map(str, same[id])) + info
-                if (id not in length):
-                    out = out + id1 + "\t" + str(
-                        same[id]) + "\t" + all[id] + "\n"
+        if id in inverse:
+            if id in same:
+                id1 = (
+                    id.split(read_number_division)[0]
+                    + read_number_division
+                    + "_".join(map(str, same[id]))
+                    + info
+                )
+                if id not in length:
+                    out = (
+                        out + id1 + "\t" + str(same[id]) + "\t" + all[id] + "\n"
+                    )
                 else:
-                    out = out + id1 + "\t" + str(sum(
-                        same[id])) + "\t" + length[id] + "\n"
+                    out = (
+                        out
+                        + id1
+                        + "\t"
+                        + str(sum(same[id]))
+                        + "\t"
+                        + length[id]
+                        + "\n"
+                    )
         else:
-            if (id in freq_id):
+            if id in freq_id:
                 id1 = freq_id[id]
             else:
                 print(id)
             freq = sum(
                 map(
                     int,
-                    id1.split(read_number_division)[1].split("|")[0].split(
-                        "_")))
+                    id1.split(read_number_division)[1].split("|")[0].split("_"),
+                )
+            )
             out = out + id1 + "\t" + str(freq) + "\t" + all[id] + "\n"
-        if (ind > 300):
+        if ind > 300:
             write_output(out, file_vertex)
             ind = 0
-            out = ''
+            out = ""
     write_output(out, file_vertex)
     return ()
 
 
 def reduce_edges(file_in, file_out):
-    done, out, ind = Tree(), '', 0
+    """Summary
+
+    Parameters
+    ----------
+    file_in : TYPE
+        Description
+    file_out : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    done, out, ind = Tree(), "", 0
     fh = open(file_in, "r")
     fh1 = open(file_out, "w")
     fh1.close()
     for l in fh:
         l = l.strip()
         l = l.split()
-        if (l[0] not in done[l[1]] and l[1] not in done[l[0]]):
-            if (l[0] != l[1]):
+        if l[0] not in done[l[1]] and l[1] not in done[l[0]]:
+            if l[0] != l[1]:
                 out = out + l[0] + "\t" + l[1] + "\t" + l[2] + "\n"
                 done[l[0]][l[1]].value = 1
                 ind = ind + 1
-                if (ind > 300):
+                if ind > 300:
                     ind = 0
                     write_output(out, file_out)
-                    out = ''
+                    out = ""
     write_output(out, file_out)
     del done
     return ()
 
 
-def deconvolute_edges(seq_file, att_file, file_vertex, file_seqs, tmp_file0,
-                      file_edges, read_number_division):
-    decon_identical(seq_file, att_file, file_vertex, file_seqs, tmp_file0,
-                    read_number_division)
+def deconvolute_edges(
+    seq_file,
+    att_file,
+    file_vertex,
+    file_seqs,
+    tmp_file0,
+    file_edges,
+    read_number_division,
+):
+    """Summary
+
+    Parameters
+    ----------
+    seq_file : TYPE
+        Description
+    att_file : TYPE
+        Description
+    file_vertex : TYPE
+        Description
+    file_seqs : TYPE
+        Description
+    tmp_file0 : TYPE
+        Description
+    file_edges : TYPE
+        Description
+    read_number_division : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
+    decon_identical(
+        seq_file,
+        att_file,
+        file_vertex,
+        file_seqs,
+        tmp_file0,
+        read_number_division,
+    )
     decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file)
     reduce_edges(tmp_file_1, file_edges)
     return ()
 
 
 def get_network_clusters(file_vertex, file_edges, cluster_file):
+    """Summary
+
+    Parameters
+    ----------
+    file_vertex : TYPE
+        Description
+    file_edges : TYPE
+        Description
+    cluster_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     (G, scale) = read_graphical_inputs(file_vertex, file_edges)
     output_cluster_file(G, cluster_file)
     return ()
 
 
 def read_graphical_inputs(file_vertex, file_edges):
+    """Summary
+
+    Parameters
+    ----------
+    file_vertex : TYPE
+        Description
+    file_edges : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file_vertex, "r")
     freq = {}
     size = []
@@ -2701,20 +5079,34 @@ def read_graphical_inputs(file_vertex, file_edges):
     for l in fh:
         l = l.strip()
         l = l.split()
-        if (l[0] in freq and l[1] in freq):
+        if l[0] in freq and l[1] in freq:
             G.add_edge(l[0], l[1])
     fh.close()
     return (G, scale1)
 
 
 def output_cluster_file(G, cluster_file):
+    """Summary
+
+    Parameters
+    ----------
+    G : TYPE
+        Description
+    cluster_file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     con = nx.connected_components(G)
     ind = 0
     ind1 = 0
     ind2 = 0
     fh = open(cluster_file, "w")
     fh.close()
-    out = '# Connected_components\n'
+    out = "# Connected_components\n"
     max_f, t, nvertmax = 0, 0, 0
     for i in con:
         ind = ind + 1
@@ -2723,92 +5115,169 @@ def output_cluster_file(G, cluster_file):
         for j in i:
             ind1 = ind1 + 1
             ind2 = ind2 + 1
-            out = out + str(ind1) + "\t" + str(ind) + "\t" + j + "\t" + str(
-                G.rtt[j]) + "\n"
+            out = (
+                out
+                + str(ind1)
+                + "\t"
+                + str(ind)
+                + "\t"
+                + j
+                + "\t"
+                + str(G.rtt[j])
+                + "\n"
+            )
             tc, t = tc + G.rtt[j], t + G.rtt[j]
             nvert = nvert + 1
-            if (ind2 > 100):
+            if ind2 > 100:
                 write_output(out, cluster_file)
                 out = ""
                 ind2 = 0
-        if (tc > max_f):
+        if tc > max_f:
             max_f, nvertmax = tc, nvert
     write_output(out, cluster_file)
-    print(file_vertex, "Maximum cluster:", max_f * 100.0 / t, "%", nvertmax,
-          "vertices")
+    print(
+        file_vertex,
+        "Maximum cluster:",
+        max_f * 100.0 / t,
+        "%",
+        nvertmax,
+        "vertices",
+    )
     return ()
 
 
 def get_network_input(file_cluster, outfile, edge_file, checked_edges):
+    """Summary
+
+    Parameters
+    ----------
+    file_cluster : TYPE
+        Description
+    outfile : TYPE
+        Description
+    edge_file : TYPE
+        Description
+    checked_edges : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(outfile, "w")
     fh.close()
     fh = open(file_cluster, "r")
     cluster = Tree()
     ids = {}
     for l in fh:
-        if (l[0] != "#"):
+        if l[0] != "#":
             l = l.strip().split()
             cluster[l[1]][l[1] + "\t" + l[2] + "\t" + l[3]].value = 1
             ids[l[2]] = 1
     fh.close()
-    (out, ind) = ('', 0)
+    (out, ind) = ("", 0)
     for c in cluster:
-        if (len(cluster[c]) > 1):
+        if len(cluster[c]) > 1:
             for l in cluster[c]:
                 out = out + l + "\n"
                 ind = ind + 1
-                if (int(l.split("\t")[2]) > 1000):
+                if int(l.split("\t")[2]) > 1000:
                     print(l)
         else:
             for l in cluster[c]:
-                if (int(l.split("\t")[2]) > 1):
+                if int(l.split("\t")[2]) > 1:
                     out = out + l + "\n"
                     ind = ind + 1
-        if (ind > 300):
+        if ind > 300:
             write_output(out, outfile)
-            (out, ind) = ('', 0)
+            (out, ind) = ("", 0)
     write_output(out, outfile)
     fh = open(checked_edges, "w")
     fh.close()
     fh = open(edge_file, "r")
-    (out, ind) = ('', 0)
+    (out, ind) = ("", 0)
     for l in fh:
         l = l.strip().split()
-        if (l[0] in ids and l[1] in ids):
+        if l[0] in ids and l[1] in ids:
             out = out + l[0] + "\t" + l[1] + "\t" + l[2] + "\n"
             ind = ind + 1
-            if (ind > 300):
+            if ind > 300:
                 write_output(out, checked_edges)
-                (out, ind) = ('', 0)
+                (out, ind) = ("", 0)
     write_output(out, checked_edges)
     fh.close()
     return ()
 
 
-def reduce_identical_sequences(Reduced_file, file_vertex,
-                               read_number_division):
+def reduce_identical_sequences(Reduced_file, file_vertex, read_number_division):
+    """Summary
+
+    Parameters
+    ----------
+    Reduced_file : TYPE
+        Description
+    file_vertex : TYPE
+        Description
+    read_number_division : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(Reduced_file, "w")
     fh.close()
     fh = open(file_vertex, "r")
-    (ind, out) = (0, '')
+    (ind, out) = (0, "")
     for l in fh:
         l = l.strip().split()
-        if (l[0].count("|") >= 1):
+        if l[0].count("|") >= 1:
             out = out + ">" + l[0] + "\n" + l[2] + "\n"
         else:
-            out = out + ">" + l[0].split(read_number_division)[
-                0] + read_number_division + l[1] + "\n" + l[2] + "\n"
+            out = (
+                out
+                + ">"
+                + l[0].split(read_number_division)[0]
+                + read_number_division
+                + l[1]
+                + "\n"
+                + l[2]
+                + "\n"
+            )
         ind = ind + 1
-        if (ind > 500):
+        if ind > 500:
             write_output(out, Reduced_file)
-            (ind, out) = (0, '')
+            (ind, out) = (0, "")
     fh.close()
     write_output(out, Reduced_file)
     return ()
 
 
-def generate_networks(Sequence_file, tmp_file_1, edge_lengths, tmp_file,
-                      file_out):
+def generate_networks(
+    Sequence_file, tmp_file_1, edge_lengths, tmp_file, file_out
+):
+    """Summary
+
+    Parameters
+    ----------
+    Sequence_file : TYPE
+        Description
+    tmp_file_1 : TYPE
+        Description
+    edge_lengths : TYPE
+        Description
+    tmp_file : TYPE
+        Description
+    file_out : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     cluster_i(Sequence_file, tmp_file_1, edge_lengths)
     (s_sizes, cluster) = get_cluster_sizes_single(tmp_file_1)
     (seqs) = get_seqs_single(Sequence_file)
@@ -2822,6 +5291,20 @@ def generate_networks(Sequence_file, tmp_file_1, edge_lengths, tmp_file,
 
 
 def write_out(out, file):
+    """Summary
+
+    Parameters
+    ----------
+    out : TYPE
+        Description
+    file : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh = open(file, "a")
     fh.write(out)
     fh.close()
@@ -2829,11 +5312,37 @@ def write_out(out, file):
 
 
 def get_freq(id):
+    """Summary
+
+    Parameters
+    ----------
+    id : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     id = id.split("__")
-    return (int(id[1]))
+    return int(id[1])
 
 
 def print_out(out, Output_trim):
+    """Summary
+
+    Parameters
+    ----------
+    out : TYPE
+        Description
+    Output_trim : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     fh_out = open(Output_trim, "a")
     fh_out.write(out)
     fh_out.close()
@@ -2841,10 +5350,18 @@ def print_out(out, Output_trim):
 
 
 def intialise_files(dir):
+    """Summary
+
+    Parameters
+    ----------
+    dir : TYPE
+        Description
+    """
     dirs_to_add = [
-        dir + "FASTQ_FILES/", dir + "ORIENTATED_SEQUENCES/",
+        dir + "FASTQ_FILES/",
+        dir + "ORIENTATED_SEQUENCES/",
         dir + "ORIENTATED_SEQUENCES/TMP/",
-        dir + "ORIENTATED_SEQUENCES/NETWORKS/"
+        dir + "ORIENTATED_SEQUENCES/NETWORKS/",
     ]
     for d in dirs_to_add:
         if not os.path.exists(d):
@@ -2852,32 +5369,83 @@ def intialise_files(dir):
 
 
 def cram_to_fastq(dir, source, id, pre_QC_bam):
-    command0 = ("samtools view -b -o {} {}".format(pre_QC_bam, source))
+    """Summary
+
+    Parameters
+    ----------
+    dir : TYPE
+        Description
+    source : TYPE
+        Description
+    id : TYPE
+        Description
+    pre_QC_bam : TYPE
+        Description
+    """
+    command0 = "samtools view -b -o {} {}".format(pre_QC_bam, source)
     print(command0)
     os.system(command0)
 
 
 def bam_to_fastq(dir, source, id):
-    if (source.count("am") != 0):
+    """Summary
+
+    Parameters
+    ----------
+    dir : TYPE
+        Description
+    source : TYPE
+        Description
+    id : TYPE
+        Description
+    """
+    if source.count("am") != 0:
         pre_QC_fastq = dir + "FASTQ_FILES/Sequences_" + id + "#.fastq"
         pre_QC_bam = dir + "FASTQ_FILES/Sequences_" + id + ".bam"
-        if (source.count("cram") != 0):
+        if source.count("cram") != 0:
             cram_to_fastq(dir, source, id, pre_QC_bam)
             source = pre_QC_bam
-        command1 = (bin_path +
-                    "bam2fastq-1.1.0/bam2fastq --force -o {} {}".format(
-                        pre_QC_fastq, source))
+        command1 = (
+            bin_path
+            + "bam2fastq-1.1.0/bam2fastq --force -o {} {}".format(
+                pre_QC_fastq, source
+            )
+        )
         os.system(command1)
 
 
 def qc_samples(dir, gene, id, source, length, species, barcode_group):
+    """Summary
+
+    Parameters
+    ----------
+    dir : TYPE
+        Description
+    gene : TYPE
+        Description
+    id : TYPE
+        Description
+    source : TYPE
+        Description
+    length : TYPE
+        Description
+    species : TYPE
+        Description
+    barcode_group : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     pre = dir + "FASTQ_FILES/Sequences_" + id
     reads1 = pre + "_1.fastq"
     reads2 = pre + "_2.fastq"
-    if (1 == 1):
+    if 1 == 1:
         print(reads1)
         print(reads2)
-        if (1 == 1):
+        if 1 == 1:
             threshold, length = "32", "100"
             # command1 = ("java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f " +
             #             reads1 + " -o " + dir + "FASTQ_FILES/Sequences_" + id +
@@ -2885,23 +5453,63 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
             # command2 = ("java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f " +
             #             reads2 + " -o " + dir + "FASTQ_FILES/Sequences_" + id +
             #             "_2 -m " + threshold + " -l " + length)
-            command1 = ("java -jar " + bin_path +
-                        "QUASR_v7.01/qualityControl.jar -f " + reads1 +
-                        " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_1 -m " + threshold + " -l " + length)
-            command2 = ("java -jar " + bin_path +
-                        "QUASR_v7.01/qualityControl.jar -f " + reads2 +
-                        " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_2 -m " + threshold + " -l " + length)
-            perl_cmd = ("perl -e '$i=0;while(<>)" +
-                        "{if(/^\@/&&$i==0){s/^\@/\>/;print;}" +
-                        "elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > ")
-            command3 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_1.qc.fq | " + perl_cmd + dir +
-                        "FASTQ_FILES/Sequences_" + id + "_1.fasta")
-            command4 = ("cat " + dir + "FASTQ_FILES/Sequences_" + id +
-                        "_2.qc.fq | " + perl_cmd + dir +
-                        "FASTQ_FILES/Sequences_" + id + "_2.fasta")
+            command1 = (
+                "java -jar "
+                + bin_path
+                + "QUASR_v7.01/qualityControl.jar -f "
+                + reads1
+                + " -o "
+                + dir
+                + "FASTQ_FILES/Sequences_"
+                + id
+                + "_1 -m "
+                + threshold
+                + " -l "
+                + length
+            )
+            command2 = (
+                "java -jar "
+                + bin_path
+                + "QUASR_v7.01/qualityControl.jar -f "
+                + reads2
+                + " -o "
+                + dir
+                + "FASTQ_FILES/Sequences_"
+                + id
+                + "_2 -m "
+                + threshold
+                + " -l "
+                + length
+            )
+            perl_cmd = (
+                "perl -e '$i=0;while(<>)"
+                + "{if(/^\@/&&$i==0){s/^\@/\>/;print;}"
+                + "elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "
+            )
+            command3 = (
+                "cat "
+                + dir
+                + "FASTQ_FILES/Sequences_"
+                + id
+                + "_1.qc.fq | "
+                + perl_cmd
+                + dir
+                + "FASTQ_FILES/Sequences_"
+                + id
+                + "_1.fasta"
+            )
+            command4 = (
+                "cat "
+                + dir
+                + "FASTQ_FILES/Sequences_"
+                + id
+                + "_2.qc.fq | "
+                + perl_cmd
+                + dir
+                + "FASTQ_FILES/Sequences_"
+                + id
+                + "_2.fasta"
+            )
             os.system(command1)
             os.system(command2)
             os.system(command3)
@@ -2922,7 +5530,7 @@ primer_file = sys.argv[9]
 method = sys.argv[10]
 command_source = sys.argv[11]
 command_source = command_source.split(",")
-if (len(sys.argv) > 13):
+if len(sys.argv) > 13:
     reverse_primer_group = sys.argv[13]
 else:
     reverse_primer_group = "OTHER"
@@ -2935,23 +5543,45 @@ trim1 = dir + "ORIENTATED_SEQUENCES/TMP/trimmed_orientated_all_" + id + ".fasta"
 trim2 = dir + "ORIENTATED_SEQUENCES/TMP/Filtered_J_" + id + ".fasta"
 trim3 = dir + "ORIENTATED_SEQUENCES/TMP/Filtered_reduced_" + id + ".fasta"
 Fail_file = dir + "FASTQ_FILES/Fail_filtered_" + id + ".fasta"
-primer_tag_file = dir + "ORIENTATED_SEQUENCES/TMP/Barcode_filtering_information_" + id + ".txt"
-primer_tag_file_count = dir + "ORIENTATED_SEQUENCES/TMP/All_barcodes_" + id + ".txt"
-Filtered_out1 = dir + "ORIENTATED_SEQUENCES/Filtered_ORFs_sequences_all_" + id + ".fasta"
-nn_orf_filtered = dir + "ORIENTATED_SEQUENCES/Nucleotide_ORF_filtered_all_" + id + ".fasta"
+primer_tag_file = (
+    dir
+    + "ORIENTATED_SEQUENCES/TMP/Barcode_filtering_information_"
+    + id
+    + ".txt"
+)
+primer_tag_file_count = (
+    dir + "ORIENTATED_SEQUENCES/TMP/All_barcodes_" + id + ".txt"
+)
+Filtered_out1 = (
+    dir + "ORIENTATED_SEQUENCES/Filtered_ORFs_sequences_all_" + id + ".fasta"
+)
+nn_orf_filtered = (
+    dir + "ORIENTATED_SEQUENCES/Nucleotide_ORF_filtered_all_" + id + ".fasta"
+)
 tmp_file_orf = dir + "ORIENTATED_SEQUENCES/TMP/Blast_matching_" + id
 filtering_report = dir + "ORIENTATED_SEQUENCES/Filtering_report_" + id + ".txt"
 # Files for clustering
 att_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/Vertex_relations_" + id + ".txt"
 file_vertex = dir + "ORIENTATED_SEQUENCES/NETWORKS/Att_" + id + ".txt"
 file_edges = dir + "ORIENTATED_SEQUENCES/NETWORKS/Edges_" + id + ".txt"
-cluster_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/Cluster_identities_" + id + ".txt"
-Reduced_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_" + id + ".fasta"
-checked_edges = dir + "ORIENTATED_SEQUENCES/NETWORKS/Checked_edges_" + id + ".txt"
+cluster_file = (
+    dir + "ORIENTATED_SEQUENCES/NETWORKS/Cluster_identities_" + id + ".txt"
+)
+Reduced_file = (
+    dir + "ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_" + id + ".fasta"
+)
+checked_edges = (
+    dir + "ORIENTATED_SEQUENCES/NETWORKS/Checked_edges_" + id + ".txt"
+)
 plot_ids_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/Plot_ids_" + id + ".txt"
 file_seqs = dir + "ORIENTATED_SEQUENCES/NETWORKS/Sequences_" + id + ".txt"
 tmp_file0 = dir + "ORIENTATED_SEQUENCES/NETWORKS/Decon_0_" + id + ".txt"
-tmp_reduced_sequences = dir + "ORIENTATED_SEQUENCES/NETWORKS/Primary_reduced_sequences" + id + ".fasta"
+tmp_reduced_sequences = (
+    dir
+    + "ORIENTATED_SEQUENCES/NETWORKS/Primary_reduced_sequences"
+    + id
+    + ".fasta"
+)
 tmp_pre = dir + "ORIENTATED_SEQUENCES/NETWORKS/Pre_tmp_" + id
 tmp_file_1 = dir + "ORIENTATED_SEQUENCES/NETWORKS/NN_Tmp_cluster_" + id + ".1"
 edge_lengths = 0.85
@@ -2962,14 +5592,15 @@ refv = lib_path + "Reference_nn_" + species + "_" + gene + "V.fasta"
 refj = lib_path + "Reference_nn_" + species + "_" + gene + "J.fasta"
 refvp = lib_path + "Reference_protein_" + species + "_" + gene + "V.fasta"
 refjp = lib_path + "Reference_protein_" + species + "_" + gene + "J.fasta"
-ref_const = lib_path + "Reference_nn_" + species + "_" + gene + "_constant_exon1.fasta"
+ref_const = (
+    lib_path + "Reference_nn_" + species + "_" + gene + "_constant_exon1.fasta"
+)
 control = "FALSE"
-if (gene.count("TR") == 0 and gene.count("IG") == 0
-        and gene.count("TCR") == 0):
+if gene.count("TR") == 0 and gene.count("IG") == 0 and gene.count("TCR") == 0:
     control = "TRUE"
     refj = lib_path + "Reference_nn_" + species + "_" + gene + ".fasta"
 # Commands
-if (command_source.count("1") != 0):
+if command_source.count("1") != 0:
     intialise_files(dir)
     bam_to_fastq(dir, source, id)
     qc_samples(dir, gene, id, source, length, species, barcode_group)
@@ -2978,30 +5609,79 @@ if (command_source.count("1") != 0):
 # been made correctly at this point (with non-zero number of lines)
 
 # Filtering and processing reads
-if (command_source.count("2") != 0):
-    if (gene.count("IG") != 0):
-        get_paired_reads_overlapping(Seq_file1, Seq_file2, tmp_Tmp_file, gene,
-                                     paired, id, method)
-        trim_sequences_bcr_tcr(tmp_Tmp_file, Fail_file, trim1, gene, paired,
-                               species, primer_file, primer_tag_file, tmp_file,
-                               primer_tag_file_count, id, ref_const,
-                               reverse_primer_group)
-        filter_igj_genes(trim1, trim2, refj, control, primer_file, ref_const,
-                         primer_tag_file_count)
+if command_source.count("2") != 0:
+    if gene.count("IG") != 0:
+        get_paired_reads_overlapping(
+            Seq_file1, Seq_file2, tmp_Tmp_file, gene, paired, id, method
+        )
+        trim_sequences_bcr_tcr(
+            tmp_Tmp_file,
+            Fail_file,
+            trim1,
+            gene,
+            paired,
+            species,
+            primer_file,
+            primer_tag_file,
+            tmp_file,
+            primer_tag_file_count,
+            id,
+            ref_const,
+            reverse_primer_group,
+        )
+        filter_igj_genes(
+            trim1,
+            trim2,
+            refj,
+            control,
+            primer_file,
+            ref_const,
+            primer_tag_file_count,
+        )
         reduce_sequences(trim2, trim3, primer_file)
-        orf_calculation_single(trim3, Filtered_out1, nn_orf_filtered, dir,
-                               gene, refv, refj, refvp, refjp, tmp_file_orf)
-        get_read_report(Seq_file1, Seq_file2, tmp_Tmp_file, trim1,
-                        nn_orf_filtered, filtering_report, id, species, gene,
-                        dir, primer_tag_file_count, primer_file, method,
-                        barcode_group)
+        orf_calculation_single(
+            trim3,
+            Filtered_out1,
+            nn_orf_filtered,
+            dir,
+            gene,
+            refv,
+            refj,
+            refvp,
+            refjp,
+            tmp_file_orf,
+        )
+        get_read_report(
+            Seq_file1,
+            Seq_file2,
+            tmp_Tmp_file,
+            trim1,
+            nn_orf_filtered,
+            filtering_report,
+            id,
+            species,
+            gene,
+            dir,
+            primer_tag_file_count,
+            primer_file,
+            method,
+            barcode_group,
+        )
 
 # Clustering reads
-if (command_source.count("3") != 0):
-    generate_networks(nn_orf_filtered, tmp_file_1, edge_lengths, tmp_file,
-                      att_file)
-    deconvolute_edges(nn_orf_filtered, att_file, file_vertex, file_seqs,
-                      tmp_file0, file_edges, read_number_division)
+if command_source.count("3") != 0:
+    generate_networks(
+        nn_orf_filtered, tmp_file_1, edge_lengths, tmp_file, att_file
+    )
+    deconvolute_edges(
+        nn_orf_filtered,
+        att_file,
+        file_vertex,
+        file_seqs,
+        tmp_file0,
+        file_edges,
+        read_number_division,
+    )
     get_network_clusters(file_vertex, file_edges, cluster_file)
     reduce_identical_sequences(Reduced_file, file_vertex, read_number_division)
     get_network_input(cluster_file, plot_ids_file, file_edges, checked_edges)

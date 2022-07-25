@@ -6,6 +6,11 @@ Pairwise sequence alignment
 according to Myers & Miller, 1988,
 'Optimal alignment in linear space',
 CABIOS, vol. 4, no. 1, pp 11-17.
+
+Attributes
+----------
+GapSymbol : TYPE
+    Description
 """
 
 import os
@@ -14,27 +19,85 @@ import string
 
 
 class Script:
-    """Operations transferring one list in another."""
+    """Operations transferring one list in another.
+
+    Attributes
+    ----------
+    g : TYPE
+        Description
+    h : TYPE
+        Description
+    s : list
+        Description
+    """
 
     def __init__(self, g=1.5, h=1.0):
+        """Summary
+
+        Parameters
+        ----------
+        g : float, optional
+            Description
+        h : float, optional
+            Description
+        """
         self.s = []
         self.g = g
         self.h = h
         self.ps("")
 
     def __str__(self):
-        """Print s."""
+        """Print s.
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         return str(self.s)
 
     def __getitem__(self, n):
-        """Print  s[n]."""
+        """Print  s[n].
+
+        Parameters
+        ----------
+        n : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         return self.s[n]
 
     def __len__(self):
-        """Print len(s)."""
+        """Print len(s).
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         return len(self.s)
 
     def weight(self, x, y, matrix):
+        """Summary
+
+        Parameters
+        ----------
+        x : TYPE
+            Description
+        y : TYPE
+            Description
+        matrix : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         # atomic comparison function
         if x == y:
             return 0
@@ -42,6 +105,18 @@ class Script:
             return 1
 
     def gapCost(self, k):
+        """Summary
+
+        Parameters
+        ----------
+        k : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         # k-symbol insert/delete cost
         # return self.g + self.h * k
         if k <= 0:
@@ -50,6 +125,13 @@ class Script:
             return self.g + self.h * k
 
     def delete(self, k):
+        """Summary
+
+        Parameters
+        ----------
+        k : TYPE
+            Description
+        """
         S = self.s
         if len(S) > 0 and S[-1] != 0:
             S[-1] = S[-1] - k
@@ -59,6 +141,13 @@ class Script:
             self.ps("del.else " + str(k))
 
     def insert(self, k):
+        """Summary
+
+        Parameters
+        ----------
+        k : TYPE
+            Description
+        """
         S = self.s
         try:
             if S[-1] < 0:
@@ -72,19 +161,61 @@ class Script:
             self.ps("ins.exc " + str(k))
 
     def replace(self):
+        """Summary"""
         S = self.s
         S.append(0)
         self.ps("rep")
 
     def ps(self, note):
+        """Summary
+
+        Parameters
+        ----------
+        note : TYPE
+            Description
+        """
         pass
 
 
 class Alignment:
+
+    """Summary"""
+
     def __init__(self):
+        """Summary"""
         pass
 
     def diff(self, A, B, M, N, S, tb, te, g, h, matrix):
+        """Summary
+
+        Parameters
+        ----------
+        A : TYPE
+            Description
+        B : TYPE
+            Description
+        M : TYPE
+            Description
+        N : TYPE
+            Description
+        S : TYPE
+            Description
+        tb : TYPE
+            Description
+        te : TYPE
+            Description
+        g : TYPE
+            Description
+        h : TYPE
+            Description
+        matrix : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         # returns the cost of an optimum
         # conversion between A[1..M] and B[1..N]
         # that begins (ends) with a delete
@@ -228,9 +359,7 @@ class Alignment:
         for j in range(0, N + 1):
             c = CC[j] + RR[j]
             if c <= midc:
-                if c < midc \
-                        or CC[j] != DD[j] \
-                        and RR[j] == SS[j]:
+                if c < midc or CC[j] != DD[j] and RR[j] == SS[j]:
                     midc = c
                     midj = j
 
@@ -244,18 +373,47 @@ class Alignment:
         # conquer: recursively around midpoint
         if type == 1:
             self.diff(A, B, midi, midj, S, tb, g, g, h, matrix)
-            self.diff(A[midi:], B[midj:], M - midi, N - midj, S, g, te, g, h,
-                      matrix)
+            self.diff(
+                A[midi:], B[midj:], M - midi, N - midj, S, g, te, g, h, matrix
+            )
         else:
             self.diff(A, B, midi - 1, midj, S, tb, 0.0, g, h, matrix)
             S.delete(2)
-            self.diff(A[midi + 1:], B[midj:], M - midi - 1, N - midj, S, 0.0,
-                      te, g, h, matrix)
+            self.diff(
+                A[midi + 1 :],
+                B[midj:],
+                M - midi - 1,
+                N - midj,
+                S,
+                0.0,
+                te,
+                g,
+                h,
+                matrix,
+            )
 
         # return the cost
         return midc
 
     def do_align(self, A, B, S, GapSymbol=None):
+        """Summary
+
+        Parameters
+        ----------
+        A : TYPE
+            Description
+        B : TYPE
+            Description
+        S : TYPE
+            Description
+        GapSymbol : None, optional
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         x, y = [], []
         # i, j, k, op = 0, 0, 0, 0
         i, j, k = 0, 0, 0
@@ -263,7 +421,7 @@ class Alignment:
         for k in range(len(S)):
             s = int(S[k])
             if s == 0:
-                if (i < len(A) and j < len(B)):
+                if i < len(A) and j < len(B):
                     a, i = A[i], i + 1
                     b, j = B[j], j + 1
                 if a == b:
@@ -280,7 +438,7 @@ class Alignment:
             elif s > 0:
                 x = x + [GapSymbol] * (s)
                 for q in range(j, j + s):
-                    if (q < len(B)):
+                    if q < len(B):
                         y.append(B[q])
                     else:
                         y.append(B[q - 1])
@@ -289,6 +447,24 @@ class Alignment:
         return x, y
 
     def align(self, A, B, matrix, GapSymbol=None):
+        """Summary
+
+        Parameters
+        ----------
+        A : TYPE
+            Description
+        B : TYPE
+            Description
+        matrix : TYPE
+            Description
+        GapSymbol : None, optional
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         # interface and top level of comparator
 
         if len(A) == len(B) == 0:
@@ -321,6 +497,22 @@ class Alignment:
         return c, x, y, S
 
     def partition(self, x, y, GapSymbol=None):
+        """Summary
+
+        Parameters
+        ----------
+        x : TYPE
+            Description
+        y : TYPE
+            Description
+        GapSymbol : None, optional
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
         # assert len(x) == len(y)
         left, both, right = [], [], []
 
@@ -345,6 +537,18 @@ GapSymbol = None
 
 
 def hasUniqueElements(L):
+    """Summary
+
+    Parameters
+    ----------
+    L : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     # Does the list have
     # unique elements only?
 
@@ -361,7 +565,23 @@ def hasUniqueElements(L):
 
 
 def printTestCase(A, a, b, x, y, c):
+    """Summary
 
+    Parameters
+    ----------
+    A : TYPE
+        Description
+    a : TYPE
+        Description
+    b : TYPE
+        Description
+    x : TYPE
+        Description
+    y : TYPE
+        Description
+    c : TYPE
+        Description
+    """
     hUE = hasUniqueElements
     print("In-List 1: ", a)
     print("In-List 2: ", b)
@@ -374,6 +594,17 @@ def printTestCase(A, a, b, x, y, c):
 
 
 def testCase(note, a, b):
+    """Summary
+
+    Parameters
+    ----------
+    note : TYPE
+        Description
+    a : TYPE
+        Description
+    b : TYPE
+        Description
+    """
     A = Alignment()
     c, x, y, s = A.align(a, b)
     c1, x1, y1, s1 = A.align(b, a)
@@ -388,6 +619,13 @@ def testCase(note, a, b):
 
 
 def test():
+    """Summary
+
+    Raises
+    ------
+    SystemExit
+        Description
+    """
     l1 = [1, 2, 3, 4]
     l2 = [1, 2, 1, 4]
     l3 = [1, 2, 3, 4, GapSymbol, GapSymbol]
@@ -468,9 +706,28 @@ def test():
 
 
 def printTestCase2(A, a, b, x, y, c, s):
+    """Summary
+
+    Parameters
+    ----------
+    A : TYPE
+        Description
+    a : TYPE
+        Description
+    b : TYPE
+        Description
+    x : TYPE
+        Description
+    y : TYPE
+        Description
+    c : TYPE
+        Description
+    s : TYPE
+        Description
+    """
     hUE = hasUniqueElements
-    print("In-List 1: ", string.join(a, ''))
-    print("In-List 2: ", string.join(b, ''))
+    print("In-List 1: ", string.join(a, ""))
+    print("In-List 2: ", string.join(b, ""))
     print("Out-List 1:", x)
     print("Out-List 2:", y)
     print("Script:    ", s)
@@ -481,6 +738,17 @@ def printTestCase2(A, a, b, x, y, c, s):
 
 
 def testCase2(note, a, b):
+    """Summary
+
+    Parameters
+    ----------
+    note : TYPE
+        Description
+    a : TYPE
+        Description
+    b : TYPE
+        Description
+    """
     A = Alignment()
     c, x, y, s = A.align(a, b)
     c1, x1, y1, s1 = A.align(b, a)
@@ -514,6 +782,20 @@ def testCase2(note, a, b):
 
 
 def Do_align(a, b):
+    """Summary
+
+    Parameters
+    ----------
+    a : TYPE
+        Description
+    b : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     a = list(a)
     b = list(b)
     A = Alignment()
@@ -522,6 +804,20 @@ def Do_align(a, b):
 
 
 def Get_position(a, b):
+    """Summary
+
+    Parameters
+    ----------
+    a : TYPE
+        Description
+    b : TYPE
+        Description
+
+    Returns
+    -------
+    TYPE
+        Description
+    """
     a = list(a)
     b = list(b)
     A = Alignment()
@@ -529,7 +825,7 @@ def Get_position(a, b):
     start = -1
     print(y)
     for i in range(0, len(y)):
-        if (y[i] is not None):
+        if y[i] is not None:
             start = i
             break
-    return (start)
+    return start

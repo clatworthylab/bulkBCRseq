@@ -50,6 +50,9 @@ parallel = true
 include = [
     "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py"
 ]
+omit = [
+    "orphan/"
+]
 
 [tool.coverage.report]
 show_missing = true
