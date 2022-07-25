@@ -137,7 +137,6 @@ import os
 # from collections import defaultdict
 
 # import Align
-from Align2 import *
 
 # import Functions
 # from Functions import *
