@@ -1,6 +1,12 @@
 name: Code style checks
 
-on: [pull_request]
+on:
+  pull_request:
+    branches-ignore:
+      - "legacy"
+  push:
+    branches:
+      - "master"
 
 jobs:
   black:
