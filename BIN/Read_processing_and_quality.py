@@ -1,105 +1,5 @@
 #!/usr/bin/env python
-"""Summary
-
-Attributes
-----------
-att_file : TYPE
-    Description
-barcode_group : TYPE
-    Description
-bin_path : TYPE
-    Description
-checked_edges : TYPE
-    Description
-cluster_file : TYPE
-    Description
-command_source : TYPE
-    Description
-control : str
-    Description
-dir : TYPE
-    Description
-edge_lengths : float
-    Description
-Fail_file : TYPE
-    Description
-file_edges : TYPE
-    Description
-file_seqs : TYPE
-    Description
-file_vertex : TYPE
-    Description
-Filtered_out1 : TYPE
-    Description
-filtering_report : TYPE
-    Description
-gene : TYPE
-    Description
-id : TYPE
-    Description
-length : TYPE
-    Description
-lib_path : TYPE
-    Description
-main_path : str
-    Description
-method : TYPE
-    Description
-nn_orf_filtered : TYPE
-    Description
-paired : TYPE
-    Description
-plot_ids_file : TYPE
-    Description
-primer_file : TYPE
-    Description
-primer_tag_file : TYPE
-    Description
-primer_tag_file_count : TYPE
-    Description
-read_number_division : str
-    Description
-Reduced_file : TYPE
-    Description
-ref_const : TYPE
-    Description
-refj : TYPE
-    Description
-refjp : TYPE
-    Description
-refv : TYPE
-    Description
-refvp : TYPE
-    Description
-Seq_file1 : TYPE
-    Description
-Seq_file2 : TYPE
-    Description
-source : TYPE
-    Description
-species : TYPE
-    Description
-tmp_file : TYPE
-    Description
-tmp_file0 : TYPE
-    Description
-tmp_file_1 : TYPE
-    Description
-tmp_file_orf : TYPE
-    Description
-tmp_pre : TYPE
-    Description
-tmp_reduced_sequences : TYPE
-    Description
-tmp_Tmp_file : TYPE
-    Description
-trim1 : TYPE
-    Description
-trim2 : TYPE
-    Description
-trim3 : TYPE
-    Description
-"""
+"""Main module to perform BCR-seq read processing and QC check."""
 import re
 import networkx as nx
 from operator import itemgetter, add
@@ -132,7 +32,7 @@ if not os.path.exists(lib_path):
 
 
 def check_type_of_priming(primer_file):
-    """Summary
+    """Summary.
 
     Parameters
     ----------
@@ -154,7 +54,7 @@ def check_type_of_priming(primer_file):
 
 
 def reduce_sequences(trim2, trim3, primer_file):
-    """Summary
+    """Summary.
 
     Parameters
     ----------
@@ -207,20 +107,21 @@ def reduce_sequences(trim2, trim3, primer_file):
         os.system(command1)
 
 
-def get_match(primer, seq):
-    """Summary
+def get_match(primer: str, seq: str) -> int:
+    """
+    Find primer sequence in sequence.
 
     Parameters
     ----------
-    primer : TYPE
-        Description
-    seq : TYPE
-        Description
+    primer : str
+        primer sequence.
+    seq : str
+        query sequence.
 
     Returns
     -------
-    TYPE
-        Description
+    int
+        starting numerical index (location) of primer sequence.
     """
     loc = []
     if seq.count(primer) != 0:
@@ -230,7 +131,7 @@ def get_match(primer, seq):
     return loc
 
 
-def get_partial_match(seq, p1, p2, primer, chain):
+def get_partial_match(seq: str, p1, p2, primer: str, chain):
     """Summary
 
     Parameters
@@ -320,89 +221,6 @@ def match_sequence_primers(primer, sequence, rc, P1, P2):
     return (sequence, p)
 
 
-def get_primers(rc, primer_file):
-    """Summary
-
-    Parameters
-    ----------
-    rc : TYPE
-        Description
-    primer_file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(primer_file, "r")
-    V_primer, J_primer, V1, V2, ja, jb = [], [], [], [], [], []
-    barcoded_j, barcoded_v = 0, 0
-    vidprimer, jidprimer = [], []
-    universal_rev = []
-    inside = 0
-    for header, sequence in fasta_iterator(fh):
-        if header.count("J") != 0 or header.count("REV_CONST") != 0:
-            if header.count("REV_CONST") != 0:
-                inside = 1
-            if sequence.count("N") != 0:
-                barcoded_j = 1
-            sequence = sequence.upper()
-            J_primer.append(sequence)
-            l = len(sequence)
-            ja.append(sequence[0 : l / 2])
-            jb.append(sequence[l / 2 : l])
-            jidprimer.append(header)
-        elif header.count("UNIVERSAL_REV") != 0:
-            universal_rev.append(sequence)
-        else:
-            if sequence.count("N") != 0:
-                barcoded_v = 1
-            sequence = sequence.upper()
-            V_primer.append(sequence)
-            l = len(sequence)
-            V1.append(sequence[0 : l / 2])
-            V2.append(sequence[l / 2 : l])
-            vidprimer.append(header)
-    fh.close()
-    return (
-        V_primer,
-        J_primer,
-        V1,
-        V2,
-        ja,
-        jb,
-        barcoded_j,
-        barcoded_v,
-        vidprimer,
-        jidprimer,
-        inside,
-        universal_rev,
-    )
-
-
-def check_location_of_primer_binding(primer_file):
-    """Summary
-
-    Parameters
-    ----------
-    primer_file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(primer_file, "r")
-    mode = "WITHIN"
-    for header, sequence in fasta_iterator(fh):
-        if header.count("REV_CONST") != 0:
-            mode = "OUTSIDE"
-    fh.close()
-    return mode
-
-
 def filter_igj_genes(
     trim1, trim2, refj, control, primer_file, ref_const, primer_tag_file_count
 ):
@@ -430,7 +248,6 @@ def filter_igj_genes(
     TYPE
         Description
     """
-    # mode = check_location_of_primer_binding(primer_file)
     mode = "WITHIN"
     fh = open(trim2, "w")
     fh.close()
@@ -509,7 +326,6 @@ def filter_igj_genes(
         fh.close()
         if len(out) > 2:
             blast_match_j(out, seqs, trim1, trim2, refj, e_value)
-    return ()
 
 
 def check_fasta_not_empty(fh):
@@ -736,7 +552,7 @@ def trim_sequences_bcr_tcr(
     """
     (rc) = init_rc()
     forward, reverse, barcoded_j, barcoded_v, v_ref = get_primers_split(
-        rc, primer_file
+        primer_file
     )
     fh_out = open(Output_trim, "w")
     fh_out.close()
@@ -744,7 +560,6 @@ def trim_sequences_bcr_tcr(
     fh_out.close()
     threshold_barcode = 0.80  # Certainty for accepting a barcode
     if barcoded_j == 1 and barcoded_v == 0:
-        inside = 1
         print("J barcoded")
         single_j_barcoded_trimming_clustered(
             forward,
@@ -764,13 +579,11 @@ def trim_sequences_bcr_tcr(
             primer_tag_file_count,
             threshold_barcode,
             ref_const,
-            inside,
             v_ref,
         )
-    return ()
 
 
-def get_primers_split(rc, primer_file):
+def get_primers_split(primer_file):
     """Summary
 
     Parameters
@@ -811,8 +624,8 @@ def get_primers_split(rc, primer_file):
                     or header.count("REV_CONST") != 0
                     or header.count("REVERSE") != 0
                 ):
-                    if header.count("REV_CONST") != 0:
-                        inside = 1
+                    # if header.count("REV_CONST") != 0:
+                    #     inside = 1
                     if sequence.count("N") != 0:
                         barcoded_j = 1
                     sequence = sequence.upper()
@@ -836,39 +649,7 @@ def get_primers_split(rc, primer_file):
                     forward = forward + [
                         [sequence, clas, uni, BC, gene_specific, header, words]
                     ]
-            else:
-                header, sequence = l[0], l[1]
-                sequence = sequence.upper()
-                words = []
-                for i in range(word_size, len(sequence)):
-                    words.append([sequence[i - word_size : i], i - word_size])
-                if (
-                    header.count("J") != 0
-                    or header.count("REV_CONST") != 0
-                    or header.count("REVERSE") != 0
-                ):
-                    if header.count("CONST") != 0:
-                        inside = 1
-                    if sequence.count("N") != 0:
-                        barcoded_j = 1
-                    sequence = sequence.upper()
-                    clas = "IMMUME_REC"
-                    reverse = reverse + [
-                        [sequence, clas, sequence, header, words]
-                    ]
-                elif header.count("REF") == 0:
-                    if sequence.count("N") != 0:
-                        barcoded_v = 1
-                    sequence = sequence.upper()
-                    clas = "IMMUNE_REC"
-                    forward = forward + [[sequence, clas, header, words]]
-                else:
-                    sequence = sequence.upper()
-                    clas = "IMMUNE_REC"
-                    v_ref = v_ref + [[sequence, clas, header, words]]
     fh.close()
-    _ = inside
-    _ = _
     return (forward, reverse, barcoded_j, barcoded_v, v_ref)
 
 
@@ -984,7 +765,6 @@ def separate_sequences(
                 write_out(out, Output_trim)
                 out, ind = "", 0
     write_out(out, Output_trim)
-    return ()
 
 
 def assess_gene_score(consensus, word_dict, threshold):
@@ -1045,7 +825,6 @@ def single_j_barcoded_trimming_clustered(
     primer_tag_file_count,
     threshold_barcode,
     ref_const,
-    inside,
     v_ref,
 ):
     """Summary
@@ -1086,8 +865,6 @@ def single_j_barcoded_trimming_clustered(
         Description
     ref_const : TYPE
         Description
-    inside : TYPE
-        Description
     v_ref : TYPE
         Description
 
@@ -1122,7 +899,6 @@ def single_j_barcoded_trimming_clustered(
     separate_sequences(
         primer_tag_file_count, primer_tag_file, Output_trim, ref_const
     )
-    return ()
 
 
 def check_barcodes_malbac(
@@ -1303,7 +1079,6 @@ def check_barcodes_malbac(
     write_out(outp, primer_tag_file)
     outp, ind = "", 0
     print(total_tags, passed_seqs_total, fail_less_than_threshold)
-    return ()
 
 
 def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
@@ -1332,7 +1107,6 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
     fh.write(out)
     fh.close()
     if len(u_seq) > 2000:
-        # command1 = "mafft --retree 2 " + insert + " " + tmp_file + "txt > " + tmp_file + "aligned"
         command1 = (
             "mafft --retree 2 --parttree "
             + "{}txt".format(tmp_file)
@@ -1698,743 +1472,6 @@ def read_untrimmed_file_single(
         + "\tPassed sequences:\t"
         + str(pass_all)
     )
-    return ()
-
-
-def read_untrimmed_file(
-    tmp_Tmp_file,
-    J_primer,
-    rc,
-    J1,
-    J2,
-    regions_J,
-    sample,
-    maxl,
-    minl,
-    js,
-    vs,
-    V_primer,
-    V1,
-    V2,
-    primer_tag_file_count,
-    Fail_file,
-    vidprimer,
-    jidprimer,
-    inside,
-    ref_const,
-    universal_rev,
-    reverse_primer_group,
-    species,
-):
-    """Summary
-
-    Parameters
-    ----------
-    tmp_Tmp_file : TYPE
-        Description
-    J_primer : TYPE
-        Description
-    rc : TYPE
-        Description
-    J1 : TYPE
-        Description
-    J2 : TYPE
-        Description
-    regions_J : TYPE
-        Description
-    sample : TYPE
-        Description
-    maxl : TYPE
-        Description
-    minl : TYPE
-        Description
-    js : TYPE
-        Description
-    vs : TYPE
-        Description
-    V_primer : TYPE
-        Description
-    V1 : TYPE
-        Description
-    V2 : TYPE
-        Description
-    primer_tag_file_count : TYPE
-        Description
-    Fail_file : TYPE
-        Description
-    vidprimer : TYPE
-        Description
-    jidprimer : TYPE
-        Description
-    inside : TYPE
-        Description
-    ref_const : TYPE
-        Description
-    universal_rev : TYPE
-        Description
-    reverse_primer_group : TYPE
-        Description
-    species : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    if inside == 1:
-        if reverse_primer_group != "ISOTYPER" and reverse_primer_group != "ISO":
-            print("ISO_DD")
-            print(ref_const)
-            fh = open(ref_const, "r")
-            ref_words, word_length, length_into_constant_region, ref_seqs = (
-                Tree(),
-                10,
-                50,
-                {},
-            )
-            for header, seq in fasta_iterator(fh):
-                seq, header = seq.upper(), header.split("|")[0]
-                ref_seqs[header] = seq
-                for i in range(
-                    word_length, min([length_into_constant_region, len(seq)])
-                ):
-                    ref_words[seq[i - word_length : i]][header].value = 1
-            fh.close()
-        if reverse_primer_group == "ISOTYPER" or reverse_primer_group == "ISO":
-            print("IsoTyper primers")
-            fh = open(
-                (
-                    "/nfs/users/nfs_r/rbr1/IMMUNOLOGY/NETWORK_METHODS/STANDARD_BCR_PROCESSING/LIBRARY/",
-                    "Annealing_IsoTyper_constant_region_distinction_formatted_"
-                    + species
-                    + ".txt",
-                ),
-                "r",
-            )
-            ref_words = Tree()
-            for l in fh:
-                if l[0] != "#":
-                    l = l.strip().split()
-                    words = l[0].split(":")
-                    id = l[1].split("*")[0]
-                    if id.count("P") == 0:
-                        ref_words[words[0]][words[1]][id].value = 1
-            fh.close()
-        else:
-            print("\t\t\t", reverse_primer_group)
-    fh = open(primer_tag_file_count, "w")
-    fh.close()
-    t, seqs1, total, ind, out = 0, Tree(), 0, 0, "#ID\tJ_tag\tV_tag\tSequence\n"
-    J_found, v_found = 0, 0
-    fh = open(tmp_Tmp_file, "r")
-    for header, seq in fasta_iterator(fh):
-        seq = seq.upper()
-        seqs1[seq][header].value = 1
-        t = t + 1
-    # status = "STATUS\t" + sample + "\tNumber of sequences\t" + str(t)
-    fail, indf = "", 0
-    if len(universal_rev) != 0:
-        universal_rev1, universal_rev2 = [], []
-        for i in range(0, len(universal_rev)):
-            universal_rev1 = universal_rev1 + [
-                universal_rev[i][0 : (len(universal_rev[i]) / 2)]
-            ]
-            universal_rev2 = universal_rev2 + [
-                universal_rev[i][
-                    (len(universal_rev[i]) / 2) : (len(universal_rev[i]))
-                ]
-            ]
-        induni = 0
-    for seq in seqs1:
-        for header in seqs1[seq]:
-            break
-        header = header + ":" + str(len(seqs1[seq]))
-        number = len(seqs1[seq])
-        total = total + number
-        # passes, j_tag, v_tag = 0, '', ''
-        passes, j_tag = 0, ""
-        # j_ident_primer, v_ident_primer = '', ''
-        # j_ident_primer = '', ''
-        for i in range(0, js):
-            (seq, pj) = match_sequence_primers(
-                J_primer[i], seq, rc, J1[i], J2[i]
-            )
-            if len(pj) != 0:
-                pj = max(pj)
-                if (
-                    pj != -1
-                    and pj + len(regions_J[J_primer[i]]) <= len(seq)
-                    and pj > 80
-                ):
-                    passes = check_barcode(
-                        seq[pj : pj + len(regions_J[J_primer[i]])],
-                        J_primer[i],
-                        regions_J[J_primer[i]],
-                    )
-                    if passes == 1:
-                        j_tag = seq[pj : pj + len(regions_J[J_primer[i]])]
-                        # j_ident_primer = J_primer[i]
-                        j_primer_id = jidprimer[i]
-                        seq, J_found = (
-                            seq[0 : pj + len(J_primer[i])],
-                            J_found + number,
-                        )
-                        break
-        if passes == 0:
-            if len(universal_rev) != 0:
-                for i in range(0, len(universal_rev)):
-                    (seq, pj) = match_sequence_primers(
-                        universal_rev[i],
-                        seq,
-                        rc,
-                        universal_rev1[i],
-                        universal_rev2[i],
-                    )
-                    bc = "NNNNANNNNANNNN"
-                    if len(pj) != 0:
-                        pj = max(pj)
-                        if pj > len(bc):
-                            # j_tag = seq[pj-(len(bc)):pj]+"_"+str(induni)
-                            j_tag = seq[pj - (len(bc)) : pj] + "_UNI_REV"
-                            # j_ident_primer = universal_rev[i]
-                            j_primer_id = "UNI_REV"
-                            seq, J_found = (
-                                seq[0 : pj - (len(bc))],
-                                J_found + number,
-                            )
-                            passes = 1
-                            induni = induni + 1
-                            break
-        gene_constant_region = ""
-        pass_constant = -1
-        # print passes
-        if inside == 1 and passes == 1:
-            if reverse_primer_group in ["ISO_DD", "TCR"]:
-                score = {}
-                seq1 = seq[len(seq) - length_into_constant_region : len(seq)]
-                for w in ref_words:
-                    if seq1.count(w) != 0:
-                        for id1 in ref_words[w]:
-                            if id1 in score:
-                                score[id1] = score[id1] + 1
-                            else:
-                                score[id1] = 1
-                max_score, max_match = -1, ""
-                for i in score:
-                    if score[i] > max_score:
-                        max_score, max_match = score[i], i
-                pass_constant = 1
-                if max_score < 4:
-                    passes = 0
-                    pass_constant = 0
-                gene_constant_region = max_match
-            elif reverse_primer_group == "ISOTYPER":
-                length_into_constant_region = 80
-                seq1 = seq[len(seq) - length_into_constant_region : len(seq)]
-                scores = {}
-                for w in ref_words:
-                    if seq1.count(w) != 0:
-                        for w1 in ref_words[w]:
-                            if seq1.count(w1) != 0:
-                                for region in ref_words[w][w1]:
-                                    if region in scores:
-                                        scores[region] = scores[region] + 1
-                                    else:
-                                        scores[region] = 1
-                score = []
-                for r in scores:
-                    if scores[r] > 5:
-                        score.append([r, scores[r]])
-                if len(score) == 0:
-                    passes = 0
-                    pass_constant = 0
-                elif len(score) == 1:
-                    gene_constant_region = score[0][0]
-                    passes = 1
-                    pass_constant = 1
-                else:
-                    score.sort(key=lambda x: x[1], reverse=True)
-                    if score[0][1] > score[1][1]:
-                        gene_constant_region = score[0][0]
-                        passes = 1
-                        pass_constant = 1
-                    else:
-                        print("CANNOT DISINGUISH", header, score)
-                        pass_constant = 0
-                        passes = 0
-            # else:
-            #    print reverse_primer_group
-        if passes == 1:
-            sequence = seq
-            if vs != 0:
-                for i in range(0, vs):
-                    (pv) = get_match(V_primer[i], seq)
-                    if pv == -1:
-                        (pv) = get_partial_match(
-                            seq, V1[i], V2[i], V_primer[i], "V"
-                        )
-                        if pv != -1:
-                            # i_found = i
-                            sequence = seq[pv + len(V_primer[i]) : len(seq)]
-                            break
-                    if len(pv) != 0:
-                        # i_found = i
-                        pv = max(pv)
-                        sequence = seq[pv + len(V_primer[i]) : len(seq)]
-                        break
-            else:
-                pv = 0
-                i = 0
-                sequence = seq[0 : len(seq)]
-            if pv != -1:
-                if len(sequence) > minl and len(sequence) < maxl:
-                    if sequence.count("N") == 0:
-                        if vs != 0:
-                            vprimersub = vidprimer[i]
-                        else:
-                            vprimersub = "NA"
-                        out = (
-                            out
-                            + header
-                            + "\t"
-                            + j_tag
-                            + "\t-\t"
-                            + sequence
-                            + "\t"
-                            + j_primer_id
-                            + "\t"
-                            + vprimersub
-                            + "\t"
-                            + gene_constant_region
-                            + "\n"
-                        )
-                        ind = ind + 1
-                        passes = 1
-                        v_found = v_found + number
-                        if ind > 10:
-                            write_out(out, primer_tag_file_count)
-                            out, ind = "", 0
-                    else:
-                        fail = fail + ">" + header + "_N\n" + seq + "\n"
-                else:
-                    fail = fail + ">" + header + "_length\n" + seq + "\n"
-            else:
-                fail = fail + ">" + header + "_V_primer\n" + seq + "\n"
-        else:
-            if pass_constant == -1:
-                fail = fail + ">" + header + "_J_primer\n" + seq + "\n"
-            elif pass_constant == 0:
-                fail = fail + ">" + header + "_CONSTANT\n" + seq + "\n"
-            else:
-                fail = fail + ">" + header + "_OTHER\n" + seq + "\n"
-        if passes == 0:
-            indf = indf + 1
-            if indf > 500:
-                print_out(fail, Fail_file)
-                indf, fail = 0, ""
-    fh.close()
-    write_out(out, primer_tag_file_count)
-    write_out(fail, Fail_file)
-    del seqs1, out, fail
-    print(
-        sample,
-        "\tTotal:\t",
-        total,
-        "\t",
-        t,
-        "\tN J found:\t",
-        J_found,
-        "\tN V found:\t",
-        v_found,
-        "\t% found:\t",
-        v_found * 100.0 / total,
-        "%",
-    )
-    return ()
-
-
-def get_barcodes_completed(primer_tag_file):
-    """Summary
-
-    Parameters
-    ----------
-    primer_tag_file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(primer_tag_file, "r")
-    bc_complete = {}
-    for l in fh:
-        if l[0] != "#":
-            l = l.strip().split()
-            tag = l[3] + "\t" + l[4]
-            bc_complete[tag] = 1
-    fh.close()
-    return bc_complete
-
-
-def print_trimmed_sequences(
-    Output_trim, primer_tag_file, primer_tag_file_count, inside, ref_const
-):
-    """Summary
-
-    Parameters
-    ----------
-    Output_trim : TYPE
-        Description
-    primer_tag_file : TYPE
-        Description
-    primer_tag_file_count : TYPE
-        Description
-    inside : TYPE
-        Description
-    ref_const : TYPE
-        Description
-    """
-    constant_region, regions, uniq_bcs = {}, {}, {}
-    print("inside", inside)
-    if inside in [0, 1]:
-        fh = open(primer_tag_file_count, "r")
-        for l in fh:
-            if l[0] != "#":
-                l = l.strip().split()
-                const_reg = l[len(l) - 2].replace("REVERSE", "REV")
-                if const_reg.count("VH") == 0:
-                    bc = l[1] + ":" + l[2]
-                    constant_region[l[0].split(":")[0]] = const_reg
-                    regions[const_reg] = 1
-                    uniq_bcs[bc] = 1
-        fh.close()
-        print("Number of unique BCs:", len(uniq_bcs))
-        del uniq_bcs
-    fh = open(primer_tag_file, "r")
-    unique_seqs, seqs = Tree(), {}
-    passed, failed, uniq_failed = 0, 0, {}
-    if inside in [0, 1]:
-        for l in fh:
-            if l[0] != "#":
-                l = l.strip().split()
-                if l[6] == "YES":
-                    passed = passed + 1
-                    consensus = l[7]
-                    if consensus.count("human_BC_REV_CONST") != 0:
-                        print(l)
-                    seqs[l[3] + ":" + l[4]] = [l[0], consensus]
-                else:
-                    failed = failed + 1
-                    if l[3] in uniq_failed:
-                        uniq_failed[l[3]] = uniq_failed[l[3]] + 1
-                    else:
-                        uniq_failed[l[3]] = 1
-    print(
-        "Passed:",
-        passed,
-        "Failed:",
-        failed,
-        "(",
-        failed * 100 / (failed + passed),
-        "%)",
-    )
-    fh.close()
-    if inside == 0:
-        for bc in seqs:
-            id = seqs[bc][0].split(":")[0].split("__")[0]
-            unique_seqs[seqs[bc][1]][id].value = 1
-        del seqs
-        out, ind = "", 0
-        for seq in unique_seqs:
-            f = len(unique_seqs[seq])
-            for id in unique_seqs[seq]:
-                break
-            out = (
-                out
-                + ">"
-                + id.split("__")[0]
-                + "__"
-                + str(f)
-                + "\n"
-                + seq
-                + "\n"
-            )
-            ind = ind + 1
-            if ind > 100:
-                write_out(out, Output_trim)
-                out, ind = "", 0
-        write_out(out, Output_trim)
-    elif inside == 1:
-        fh = open(ref_const, "r")
-        word_size, ref_words = 10, {}
-        for header, seq in fasta_iterator(fh):
-            words, seq = [], seq.upper()
-            for i in range(word_size, len(seq)):
-                words.append(seq[i - word_size : i])
-            ref_words[header.split("|")[0]] = words
-        for bc in seqs:
-            seq, id = seqs[bc][1], seqs[bc][0]
-            # score = []
-            # for const in ref_words:
-            #    c
-            # print bc, seqs[bc]
-            # #id = seqs[bc][0].split(":")[0].split("__")[0]
-            # if(id in constant_region):
-            #  unique_seqs[seqs[bc][1]][constant_region[id]][id].value = 1
-            # print seqs[bc][1], constant_region[id], id
-        del seqs
-
-
-def read_untrimmed_file_double1(
-    regions_J,
-    J_primer,
-    J1,
-    J2,
-    regions_V,
-    V_primer,
-    V1,
-    V2,
-    rc,
-    tmp_Tmp_file,
-    Fail_file,
-    Output_trim,
-    gene,
-    paired,
-    species,
-    primer_file,
-    primer_tag_file,
-    tmp_file,
-    sample,
-    V_primerfull,
-    primer_tag_file_count,
-):
-    """Summary
-
-    Parameters
-    ----------
-    regions_J : TYPE
-        Description
-    J_primer : TYPE
-        Description
-    J1 : TYPE
-        Description
-    J2 : TYPE
-        Description
-    regions_V : TYPE
-        Description
-    V_primer : TYPE
-        Description
-    V1 : TYPE
-        Description
-    V2 : TYPE
-        Description
-    rc : TYPE
-        Description
-    tmp_Tmp_file : TYPE
-        Description
-    Fail_file : TYPE
-        Description
-    Output_trim : TYPE
-        Description
-    gene : TYPE
-        Description
-    paired : TYPE
-        Description
-    species : TYPE
-        Description
-    primer_file : TYPE
-        Description
-    primer_tag_file : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-    sample : TYPE
-        Description
-    V_primerfull : TYPE
-        Description
-    primer_tag_file_count : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    for f in [primer_tag_file_count]:
-        fh = open(f, "w")
-        fh.close()
-    fh = open(tmp_Tmp_file, "r")
-    (js, vs) = (len(J_primer), len(V_primer))
-    # seqs = Tree()
-    # (found, lost, total, ind, indf, indp, indw, indfw, fail, out, out1, out2,
-    #  fail) = ([], [], 0, 0, 0, 0, 0, 0, '', '', '', '', '')
-    (total, ind, indp, out) = (0, 0, 0, "")
-    maxl = 1000000
-    if gene == "HEAVY" or gene == "IGH":
-        minl = 120
-    if gene == "KAPPA" or gene == "IGK":
-        minl = 110
-    if gene == "LAMBDA" or gene == "IGL":
-        (minl, maxl) = (90, 150)
-    # J_found, v_found, tot, indexing = 0, 0, 0, 0
-    J_found, v_found, indexing = 0, 0, 0
-    seqs1, t = Tree(), 0
-    for header, seq in fasta_iterator(fh):
-        seq = seq.upper()
-        seqs1[seq][header].value = 1
-        t = t + 1
-    status = "STATUS\t" + sample + "\tNumber of sequences\t" + str(t)
-    out, ind = "#ID\tJ_tag\tV_tag\tSequence\n", 0
-    for seq in seqs1:
-        for header in seqs1[seq]:
-            break
-        header = header + ":" + str(len(seqs1[seq]))
-        number = len(seqs1[seq])
-        (indexing, f, ind, total) = (indexing + 1, 0, ind + 1, total + number)
-        passes, j_tag, v_tag = 0, "", ""
-        for i in range(0, js):
-            (seq, pj) = match_sequence_primers(
-                J_primer[i], seq, rc, J1[i], J2[i]
-            )
-            if max(pj + [-1]) != -1:
-                pj = pj[0]
-                if pj + len(regions_J[J_primer[i]]) <= len(seq):
-                    passes = check_barcode(
-                        seq[pj : pj + len(regions_J[J_primer[i]])],
-                        J_primer[i],
-                        regions_J[J_primer[i]],
-                    )
-                    if passes == 1:
-                        j_tag = seq[pj : pj + len(regions_J[J_primer[i]])]
-                        seq = seq[0:pj]
-                        break
-        if passes == 1:
-            J_found = J_found + number
-            passes, pv = 0, -1
-            for i in range(0, vs):
-                (pv) = get_match(V_primer[i], seq)
-                if max(pv + [-1]) != -1:
-                    pv = pv[0]
-                    if pv - len(regions_V[V_primer[i]]) + len(V_primer[i]) > -1:
-                        passes = check_barcode(
-                            seq[
-                                pv
-                                - len(regions_V[V_primer[i]])
-                                + len(V_primer[i]) : pv
-                                + len(V_primer[i])
-                            ],
-                            V_primer[i],
-                            regions_V[V_primer[i]],
-                        )
-                        if passes == 1:
-                            v_found = v_found + number
-                            v_tag = seq[
-                                pv
-                                - len(regions_V[V_primer[i]])
-                                + len(V_primer[i]) : pv
-                                + len(V_primer[i])
-                            ]
-                            sequence = seq[pv + len(V_primer[i]) : len(seq)]
-                            break
-            if passes == 0:
-                for i in range(0, vs):
-                    (pv) = get_match(V1[i], seq)
-                    if max(pv + [-1]) != -1:
-                        pv = pv[0]
-                        if pv - len(regions_V[V_primer[i]]) > 0:
-                            bc = seq[pv - len(regions_V[V_primer[i]]) : pv]
-                            tag = regions_V[V_primer[i]]
-                            passes = check_barcode_malbac(bc, tag)
-                            if passes == 1:
-                                v_found = v_found + number
-                                v_tag = bc
-                                sequence = seq[pv + len(V_primer[i]) : len(seq)]
-                                break
-                    else:
-                        (pv) = get_match(V2[i], seq)
-                        if max(pv + [-1]) != -1:
-                            pv = pv[0]
-                            if pv - len(regions_V[V_primer[i]]) > 0:
-                                bc = seq[
-                                    pv
-                                    - len(V1[i])
-                                    - len(regions_V[V_primer[i]]) : pv
-                                    - len(V1[i])
-                                ]
-                                tag = regions_V[V_primer[i]]
-                                passes = check_barcode_malbac(bc, tag)
-                                if passes == 1:
-                                    v_found = v_found + number
-                                    v_tag = bc
-                                    sequence = seq[pv + len(V2[i]) : len(seq)]
-                                    break
-            if passes == 0:
-                for i in range(0, vs):
-                    pre_bc_region = V_primerfull[i][
-                        0 : V_primerfull[i].index("N")
-                    ]
-                    pre_bc_region2 = pre_bc_region[
-                        len(pre_bc_region) / 2 : len(pre_bc_region)
-                    ]
-                    pv = get_match(pre_bc_region2, seq)
-                    if max(pv + [-1]) != -1:
-                        pv = pv[0]
-                        bc = seq[
-                            pv
-                            + len(pre_bc_region2)
-                            - 1 : pv
-                            + len(pre_bc_region2)
-                            + len(regions_V[V_primer[i]])
-                            - 1
-                        ]
-                        tag = regions_V[V_primer[i]]
-                        passes = check_barcode_malbac(bc, tag)
-                        if passes == 1:
-                            v_found = v_found + number
-                            v_tag = bc
-                            sequence = seq[
-                                pv
-                                + len(pre_bc_region2)
-                                + len(tag)
-                                + len(V_primer[i]) : len(seq)
-                            ]
-                            break
-            if passes == 1:
-                if len(sequence) > minl and len(sequence) < maxl:
-                    if sequence.count("N") == 0:
-                        out = (
-                            out
-                            + header
-                            + "\t"
-                            + j_tag
-                            + "\t"
-                            + v_tag
-                            + "\t"
-                            + sequence
-                            + "\t-\t-\t-\n"
-                        )
-                        indp = indp + number
-                        ind = ind + 1
-                        if ind > 200:
-                            write_out(out, primer_tag_file_count)
-                            out, ind = "", 0
-    fh.close()
-    write_out(out, primer_tag_file_count)
-    out, ind = "", 0
-    status = (
-        status
-        + "\tTotal sequences:\t"
-        + str(total)
-        + "\tNumber of V primers found:\t"
-        + str(v_found)
-        + "\tNumber of J primers found:\t"
-        + str(J_found)
-        + "\tPassed sequences:\t"
-        + str(indp)
-    )
-    return ()
 
 
 def get_sequences(file):
@@ -2542,313 +1579,6 @@ def join_reads(s1, s2, rc, length):
     return (seq, failed)
 
 
-def get_barcodes(barcode, barcode_file, rc):
-    """Summary
-
-    Parameters
-    ----------
-    barcode : TYPE
-        Description
-    barcode_file : TYPE
-        Description
-    rc : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    barcode = barcode.split(",")
-    fh = open(barcode_file, "r")
-    barcodes, allbarcodes, barcode_stem = [], [], []
-    rc_barcodes = []
-    for l in fh:
-        if l[0] != "#":
-            l = l.strip().split()
-            allbarcodes.append(l[1])
-            if l[0] in barcode:
-                barcodes.append(l[1])
-                rc_barcodes.append(reverse_comp(l[1], rc))
-            elif l[0] == "STEM":
-                barcode_stem.append(
-                    [
-                        l[1],
-                        l[1][0 : len(l[1]) / 2],
-                        l[1][len(l[1]) / 2 : len(l[1])],
-                    ]
-                )
-    fh.close()
-    return (barcodes, allbarcodes, barcode_stem, rc_barcodes)
-
-
-def split_reads_and_join(
-    file1,
-    file2,
-    outfile,
-    gene,
-    paired,
-    id,
-    method,
-    primer_file,
-    barcode_group,
-    other,
-    dir,
-):
-    """Summary
-
-    Parameters
-    ----------
-    file1 : TYPE
-        Description
-    file2 : TYPE
-        Description
-    outfile : TYPE
-        Description
-    gene : TYPE
-        Description
-    paired : TYPE
-        Description
-    id : TYPE
-        Description
-    method : TYPE
-        Description
-    primer_file : TYPE
-        Description
-    barcode_group : TYPE
-        Description
-    other : TYPE
-        Description
-    dir : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    split_reads_and_join_pre(
-        file1,
-        file2,
-        outfile,
-        gene,
-        paired,
-        id,
-        method,
-        primer_file,
-        barcode_group,
-        other,
-        dir,
-    )
-    check_split(outfile, barcode_group, other)
-    return ()
-
-
-def check_split(outfile, barcode_group, other):
-    """Summary
-
-    Parameters
-    ----------
-    outfile : TYPE
-        Description
-    barcode_group : TYPE
-        Description
-    other : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    rc = init_rc()
-    barcode, barcode_file = other.split(",")[0], other.split(",")[1]
-    barcodes, allbarcodes, barcode_stem, rc_barcodes = get_barcodes(
-        barcode, barcode_file, rc
-    )
-    allbarcodes_rc = []
-    for b in allbarcodes:
-        allbarcodes_rc.append(reverse_comp(b, rc))
-    out, ind = "", 0
-    outfile1 = outfile.replace(".fasta", "_CHECKED.fasta")
-    fh = open(outfile1, "w")
-    fh.close()
-    fh = open(outfile, "r")
-    for header, sequence in fasta_iterator(fh):
-        score = []
-        for i in range(0, len(allbarcodes)):
-            p1 = len(get_match(allbarcodes[i], sequence))
-            p2 = len(get_match(allbarcodes_rc[i], sequence))
-            score.append(p1 + p2)
-        if sum(score) == 1:
-            out = out + ">" + header + "\n" + sequence + "\n"
-            ind = ind + 1
-            if ind > 500:
-                write_out(out, outfile1)
-                out, ind = "", 0
-    fh.close()
-    write_out(out, outfile1)
-    return ()
-
-
-def split_reads_and_join_pre(
-    file1,
-    file2,
-    outfile,
-    gene,
-    paired,
-    id,
-    method,
-    primer_file,
-    barcode_group,
-    other,
-    dir,
-):
-    """Summary
-
-    Parameters
-    ----------
-    file1 : TYPE
-        Description
-    file2 : TYPE
-        Description
-    outfile : TYPE
-        Description
-    gene : TYPE
-        Description
-    paired : TYPE
-        Description
-    id : TYPE
-        Description
-    method : TYPE
-        Description
-    primer_file : TYPE
-        Description
-    barcode_group : TYPE
-        Description
-    other : TYPE
-        Description
-    dir : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    rc = init_rc()
-    file1 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_1.fasta"
-    file2 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_2.fasta"
-    print("\t", other)
-    barcode, barcode_file = other.split(",")[0], other.split(",")[1]
-    barcodes, allbarcodes, barcode_stem, rc_barcodes = get_barcodes(
-        barcode, barcode_file, rc
-    )
-    (rc) = init_rc()
-    (seqs1) = get_sequences(file1)
-    (seqs2) = get_sequences(file2)
-    print(len(seqs1), len(seqs2))
-    out, ind = "", 0
-    fh = open(outfile, "w")
-    fh.close()
-    # tot, joining, total, length, primer_match = 0, 0, 0, 20, 0
-    joining, total, length, primer_match = 0, 0, 20, 0
-    if gene == "LAMBDA" or gene == "KAPPA" or gene == "IGK":
-        length = 30
-    count_joined, count_barcode, count_barcode_saved = 0, 0, 0
-    for id in seqs1:
-        if id in seqs2:
-            total = total + 1
-            # s1, s2 = seqs1[id], seqs2[id]
-            seq, failed = join_reads(seqs1[id], seqs2[id], rc, length)
-            if failed == 0 and len(seq) > 150:
-                seq, joining = seq.upper(), joining + 1
-                count_joined = count_joined + 1
-                for primer in barcodes:
-                    p = get_match(primer, seq)
-                    if len(p) == 0:
-                        seq = reverse_comp(seq, rc)
-                        p = get_match(primer, seq)
-                        break
-                    else:
-                        break
-                if len(p) != 0:
-                    count_barcode = count_barcode + 1
-                    out = out + ">" + id + "\n" + seq + "\n"
-                    ind, primer_match = ind + 1, primer_match + 1
-                    if ind > 200:
-                        write_out(out, outfile)
-                        out, ind = "", 0
-                else:
-                    for prim in barcode_stem:
-                        p = get_match(prim[0], seq)
-                        if len(p) == 0:
-                            seq = reverse_comp(seq, rc)
-                            p = get_match(prim[0], seq)
-                        if len(p) != 0:
-                            start = p[0] + len(prim[0]) - 3
-                            start = p[0] + len(prim[0]) - 6
-                            for i in range(0, len(barcodes)):
-                                bc_halves = [
-                                    barcodes[i][2 : len(barcodes[i]) / 2],
-                                    barcodes[i][
-                                        len(barcodes[i]) / 2 : len(barcodes[i])
-                                        - 2
-                                    ],
-                                ]
-                                bc_shift = [2, len(barcodes[i]) / 2]
-                                test = seq[
-                                    start : start + len(barcodes[i]) + 10
-                                ]
-                                for j in range(0, len(bc_halves)):
-                                    if test.count(bc_halves[j]) != 0:
-                                        p = (
-                                            test.index(bc_halves[j])
-                                            - bc_shift[j]
-                                        )
-                                        sub_test = test[
-                                            p : p + len(barcodes[i])
-                                        ]
-                                        a = fuzzy_substring(
-                                            sub_test, barcodes[i]
-                                        )
-                                        if a <= 1:
-                                            count_barcode = count_barcode + 1
-                                            count_barcode_saved = (
-                                                count_barcode_saved + 1
-                                            )
-                                            out = (
-                                                out
-                                                + ">"
-                                                + id
-                                                + "\n"
-                                                + seq
-                                                + "\n"
-                                            )
-                                            ind, primer_match = (
-                                                ind + 1,
-                                                primer_match + 1,
-                                            )
-                                            if ind > 200:
-                                                write_out(out, outfile)
-                                                out, ind = "", 0
-    write_out(out, outfile)
-    del out, ind
-    print(
-        id + "\tTotal sequences:",
-        total,
-        "\tNumber of joined sequences:",
-        joining,
-        "Number of barcodes matched:",
-        primer_match,
-        "% retained:",
-        primer_match * 100.0 / total,
-        "IDs saved",
-        count_barcode_saved,
-    )
-    return ()
-
-
 def get_paired_reads_overlapping(
     file1, file2, outfile, gene, paired, id, method
 ):
@@ -2923,7 +1653,6 @@ def get_paired_reads_overlapping(
         "\tNo pairs:",
         fail_no_pair,
     )
-    return ()
 
 
 def calculate_orf_length(codon, sequence, type, gene):
@@ -3078,7 +1807,6 @@ def blast_match_j_const(out, seqs, trim1, trim2, refj, e_value, indent):
                 out = out + ">" + l[0] + "\n" + seq_j + "\n"
     fh.close()
     write_out(out, trim2)
-    return ()
 
 
 def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
@@ -3127,59 +1855,6 @@ def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
     fh = open(trim2, "a")
     fh.write(out)
     fh.close()
-    return ()
-
-
-def blast_match(V_region, ref, tmp_file, v_match):
-    """Summary
-
-    Parameters
-    ----------
-    V_region : TYPE
-        Description
-    ref : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-    v_match : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(tmp_file, "w")
-    fh.write(V_region)
-    fh.close()
-    command1 = [
-        bin_path,
-        "blastall",
-        "-p",
-        "blastn",
-        "-a",
-        "10",
-        "-d",
-        "{}".format(ref),
-        "-e",
-        "1",
-        "-i",
-        "{}".format(tmp_file),
-        "-o",
-        "{}_blast".format(tmp_file),
-        "-b",
-        "1",
-        "-m",
-        "8",
-    ]
-    os.system(command1)
-    fh = open(tmp_file + "_blast", "r")
-    passes = {}
-    for l in fh:
-        l = l.strip().split()
-        if int(l[3]) > v_match:
-            passes[l[0]] = l[1]
-    return passes
 
 
 def orf_calculation_single(
@@ -3220,7 +1895,6 @@ def orf_calculation_single(
         Description
     """
     # # Only when nn file is provided before
-    # get_translation_of_nn_sequences_from_other_file(Filtered_out1, nn_orf_filtered,ref,refj, ref_protein,refjp)
     get_protein_sequences(
         Output_trim,
         Filtered_out1,
@@ -3245,98 +1919,6 @@ def orf_calculation_single(
         refjp,
         tmp_file,
     )
-
-
-def get_translation_of_nn_sequences_from_other_file(
-    Filtered_out1, nn_orf_filtered, ref, refj, ref_protein, refjp
-):
-    """Summary
-
-    Parameters
-    ----------
-    Filtered_out1 : TYPE
-        Description
-    nn_orf_filtered : TYPE
-        Description
-    ref : TYPE
-        Description
-    refj : TYPE
-        Description
-    ref_protein : TYPE
-        Description
-    refjp : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(Filtered_out1, "w")
-    fh.close()
-    out, ind = "", 0
-    (codon) = get_codons()
-    # (word, v_match) = (4, 45)
-    (word) = 4
-    (dict1) = get_sequences_ref(ref_protein, word)
-    fh = open(nn_orf_filtered, "r")
-    number_seqs, number_accepted, batch, indb = 0, 0, 1000, 0
-    # V_region, seqs, ORFa, ORFb = '', Tree(), {}, {}
-    seqs, ORFa = Tree(), {}
-    batch_number, orf_fail, p_seq = 0, 0, {}
-    out = ""
-    for header, seq in fasta_iterator(fh):
-        if seq.count("N") == 0:
-            seq = seq.replace("-", "")
-            header = header.split("#")[0]
-            if header.count("__") == 0:
-                freq = get_freq(header)
-                header = header.replace(":", "") + "__" + str(freq)
-            (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene)
-            ORFa[header] = ORF1
-            number_seqs = number_seqs + 1  # freq
-            if accept1 == 0:
-                orf_fail = orf_fail + 1
-            if accept1 != 0:
-                if len(ORF1) > 1:
-                    min_score, found = 2, 0
-                    (O1, score1, codon1) = get_max_orf(ORF1, word, dict1)
-                    if score1 > min_score:
-                        min_score = score1
-                        p_seq[header] = O1
-                        seq = seq[codon1 : len(seq)]
-                        found = 1
-                    if found == 1:
-                        number_accepted = (
-                            number_accepted + 1
-                        )  # int(header.split("__")[1])
-                else:
-                    p_seq[header] = ORF1[0][0]
-                    number_accepted = (
-                        number_accepted + 1
-                    )  # int(header.split("__")[1])
-                    seq = seq[ORF1[0][1] : len(seq)]
-                seqs[seq][header].value = 1
-                indb = indb + 1
-                if indb >= batch:
-                    batch_number = batch_number + 1
-                    out = ""
-                    for id in p_seq:
-                        out = out + ">" + id + "\n" + p_seq[id] + "\n"
-                    write_out(out, Filtered_out1)
-                    p_seq = {}
-                    out = ""
-    fh.close()
-    write_out(out, Filtered_out1)
-    out, ind = "", 0
-    for id in p_seq:
-        out = out + ">" + id + "\n" + p_seq[id] + "\n"
-        ind = ind + 1
-        if ind > 500:
-            write_out(out, Filtered_out1)
-            out, ind = "", 0
-    write_out(out, Filtered_out1)
-    return ()
 
 
 def get_protein_sequences(
@@ -3449,7 +2031,6 @@ def get_protein_sequences(
             write_out(out, Filtered_out1)
             out, ind = "", 0
     write_out(out, Filtered_out1)
-    return ()
 
 
 def get_nucleotide_sequences(
@@ -3515,7 +2096,6 @@ def get_nucleotide_sequences(
     write_out(out, nn_orf_filtered)
     fh.close()
     print(len(ids), len(done))
-    return ()
 
 
 def get_number_sequences(file):
@@ -3572,65 +2152,6 @@ def get_reduced_number_sequences_multi_constants(file):
             count = count + sum(
                 map(int, header.split("__")[1].split("|")[0].split("_"))
             )
-        fh.close()
-    return count
-
-
-def count_raw_barcoded_sequences(file):
-    """Summary
-
-    Parameters
-    ----------
-    file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    count, bc, nbc = 0, {}, 0
-    process = subprocess.Popen(
-        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    out, err = process.communicate()
-    c = out.decode("utf-8").split()
-    if c[0] != "ls:" and c[0] != "0":
-        fh = open(file, "r")
-        for l in fh:
-            if l[0] != "#":
-                l = l.strip().split()
-                count = count + int(l[0].split(":")[1])
-                bc[l[1] + ":" + l[2]] = 1
-        fh.close()
-        nbc = len(bc)
-        del bc
-    return (count, nbc)
-
-
-def get_reduced_number_sequences(file):
-    """Summary
-
-    Parameters
-    ----------
-    file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    count = 0
-    process = subprocess.Popen(
-        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    out, err = process.communicate()
-    c = out.decode("utf-8").split()
-    if c[0] != "ls:" and c[0] != "0":
-        fh = open(file, "r")
-        for header, sequence in fasta_iterator(fh):
-            count = count + int(header.split("__")[1])
         fh.close()
     return count
 
@@ -3826,105 +2347,6 @@ def get_read_report(
     fh.write(out)
     fh.close()
     print(out)
-    return ()
-
-
-def get_read_report1(
-    Seq_file1,
-    Seq_file2,
-    tmp_Tmp_file,
-    trim1,
-    nn_orf_filtered,
-    filtering_report,
-    id,
-    species,
-    gene,
-    dir,
-    trim2,
-):
-    """Summary
-
-    Parameters
-    ----------
-    Seq_file1 : TYPE
-        Description
-    Seq_file2 : TYPE
-        Description
-    tmp_Tmp_file : TYPE
-        Description
-    trim1 : TYPE
-        Description
-    nn_orf_filtered : TYPE
-        Description
-    filtering_report : TYPE
-        Description
-    id : TYPE
-        Description
-    species : TYPE
-        Description
-    gene : TYPE
-        Description
-    dir : TYPE
-        Description
-    trim2 : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    raw1, raw2, joined = (
-        get_number_sequences(Seq_file1),
-        get_number_sequences(Seq_file2),
-        get_number_sequences(tmp_Tmp_file),
-    )
-    primer_matching, orf = get_reduced_number_sequences(
-        trim1
-    ), get_reduced_number_sequences(nn_orf_filtered)
-    Jgene_filtered = get_reduced_number_sequences(trim2)
-    out = (
-        "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
-        + "N raw reads (2)\tN joined reads\tN reads primer matched\tJ filtered\tN reads w/t ORF\n"
-    )
-    out = (
-        out
-        + dir
-        + "\t"
-        + id
-        + "\t"
-        + species
-        + "\t"
-        + gene
-        + "\t"
-        + str(orf * 100.0 / min([raw1, raw2]))
-        + "\t"
-        + str(raw1)
-        + "\t"
-        + str(raw2)
-        + "\t"
-        + str(joined)
-        + "\t"
-        + str(primer_matching)
-        + "\t"
-        + str(Jgene_filtered)
-        + "\t"
-        + str(orf)
-        + "\n"
-    )
-    # outx = ("Directory:\t" + dir + "\nSample:\t" + file + "\nSpecies:\t" +
-    #         species + "\nGene:\t" + gene + "\nNumber of raw reads:\t" +
-    #         str(raw1) + " (read 1)\t" + str(raw2) + " (read 2)\n")
-    # outx = (out + "Number of joined reads:\t" + str(joined) +
-    #         "\nNumber of reads matched to primer sequence:\t" +
-    #         str(primer_matching) +
-    #         "\nNumber of reads with open reading frame:\t" + str(orf) +
-    #         "\nPercentage reads retained:\t" +
-    #         str(primer_matching * 100.0 / min([raw1, raw2])) + " %\n")
-    fh = open(filtering_report, "w")
-    fh.write(out)
-    fh.close()
-    return ()
 
 
 def cluster_i(Reduced_file, tmp_file, diff):
@@ -3939,9 +2361,6 @@ def cluster_i(Reduced_file, tmp_file, diff):
     diff : TYPE
         Description
     """
-    # cd_hit_directory = "/nfs/users/nfs_k/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
-    # cd_hit_directory = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
-    # cd_hit_directory = bin_path + "cd-hit-v4.5.7-2011-12-16/"
     command = (
         "cd-hit -i "
         + Reduced_file
@@ -4053,7 +2472,6 @@ def get_similarity_single(clust_seqs, file_out, c):
                     out = ""
     write_output(out, file_out)
     del out
-    return ()
 
 
 def get_similarity(clust_seqs, file_out, c, seqs2):
@@ -4141,7 +2559,6 @@ def get_similarity(clust_seqs, file_out, c, seqs2):
                     out = ""
     write_output(out, file_out)
     del out
-    return ()
 
 
 def get_diff(s1, s2, mismatch):
@@ -4278,7 +2695,6 @@ def write_output(out, file):
     fh = open(file, "a")
     fh.write(out)
     fh.close()
-    return ()
 
 
 def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
@@ -4332,7 +2748,6 @@ def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
                 if len(clust_seqs) > 500:
                     print(len(clust_seqs), total, ind)
                 get_similarity_single(clust_seqs, file_out, c)
-    return ()
 
 
 def get_clusters(file):
@@ -4540,7 +2955,6 @@ def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
                             break
     write_output(out, tmp_file)
     print(out)
-    return ()
 
 
 def get_coclustered(file):
@@ -4607,7 +3021,6 @@ def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
     fh1.close()
     print_single_edges(file_edges, inverse, edges, tmp_file_1, raw)
     del inverse, edges, edges23
-    return ()
 
 
 def get_inverse_ids(file_seqs, file_vertex, freq_id):
@@ -4764,7 +3177,6 @@ def decon_identical(
         info,
         freq_id,
     )
-    return ()
 
 
 def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
@@ -4824,7 +3236,6 @@ def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
                     ind = 0
     write_output(edge, tmp_file)
     del edges
-    return ()
 
 
 def print_vertices(
@@ -4902,7 +3313,6 @@ def print_vertices(
             ind = 0
             out = ""
     write_output(out, file_vertex)
-    return ()
 
 
 def reduce_edges(file_in, file_out):
@@ -4938,7 +3348,6 @@ def reduce_edges(file_in, file_out):
                     out = ""
     write_output(out, file_out)
     del done
-    return ()
 
 
 def deconvolute_edges(
@@ -4984,7 +3393,6 @@ def deconvolute_edges(
     )
     decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file)
     reduce_edges(tmp_file_1, file_edges)
-    return ()
 
 
 def get_network_clusters(file_vertex, file_edges, cluster_file):
@@ -5006,7 +3414,6 @@ def get_network_clusters(file_vertex, file_edges, cluster_file):
     """
     (G, scale) = read_graphical_inputs(file_vertex, file_edges)
     output_cluster_file(G, cluster_file)
-    return ()
 
 
 def read_graphical_inputs(file_vertex, file_edges):
@@ -5111,7 +3518,6 @@ def output_cluster_file(G, cluster_file):
         nvertmax,
         "vertices",
     )
-    return ()
 
 
 def get_network_input(file_cluster, outfile, edge_file, checked_edges):
@@ -5175,7 +3581,6 @@ def get_network_input(file_cluster, outfile, edge_file, checked_edges):
                 (out, ind) = ("", 0)
     write_output(out, checked_edges)
     fh.close()
-    return ()
 
 
 def reduce_identical_sequences(Reduced_file, file_vertex, read_number_division):
@@ -5220,7 +3625,6 @@ def reduce_identical_sequences(Reduced_file, file_vertex, read_number_division):
             (ind, out) = (0, "")
     fh.close()
     write_output(out, Reduced_file)
-    return ()
 
 
 def generate_networks(
@@ -5252,7 +3656,6 @@ def generate_networks(
     get_similar_clusters(s_sizes, cluster, seqs, tmp_file + "_coclustered")
     (inv, coclust) = get_coclustered(tmp_file + "_coclustered")
     get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv)
-    return ()
 
 
 ##
@@ -5276,7 +3679,6 @@ def write_out(out, file):
     fh = open(file, "a")
     fh.write(out)
     fh.close()
-    return ()
 
 
 def get_freq(id):
@@ -5314,7 +3716,6 @@ def print_out(out, Output_trim):
     fh_out = open(Output_trim, "a")
     fh_out.write(out)
     fh_out.close()
-    return ()
 
 
 def intialise_files(dir):
@@ -5477,7 +3878,6 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
             os.system(command2)
             os.system(command3)
             os.system(command4)
-    return ()
 
 
 ###########################
