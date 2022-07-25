@@ -3,13 +3,13 @@ name: test_py3
 on:
   pull_request:
     branches-ignore:
-      - 'legacy'
+      - "legacy"
   push:
     branches:
       - "master"
 
 env:
-  cache-version: 'cache-v1'
+  cache-version: "cache-v1"
 
 jobs:
   tests:    
