@@ -62,8 +62,21 @@ jobs:
     
     - name: Test with pytest
       run: |
-        pytest --cov=BIN --cov=preprocessing
+        pytest --cov=BIN --cov-report=xml
 
     - name: Show coverage
       run: |
         coverage report
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        directory: ./coverage/reports/
+        env_vars: ${{ format('OS={0},PYTHON={1}', matrix.config.os, matrix.config.python-version) }}
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+        path_to_write_report: ./coverage/codecov_report.txt
+        verbose: true
