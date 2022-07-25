@@ -2187,35 +2187,6 @@ def print_trimmed_sequences(
         del seqs
 
 
-def get_mismatches_from_consensus(a, b):
-    """Summary
-
-    Parameters
-    ----------
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    mm = 0
-    if len(a) > 10 and len(b) > 10:
-        s1, s2 = do_align(a, b)
-        for i in range(0, len(s1)):
-            if s1[i] != s2[i]:
-                if s1[i] is not None and s2[i] is not None:
-                    mm = mm + 1
-                    if mm > 4:
-                        break
-    else:
-        mm = 5
-    return mm
-
-
 def read_untrimmed_file_double1(
     regions_J,
     J_primer,

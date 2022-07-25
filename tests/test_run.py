@@ -99,13 +99,13 @@ def tester(request):
         Description
     """
     return Tester(
-        request.param,
-        None,
-        False,
-        True,
-        True,
-        "tests/output/",
-        [
+        option=request.param,
+        metadata=None,
+        bsub=False,
+        verbose=True,
+        execute=True,
+        base="tests/output/",
+        sub=[
             "FASTQ_FILES",
             "ORIENTATED_SEQUENCES",
             "ORIENTATED_SEQUENCES/NETWORKS",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Summary
+"""Summary.
 
 Attributes
 ----------
@@ -11,7 +11,6 @@ main_path : str
     Description
 """
 from collections import defaultdict
-from ._align import Alignment
 import sys
 import os
 
@@ -39,8 +38,7 @@ if not os.path.exists(lib_path):
 
 
 class Tree(defaultdict):
-
-    """Summary
+    """Summary.
 
     Attributes
     ----------
@@ -49,7 +47,7 @@ class Tree(defaultdict):
     """
 
     def __init__(self, value=None):
-        """Summary
+        """Summary.
 
         Parameters
         ----------
@@ -61,7 +59,7 @@ class Tree(defaultdict):
 
 
 def fasta_iterator(fh1):
-    """Summary
+    """Read a fasta file line by line.
 
     Parameters
     ----------
@@ -236,28 +234,6 @@ def fuzzy_substring(needle, haystack):
             )
         row1 = row2
     return min(row1)
-
-
-def do_align(a, b):
-    """Summary
-
-    Parameters
-    ----------
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    a = list(a)
-    b = list(b)
-    A = Alignment()
-    c, x, y, s = A.align(a, b)
-    return (x, y)
 
 
 def translate(seq, codon):
