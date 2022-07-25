@@ -48,6 +48,8 @@ include = [
 ]
 omit = [
     "orphan/*",
+    "preprocessing",
+    "bulkBCRseq",
 ]
 
 [tool.coverage.report]
@@ -61,3 +63,8 @@ filterwarnings = ["ignore::DeprecationWarning",
                   "ignore::FutureWarning"
                   ]
 testpaths=["tests"]
+
+[tool.vulture]
+exclude = ["orphan/"]
+paths = ["Processing_sequences_large_scale.py", "bulkBCRseq"]
+verbose = true
