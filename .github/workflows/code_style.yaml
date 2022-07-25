@@ -54,5 +54,4 @@ jobs:
       - name: Scavenge
         uses: anaynayak/python-vulture-action@v1.0
         id: vulture
-        with:
-          vulture-args: . --exclude "orphan/orphan.py,orphan/IsoTyper_1.0.py" --min-confidence 90
+        run: vulture .

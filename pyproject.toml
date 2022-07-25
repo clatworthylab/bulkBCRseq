@@ -68,3 +68,4 @@ testpaths=["tests"]
 exclude = ["orphan/"]
 paths = ["Processing_sequences_large_scale.py", "bulkBCRseq"]
 verbose = true
+min_confidence = 80
