@@ -4569,16 +4569,14 @@ def Cluster_i(Reduced_file, tmp_file, diff):
     """
     # cd_hit_directory = "/lustre/scratch118/infgen/team146/rbr1/BCR_TCR_REPERTOIRE_FILTERING_PIPELINE/BIN/cd-hit-v6.5.7-2011-12-16/"
     # cd_hit_directory = "/nfs/users/nfs_k/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
-    cd_hit_directory = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
     command = (
-        cd_hit_directory
-        + "cd-hit -i "
+        "cd-hit -i "
         + Reduced_file
         + " -o "
         + tmp_file
         + " -c "
         + str(diff)
-        + " -d 180 -T 10  -M 0 -AL 40 "
+        + " -g 1 -d 180 -T 10 -M 0 -AL 40 -bak 1 -p 1"
     )
     os.system(command)
     return ()
@@ -6125,12 +6123,7 @@ def BAM_to_FASTQ(dir, source, id):
         if source.count("cram") != 0:
             CRAM_to_FASTQ(dir, source, id, pre_QC_bam)
             source = pre_QC_bam
-        command1 = (
-            "BIN/bam2fastq-1.1.0/bam2fastq --force -o "
-            + pre_QC_fastq
-            + " "
-            + source
-        )
+        command1 = "bam2fastq --force -o " + pre_QC_fastq + " " + source
         os.system(command1)
     return ()
 
