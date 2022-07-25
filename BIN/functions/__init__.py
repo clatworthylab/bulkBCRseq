@@ -4,7 +4,6 @@
 from ._functions import (
     Tree,
     fuzzy_substring,
-    do_align,
     deconvolute_same_array,
     get_codons,
     init_rc,
@@ -16,7 +15,6 @@ from ._functions import (
 __all__ = [
     "Tree",
     "fuzzy_substring",
-    "do_align",
     "deconvolute_same_array",
     "get_codons",
     "init_rc",
