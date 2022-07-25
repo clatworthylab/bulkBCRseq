@@ -51,7 +51,8 @@ include = [
     "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py"
 ]
 omit = [
-    "orphan/"
+    "orphan/Isotyper_1.0.py",
+    "orphan/orphan.py",
 ]
 
 [tool.coverage.report]
