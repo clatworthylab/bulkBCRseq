@@ -1,14 +1,5 @@
 #!/usr/bin/env python
 """Summary
-
-Attributes
-----------
-bin_path : TYPE
-    Description
-lib_path : TYPE
-    Description
-main_path : str
-    Description
 """
 from collections import defaultdict
 import sys
