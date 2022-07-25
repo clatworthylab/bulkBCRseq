@@ -31,28 +31,6 @@ if not os.path.exists(lib_path):
         )
 
 
-def check_type_of_priming(primer_file):
-    """Summary.
-
-    Parameters
-    ----------
-    primer_file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(primer_file, "r")
-    const = "FALSE"
-    for header, sequence in fasta_iterator(fh):
-        if header.count("REV_CONST") != 0:
-            const = "TRUE"
-    fh.close()
-    return const
-
-
 def reduce_sequences(trim2, trim3, primer_file):
     """Summary.
 
@@ -65,7 +43,6 @@ def reduce_sequences(trim2, trim3, primer_file):
     primer_file : TYPE
         Description
     """
-    # const = check_type_of_priming(primer_file)
     const = "TRUE"
     minl = 185  # change for shorter runs
     if const == "TRUE":
@@ -129,96 +106,6 @@ def get_match(primer: str, seq: str) -> int:
             loc = loc + [m.start()]
             # loc = seq.index(primer)
     return loc
-
-
-def get_partial_match(seq: str, p1, p2, primer: str, chain):
-    """Summary
-
-    Parameters
-    ----------
-    seq : TYPE
-        Description
-    p1 : TYPE
-        Description
-    p2 : TYPE
-        Description
-    primer : TYPE
-        Description
-    chain : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    # offset = len(seq)
-    loc, s = -1, -1
-    l = len(primer)
-    if seq.count(p1) != 0:
-        pos = seq.index(p1)
-        seq1 = seq[pos : pos + l]
-        a = fuzzy_substring(seq1, primer)
-        if chain == "V":
-            if pos < len(seq) / 2:
-                s = pos + (l)
-            else:
-                loc = -1
-        else:
-            s = pos
-        if a <= 3:
-            loc = s
-    else:
-        if seq.count(p2) != 0:
-            l = len(primer) / 2
-            pos = seq.index(p2)
-            if chain == "V":
-                s = pos + (len(p2))
-            else:
-                s = pos - (l)
-            if s < 0:
-                s = 0
-            seq1 = seq[s : pos + l]
-            a = fuzzy_substring(seq1, primer)
-            if a <= 3:
-                loc = s  # pos+len(p2)
-    return [loc]
-
-
-def match_sequence_primers(primer, sequence, rc, P1, P2):
-    """Summary
-
-    Parameters
-    ----------
-    primer : TYPE
-        Description
-    sequence : TYPE
-        Description
-    rc : TYPE
-        Description
-    P1 : TYPE
-        Description
-    P2 : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    (p) = get_match(primer, sequence)
-    # passed = 0
-    if len(p) == 0:
-        rc_sequence = reverse_comp(sequence, rc)
-        (p) = get_match(primer, rc_sequence)
-        if len(p) == 0:
-            # print sequence, P1, P2,primer
-            (p) = get_partial_match(sequence, P1, P2, primer, "J")
-            if p == -1:
-                (p) = get_partial_match(rc_sequence, P1, P2, primer, "J")
-                if p != -1:
-                    sequence = rc_sequence
-    return (sequence, p)
 
 
 def filter_igj_genes(
