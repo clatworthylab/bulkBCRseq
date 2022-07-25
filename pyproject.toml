@@ -38,6 +38,13 @@ quiet = false
 whitelist-regex = []
 color = true
 
+[tool.pytest.ini_options]
+addopts = "-v --cov=BIN --cov=bulkBCRseq --cov=preprocessing --cov-report term-missing"
+testpaths = [
+    "tests",
+]
+
+
 [tool.coverage.run]
 parallel = true
 include = [
