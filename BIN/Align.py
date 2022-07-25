@@ -293,7 +293,7 @@ class Alignment:
         if M <= 1:
             if M <= 0:
                 S.insert(N)
-            return S.gapCost(N)
+                return S.gapCost(N)
 
             if tb > te:
                 tb = te

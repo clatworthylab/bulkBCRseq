@@ -2236,7 +2236,6 @@ def read_untrimmed_file_double1(
     primer_tag_file,
     tmp_file,
     sample,
-    J_primerfull,
     V_primerfull,
     primer_tag_file_count,
 ):
@@ -2281,8 +2280,6 @@ def read_untrimmed_file_double1(
     tmp_file : TYPE
         Description
     sample : TYPE
-        Description
-    J_primerfull : TYPE
         Description
     V_primerfull : TYPE
         Description
@@ -2958,7 +2955,7 @@ def get_paired_reads_overlapping(
     return ()
 
 
-def calculate_orf_length(codon, sequence, type, gene, read):
+def calculate_orf_length(codon, sequence, type, gene):
     """Summary
 
     Parameters
@@ -2970,8 +2967,6 @@ def calculate_orf_length(codon, sequence, type, gene, read):
     type : TYPE
         Description
     gene : TYPE
-        Description
-    read : TYPE
         Description
 
     Returns
@@ -3326,7 +3321,7 @@ def get_translation_of_nn_sequences_from_other_file(
             if header.count("__") == 0:
                 freq = get_freq(header)
                 header = header.replace(":", "") + "__" + str(freq)
-            (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene, 1)
+            (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene)
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
             if accept1 == 0:
@@ -3436,7 +3431,7 @@ def get_protein_sequences(
             if header.count("__") == 0:
                 freq = get_freq(header)
                 header = header.replace(":", "") + "__" + str(freq)
-            (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene, 1)
+            (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene)
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
             if accept1 == 0:

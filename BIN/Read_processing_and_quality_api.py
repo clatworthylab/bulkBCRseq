@@ -8,7 +8,6 @@ bin_path : str
 lib_path : str
     Description
 """
-import math
 import sys
 import os
 from collections import defaultdict
@@ -2728,7 +2727,6 @@ def Read_untrimmed_file_double1(
     primer_tag_file,
     tmp_file,
     sample,
-    J_primerfull,
     V_primerfull,
     primer_tag_file_count,
 ):
@@ -2773,8 +2771,6 @@ def Read_untrimmed_file_double1(
     tmp_file : TYPE
         Description
     sample : TYPE
-        Description
-    J_primerfull : TYPE
         Description
     V_primerfull : TYPE
         Description
@@ -3511,7 +3507,7 @@ def Translate(seq, codon):
     return p_seq
 
 
-def Calculate_ORF_Length(codon, sequence, type, gene, read):
+def Calculate_ORF_Length(codon, sequence, type, gene):
     """Summary
 
     Parameters
@@ -3523,8 +3519,6 @@ def Calculate_ORF_Length(codon, sequence, type, gene, read):
     type : TYPE
         Description
     gene : TYPE
-        Description
-    read : TYPE
         Description
 
     Returns
@@ -3881,7 +3875,7 @@ def Get_translation_of_nn_sequences_from_other_file(
             if header.count("__") == 0:
                 freq = Get_freq(header)
                 header = header.replace(":", "") + "__" + str(freq)
-            (ORF1, accept1) = Calculate_ORF_Length(codon, seq, "V", gene, 1)
+            (ORF1, accept1) = Calculate_ORF_Length(codon, seq, "V", gene)
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
             if accept1 == 0:
@@ -3999,7 +3993,7 @@ def Get_protein_sequences(
             if header.count("__") == 0:
                 freq = Get_freq(header)
                 header = header.replace(":", "") + "__" + str(freq)
-            (ORF1, accept1) = Calculate_ORF_Length(codon, seq, "V", gene, 1)
+            (ORF1, accept1) = Calculate_ORF_Length(codon, seq, "V", gene)
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
             if accept1 == 0:

@@ -16,7 +16,6 @@ lib_path : str
 network_statistics : TYPE
     Description
 """
-import math
 import sys
 import os
 from collections import defaultdict
@@ -39,8 +38,7 @@ import re
 import time
 import subprocess
 import numpy as np
-from numpy import outer
-from operator import itemgetter, attrgetter
+from operator import itemgetter
 import copy
 
 

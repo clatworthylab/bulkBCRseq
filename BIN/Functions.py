@@ -10,7 +10,6 @@ GapSymbol : TYPE
 lib_path : str
     Description
 """
-import math
 import sys
 import os
 
@@ -1050,7 +1049,7 @@ class Alignment:
                 if midj < N:
                     S.insert(N - midj)
 
-        return midc
+            return midc
 
         # devide: find optimum midpoint
         # (midi, midj) of cost midc
