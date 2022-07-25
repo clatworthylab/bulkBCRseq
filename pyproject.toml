@@ -53,3 +53,11 @@ omit = [
 [tool.coverage.report]
 show_missing = true
 precision = 2
+
+# Configuration for pytest
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::DeprecationWarning",
+                  "ignore::PendingDeprecationWarning",
+                  "ignore::FutureWarning"
+                  ]
+testpaths=["tests"]
