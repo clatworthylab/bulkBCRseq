@@ -43,3 +43,14 @@ addopts = "-v --cov --cov-report term-missing"
 testpaths = [
     "tests",
 ]
+
+
+[tool.coverage.run]
+parallel = true
+include = [
+    "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py"
+]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
