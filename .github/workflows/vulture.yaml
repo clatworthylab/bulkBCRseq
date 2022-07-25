@@ -1,5 +1,12 @@
-on: [push]
+name: vulture
 
+on:
+  pull_request:
+    branches-ignore:
+      - "legacy"
+  push:
+    branches:
+      - "master"
 jobs:
   build:
     runs-on: ubuntu-latest
