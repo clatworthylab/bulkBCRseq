@@ -15,3 +15,5 @@ dependencies:
 - samtools
 - bam2fastq
 - cd-hit
+- pip:
+  - pytest-cov
