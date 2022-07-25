@@ -54,4 +54,3 @@ jobs:
       - name: Scavenge
         uses: anaynayak/python-vulture-action@v1.0
         id: vulture
-        run: vulture .
