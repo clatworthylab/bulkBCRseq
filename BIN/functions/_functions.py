@@ -1,17 +1,7 @@
 #!/usr/bin/env python
 """Summary
-
-Attributes
-----------
-bin_path : TYPE
-    Description
-lib_path : TYPE
-    Description
-main_path : str
-    Description
 """
 from collections import defaultdict
-from ._align import Alignment
 import sys
 import os
 
@@ -236,28 +226,6 @@ def fuzzy_substring(needle, haystack):
             )
         row1 = row2
     return min(row1)
-
-
-def do_align(a, b):
-    """Summary
-
-    Parameters
-    ----------
-    a : TYPE
-        Description
-    b : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    a = list(a)
-    b = list(b)
-    A = Alignment()
-    c, x, y, s = A.align(a, b)
-    return (x, y)
 
 
 def translate(seq, codon):
