@@ -3523,9 +3523,10 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
             os.system(command4)
     return ()
 
+
 def prep_fastqs(dir, source, id, r1pattern):
     """Prepare fastqs for input into the script.
-    
+
     Parameters
     ----------
     dir : str
@@ -3539,8 +3540,8 @@ def prep_fastqs(dir, source, id, r1pattern):
     """
     if source.count(r1pattern) != 0:
         r1_original = source
-        r2_original = re.sub(r1pattern, '_R2_001', source)
-    if source.count('.gz') != 0:
+        r2_original = re.sub(r1pattern, "_R2_001", source)
+    if source.count(".gz") != 0:
         new_r1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fastq.gz"
         new_r2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fastq.gz"
     else:
@@ -3550,11 +3551,12 @@ def prep_fastqs(dir, source, id, r1pattern):
     cmd2 = f"cp {r2_orginal} {new_r2}"
     os.system(cmd1)
     os.system(cmd2)
-    if source.count('.gz') != 0:
+    if source.count(".gz") != 0:
         cmd1g = f"gunzip {new_r1}"
         cmd2g = f"gunzip {new_r2}"
         os.system(cmd1g)
         os.system(cmd2g)
+
 
 ###########################
 dir = sys.argv[1]
@@ -3642,7 +3644,7 @@ R1PATTERN = "_R1_001"
 # Commands
 if command_source.count("1") != 0:
     intialise_files(dir)
-    if source.count("am") != 0
+    if source.count("am") != 0:
         bam_to_fastq(dir, source, id)
     elif (source.count(".fastq") != 0) or (source.count(".fq") != 0):
         # rename them to Seqeuence_{id}_1.fastq Seqeuence_{id}_2.fastq
