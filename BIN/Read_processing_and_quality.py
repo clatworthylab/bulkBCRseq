@@ -1580,62 +1580,6 @@ def get_max_orf(ORF, word, dict):
     return (orf, mscore, codon)
 
 
-def blast_match_j_const(out, seqs, trim1, trim2, refj, e_value, indent):
-    """Summary
-
-    Parameters
-    ----------
-    out : TYPE
-        Description
-    seqs : TYPE
-        Description
-    trim1 : TYPE
-        Description
-    trim2 : TYPE
-        Description
-    refj : TYPE
-        Description
-    e_value : TYPE
-        Description
-    indent : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(trim1 + "_blast_J", "w")
-    fh.write(out)
-    fh.close()
-    command1 = (
-        bin_path
-        + "blastall -p blastn -a 10 -d {}".format(refj)
-        + " -e {}".format(str(e_value))
-        + " -i {}_blast_J".format(trim1)
-        + " -o {}_blast_J_results".format(trim1)
-        + " -b 1 -m 8"
-    )
-    os.system(command1)
-    fh = open(trim1 + "_blast_J_results", "r")
-    out = ""
-    for l in fh:
-        l = l.strip().split()
-        header, gene = l[0].split("|")[1].split("_"), list(
-            map(int, l[0].split("|")[0].split("__")[1].split("_"))
-        )
-        gene = header[gene.index(max(gene))]
-        if l[1].count(gene[0:3]) != 0:
-            if int(l[6]) < int(l[7]) and int(l[8]) < int(l[9]):
-                j_end = int(l[7])
-                seq_j = seqs[l[0]][0]
-                seq_j = seq_j[0 : j_end + seqs[l[0]][1]]
-                out = out + ">" + l[0] + "\n" + seq_j + "\n"
-    fh.close()
-    write_out(out, trim2)
-    return ()
-
-
 def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
     """Summary
 
@@ -1685,58 +1629,6 @@ def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
     return ()
 
 
-def blast_match(V_region, ref, tmp_file, v_match):
-    """Summary
-
-    Parameters
-    ----------
-    V_region : TYPE
-        Description
-    ref : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-    v_match : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(tmp_file, "w")
-    fh.write(V_region)
-    fh.close()
-    command1 = [
-        bin_path,
-        "blastall",
-        "-p",
-        "blastn",
-        "-a",
-        "10",
-        "-d",
-        "{}".format(ref),
-        "-e",
-        "1",
-        "-i",
-        "{}".format(tmp_file),
-        "-o",
-        "{}_blast".format(tmp_file),
-        "-b",
-        "1",
-        "-m",
-        "8",
-    ]
-    os.system(command1)
-    fh = open(tmp_file + "_blast", "r")
-    passes = {}
-    for l in fh:
-        l = l.strip().split()
-        if int(l[3]) > v_match:
-            passes[l[0]] = l[1]
-    return passes
-
-
 def orf_calculation_single(
     Output_trim,
     Filtered_out1,
@@ -1774,8 +1666,6 @@ def orf_calculation_single(
     tmp_file : TYPE
         Description
     """
-    # # Only when nn file is provided before
-    # get_translation_of_nn_sequences_from_other_file(Filtered_out1, nn_orf_filtered,ref,refj, ref_protein,refjp)
     get_protein_sequences(
         Output_trim,
         Filtered_out1,
@@ -1800,98 +1690,6 @@ def orf_calculation_single(
         refjp,
         tmp_file,
     )
-
-
-def get_translation_of_nn_sequences_from_other_file(
-    Filtered_out1, nn_orf_filtered, ref, refj, ref_protein, refjp
-):
-    """Summary
-
-    Parameters
-    ----------
-    Filtered_out1 : TYPE
-        Description
-    nn_orf_filtered : TYPE
-        Description
-    ref : TYPE
-        Description
-    refj : TYPE
-        Description
-    ref_protein : TYPE
-        Description
-    refjp : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(Filtered_out1, "w")
-    fh.close()
-    out, ind = "", 0
-    (codon) = get_codons()
-    # (word, v_match) = (4, 45)
-    (word) = 4
-    (dict1) = get_sequences_ref(ref_protein, word)
-    fh = open(nn_orf_filtered, "r")
-    number_seqs, number_accepted, batch, indb = 0, 0, 1000, 0
-    # V_region, seqs, ORFa, ORFb = '', Tree(), {}, {}
-    seqs, ORFa = Tree(), {}
-    batch_number, orf_fail, p_seq = 0, 0, {}
-    out = ""
-    for header, seq in fasta_iterator(fh):
-        if seq.count("N") == 0:
-            seq = seq.replace("-", "")
-            header = header.split("#")[0]
-            if header.count("__") == 0:
-                freq = get_freq(header)
-                header = header.replace(":", "") + "__" + str(freq)
-            (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene)
-            ORFa[header] = ORF1
-            number_seqs = number_seqs + 1  # freq
-            if accept1 == 0:
-                orf_fail = orf_fail + 1
-            if accept1 != 0:
-                if len(ORF1) > 1:
-                    min_score, found = 2, 0
-                    (O1, score1, codon1) = get_max_orf(ORF1, word, dict1)
-                    if score1 > min_score:
-                        min_score = score1
-                        p_seq[header] = O1
-                        seq = seq[codon1 : len(seq)]
-                        found = 1
-                    if found == 1:
-                        number_accepted = (
-                            number_accepted + 1
-                        )  # int(header.split("__")[1])
-                else:
-                    p_seq[header] = ORF1[0][0]
-                    number_accepted = (
-                        number_accepted + 1
-                    )  # int(header.split("__")[1])
-                    seq = seq[ORF1[0][1] : len(seq)]
-                seqs[seq][header].value = 1
-                indb = indb + 1
-                if indb >= batch:
-                    batch_number = batch_number + 1
-                    out = ""
-                    for id in p_seq:
-                        out = out + ">" + id + "\n" + p_seq[id] + "\n"
-                    write_out(out, Filtered_out1)
-                    p_seq = {}
-                    out = ""
-    fh.close()
-    write_out(out, Filtered_out1)
-    out, ind = "", 0
-    for id in p_seq:
-        out = out + ">" + id + "\n" + p_seq[id] + "\n"
-        ind = ind + 1
-        if ind > 500:
-            write_out(out, Filtered_out1)
-            out, ind = "", 0
-    write_out(out, Filtered_out1)
-    return ()
 
 
 def get_protein_sequences(
@@ -2129,38 +1927,6 @@ def get_reduced_number_sequences_multi_constants(file):
             )
         fh.close()
     return count
-
-
-def count_raw_barcoded_sequences(file):
-    """Summary
-
-    Parameters
-    ----------
-    file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    count, bc, nbc = 0, {}, 0
-    process = subprocess.Popen(
-        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    out, err = process.communicate()
-    c = out.decode("utf-8").split()
-    if c[0] != "ls:" and c[0] != "0":
-        fh = open(file, "r")
-        for l in fh:
-            if l[0] != "#":
-                l = l.strip().split()
-                count = count + int(l[0].split(":")[1])
-                bc[l[1] + ":" + l[2]] = 1
-        fh.close()
-        nbc = len(bc)
-        del bc
-    return (count, nbc)
 
 
 def get_reduced_number_sequences(file):
