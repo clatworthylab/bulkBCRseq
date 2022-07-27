@@ -45,6 +45,12 @@ conda activate py3
 # if necessary, change path to where bulkBCRseq folder is
 # cd path/to/bulkBCRseq
 ```
+
+## Note!
+If you are starting from fastq files directly, please change the 5th column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1 suffix isn't this pattern, please modify the `R1PATTERN` variable in here directly, after cloning this repository:
+https://github.com/clatworthylab/bulkBCRseq/blob/3d17a2752a6b482f50c0b8d211db94ddf5e655d1/BIN/Read_processing_and_quality.py#L3641-L3643
+
+
 ## Basic usage:
 ```bash
 python Processing_sequences_large_scale.py [sample file list] [commands (comma separated list)] [bsub command: Y/N] [print commands: Y/N] [run commands: Y/N]
