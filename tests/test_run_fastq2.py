@@ -67,7 +67,7 @@ class Tester:
         else:
             opt = self.option
         if self.metadata is None:
-            meta = "tests/data/Sample_metadata2a.txt"
+            meta = "tests/data/Sample_metadata2b.txt"
         else:
             meta = self.metadata
         if self.bsub:
