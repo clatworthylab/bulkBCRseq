@@ -1929,33 +1929,6 @@ def get_reduced_number_sequences_multi_constants(file):
     return count
 
 
-def get_reduced_number_sequences(file):
-    """Summary
-
-    Parameters
-    ----------
-    file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    count = 0
-    process = subprocess.Popen(
-        ["wc", "-l", file], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    out, err = process.communicate()
-    c = out.decode("utf-8").split()
-    if c[0] != "ls:" and c[0] != "0":
-        fh = open(file, "r")
-        for header, sequence in fasta_iterator(fh):
-            count = count + int(header.split("__")[1])
-        fh.close()
-    return count
-
-
 def count_barcodes(primer_tag_file):
     """Summary
 
@@ -2046,168 +2019,31 @@ def get_read_report(
     TYPE
         Description
     """
-    if method == "Multiplex_FORWARD_BARCODE_GROUPED":
-        Seq_file1 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_1.fasta"
-        Seq_file2 = dir + "FASTQ_FILES/Sequences_" + barcode_group + "_2.fasta"
-    # rc = {}
     barcoded_j, barcoded_v = 1, 0
     print(barcoded_j, barcoded_v)
-    if barcoded_j + barcoded_v == 0:
-        raw1, raw2, joined, gene_matching = (
-            get_number_sequences(Seq_file1),
-            get_number_sequences(Seq_file2),
-            get_number_sequences(tmp_Tmp_file),
-            get_reduced_number_sequences_multi_constants(trim1),
-        )
-        orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
-        number_unique_seqs = get_number_sequences(nn_orf_filtered)
-        out = (
-            "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
-            + "N raw reads (2)\tN joined reads\tN reads gene matched\tN reads w/tORF\tUnique sequences\n"
-        )
-        out = (
-            out
-            + dir
-            + "\t"
-            + id
-            + "\t"
-            + species
-            + "\t"
-            + gene
-            + "\t"
-            + str(orf * 100.0 / min([raw1, raw2]))
-            + "\t"
-            + str(raw1)
-            + "\t"
-            + str(raw2)
-            + "\t"
-            + str(joined)
-            + "\t"
-            + str(gene_matching)
-            + "\t"
-            + str(orf)
-            + "\t"
-            + str(number_unique_seqs)
-            + "\n"
-        )
-    else:
-        (
-            n_barcodes,
-            uniq_sequences,
-            total_sequences_included_before_bc,
-        ) = count_barcodes(primer_tag_file)
-        print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
-        raw1, raw2, joined, gene_matching = (
-            get_number_sequences(Seq_file1),
-            get_number_sequences(Seq_file2),
-            get_number_sequences(tmp_Tmp_file),
-            get_reduced_number_sequences_multi_constants(trim1),
-        )
-        # count_bc_found, count_uniq_bcs = -1, -1
-        orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
-        number_unique_seqs = get_number_sequences(nn_orf_filtered)
-        out = (
-            "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
-            + "N raw reads (2)\tN joined reads\tN reads with BCs\tN uniq BCs\tN reads gene matched\t"
-            + "N reads w/t ORF\tUnique sequences\n"
-        )
-        orf_perc = str(orf * 100.0 / min([raw1, raw2]))
-        if min([raw1, raw2]) == -1:
-            orf_perc = "NA"
-        out = (
-            out
-            + dir
-            + "\t"
-            + id
-            + "\t"
-            + species
-            + "\t"
-            + gene
-            + "\t"
-            + orf_perc
-            + "\t"
-            + str(raw1)
-            + "\t"
-            + str(raw2)
-            + "\t"
-            + str(joined)
-            + "\t"
-            + str(n_barcodes)
-            + "\t"
-            + str(uniq_sequences)
-            + "\t"
-            + str(gene_matching)
-            + "\t"
-            + str(orf)
-            + "\t"
-            + str(number_unique_seqs)
-            + "\n"
-        )
-    fh = open(filtering_report, "w")
-    fh.write(out)
-    fh.close()
-    print(out)
-    return ()
-
-
-def get_read_report1(
-    Seq_file1,
-    Seq_file2,
-    tmp_Tmp_file,
-    trim1,
-    nn_orf_filtered,
-    filtering_report,
-    id,
-    species,
-    gene,
-    dir,
-    trim2,
-):
-    """Summary
-
-    Parameters
-    ----------
-    Seq_file1 : TYPE
-        Description
-    Seq_file2 : TYPE
-        Description
-    tmp_Tmp_file : TYPE
-        Description
-    trim1 : TYPE
-        Description
-    nn_orf_filtered : TYPE
-        Description
-    filtering_report : TYPE
-        Description
-    id : TYPE
-        Description
-    species : TYPE
-        Description
-    gene : TYPE
-        Description
-    dir : TYPE
-        Description
-    trim2 : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    raw1, raw2, joined = (
+    (
+        n_barcodes,
+        uniq_sequences,
+        total_sequences_included_before_bc,
+    ) = count_barcodes(primer_tag_file)
+    print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
+    raw1, raw2, joined, gene_matching = (
         get_number_sequences(Seq_file1),
         get_number_sequences(Seq_file2),
         get_number_sequences(tmp_Tmp_file),
+        get_reduced_number_sequences_multi_constants(trim1),
     )
-    primer_matching, orf = get_reduced_number_sequences(
-        trim1
-    ), get_reduced_number_sequences(nn_orf_filtered)
-    Jgene_filtered = get_reduced_number_sequences(trim2)
+    # count_bc_found, count_uniq_bcs = -1, -1
+    orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
+    number_unique_seqs = get_number_sequences(nn_orf_filtered)
     out = (
         "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
-        + "N raw reads (2)\tN joined reads\tN reads primer matched\tJ filtered\tN reads w/t ORF\n"
+        + "N raw reads (2)\tN joined reads\tN reads with BCs\tN uniq BCs\tN reads gene matched\t"
+        + "N reads w/t ORF\tUnique sequences\n"
     )
+    orf_perc = str(orf * 100.0 / min([raw1, raw2]))
+    if min([raw1, raw2]) == -1:
+        orf_perc = "NA"
     out = (
         out
         + dir
@@ -2218,7 +2054,7 @@ def get_read_report1(
         + "\t"
         + gene
         + "\t"
-        + str(orf * 100.0 / min([raw1, raw2]))
+        + orf_perc
         + "\t"
         + str(raw1)
         + "\t"
@@ -2226,25 +2062,21 @@ def get_read_report1(
         + "\t"
         + str(joined)
         + "\t"
-        + str(primer_matching)
+        + str(n_barcodes)
         + "\t"
-        + str(Jgene_filtered)
+        + str(uniq_sequences)
+        + "\t"
+        + str(gene_matching)
         + "\t"
         + str(orf)
+        + "\t"
+        + str(number_unique_seqs)
         + "\n"
     )
-    # outx = ("Directory:\t" + dir + "\nSample:\t" + file + "\nSpecies:\t" +
-    #         species + "\nGene:\t" + gene + "\nNumber of raw reads:\t" +
-    #         str(raw1) + " (read 1)\t" + str(raw2) + " (read 2)\n")
-    # outx = (out + "Number of joined reads:\t" + str(joined) +
-    #         "\nNumber of reads matched to primer sequence:\t" +
-    #         str(primer_matching) +
-    #         "\nNumber of reads with open reading frame:\t" + str(orf) +
-    #         "\nPercentage reads retained:\t" +
-    #         str(primer_matching * 100.0 / min([raw1, raw2])) + " %\n")
     fh = open(filtering_report, "w")
     fh.write(out)
     fh.close()
+    print(out)
     return ()
 
 
