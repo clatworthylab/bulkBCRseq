@@ -3524,6 +3524,19 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
     return ()
 
 def prep_fastqs(dir, source, id, r1pattern):
+    """Prepare fastqs for input into the script.
+    
+    Parameters
+    ----------
+    dir : str
+        location of output.
+    source : str
+        location of R1 fastq file.
+    id : str
+        name of sample.
+    r1pattern : str
+        suffix pattern before .fastq to try and match
+    """
     if source.count(r1pattern) != 0:
         r1_original = source
         r2_original = re.sub(r1pattern, '_R2_001', source)
