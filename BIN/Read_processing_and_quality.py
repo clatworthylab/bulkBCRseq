@@ -2209,94 +2209,6 @@ def get_similarity_single(clust_seqs, file_out, c):
     return ()
 
 
-def get_similarity(clust_seqs, file_out, c, seqs2):
-    """Summary
-
-    Parameters
-    ----------
-    clust_seqs : TYPE
-        Description
-    file_out : TYPE
-        Description
-    c : TYPE
-        Description
-    seqs2 : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    done = Tree()
-    total = len(clust_seqs)
-    out = ""
-    ind1 = 0
-    mismatch = 3
-    # red = 8
-    for i1 in range(0, total - 1):
-        read1 = clust_seqs[i1]
-        id1 = read1[0]
-        seq1 = read1[1]
-        done[id1] = 1
-        seq3 = seqs2[id1]
-        (l1, l3) = (len(seq1), len(seq3))
-        for i2 in range(i1 + 1, total):
-            if i1 < i2:
-                read2 = clust_seqs[i2]
-                id2 = read2[0]
-                seq2 = read2[1]
-                seq4 = seqs2[id2]
-                (l2, l4) = (len(seq2), len(seq4))
-                if id2 not in done:
-                    (s1, s2, p1) = trim_sequences(seq1, seq2, l1, l2)
-                    (s3, s4, p2) = trim_sequences(seq3, seq4, l3, l4)
-                    sa = s1 + s3
-                    sb = s2 + s4
-                    if p1 == 1 and p2 == 1:
-                        if sa == sb:
-                            out = (
-                                out
-                                + "0\t"
-                                + id1
-                                + "\t"
-                                + id2
-                                + "\t"
-                                + c
-                                + "\t"
-                                + str(l1)
-                                + "\t"
-                                + str(l2)
-                                + "\n"
-                            )
-                        else:
-                            (p, mm) = get_diff(sa, sb, mismatch)
-                            if p == 1 and mm <= mismatch:
-                                out = (
-                                    out
-                                    + str(mm)
-                                    + "\t"
-                                    + id1
-                                    + "\t"
-                                    + id2
-                                    + "\t"
-                                    + c
-                                    + "\t"
-                                    + str(l1)
-                                    + "\t"
-                                    + str(l2)
-                                    + "\n"
-                                )
-                                ind1 = ind1 + 1
-                if ind1 >= 1000:
-                    write_output(out, file_out)
-                    ind1 = 0
-                    out = ""
-    write_output(out, file_out)
-    del out
-    return ()
-
-
 def get_diff(s1, s2, mismatch):
     """Summary
 
@@ -3447,27 +3359,6 @@ def get_freq(id):
     """
     id = id.split("__")
     return int(id[1])
-
-
-def print_out(out, Output_trim):
-    """Summary
-
-    Parameters
-    ----------
-    out : TYPE
-        Description
-    Output_trim : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh_out = open(Output_trim, "a")
-    fh_out.write(out)
-    fh_out.close()
-    return ()
 
 
 def intialise_files(dir):
