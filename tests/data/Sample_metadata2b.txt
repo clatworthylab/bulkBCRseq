@@ -1,0 +1,1 @@
+test1	test1	Lane_1	IGH	tests/data/test1_R1_001.fastq	OVERLAPPING	UNPAIRED	tests/output/	Multiplex	MUS_MUSCULUS	LIBRARY/Primers_MUS_MUSCULUS_IG_RBR_Constant_region_MPLX_table.txt	XX	ISOTYPER	ISOTYPER
