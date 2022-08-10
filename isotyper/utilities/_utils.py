@@ -274,4 +274,4 @@ def intialise_tmp_directory(loc: Path):
     """
     dirs_to_add = [loc, loc / "TMP"]
     for d in dirs_to_add:
-        d.mkdir(exist_ok=True)
+        d.mkdir(exist_ok=True, parents=True)

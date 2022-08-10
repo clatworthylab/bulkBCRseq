@@ -3337,7 +3337,7 @@ def intialise_files(out_path: Path):
         out_path / "ORIENTATED_SEQUENCES" / "NETWORKS",
     ]
     for d in dirs_to_add:
-        d.mkdir(exist_ok=True)
+        d.mkdir(exist_ok=True, parents=True)
 
 
 def cram_to_fastq(cram_path: Path, out_pre_qc_bam_path: Path):
