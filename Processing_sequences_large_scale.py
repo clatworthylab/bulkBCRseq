@@ -1,10 +1,10 @@
-# import math
 import sys
-
-# from collections import defaultdict
 import os
+from pathlib import Path
 
-# import subprocess
+# import shutil
+
+Path("logs").mkdir(exist_ok=True)
 
 
 def Get_info(file):
