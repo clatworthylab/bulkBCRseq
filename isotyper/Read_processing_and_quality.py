@@ -3503,7 +3503,7 @@ def prep_fastqs(out_path, source_path, sample_id, r1pattern, r2pattern):
         suffix pattern before .fastq to try and match for R2
     """
     if re.search(r1pattern, str(source_path)):
-        r1_original = source_path
+        r1_original = Path(source_path)
         r2_original = Path(re.sub(r1pattern, r2pattern, str(source_path)))
     else:
         raise ValueError(
