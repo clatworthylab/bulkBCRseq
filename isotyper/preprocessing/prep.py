@@ -20,7 +20,7 @@ from isotyper.utilities._args import (
 
 
 def bam_to_fastq(source_path: Path):
-    """Summary
+    """Convert bam to fastq,
 
     Parameters
     ----------
@@ -200,6 +200,7 @@ def qc_samples(
 
 
 def main():
+    """main function to prepare step 1."""
     intialise_files()
     if (
         len(
