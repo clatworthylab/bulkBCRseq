@@ -10,7 +10,8 @@ import sys
 import os
 
 # set up some default paths
-main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+# main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+main_path = ""
 bin_path = main_path + "BIN/"
 lib_path = main_path + "LIBRARY/"
 if not os.path.exists(bin_path):
