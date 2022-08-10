@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-"""Summary
-"""
-from . import functions as fn
-from fn import *
+from isotyper import utilities as utl
 
 __all__ = [
-    "fn",
+    "utl",
 ]
