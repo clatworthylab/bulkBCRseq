@@ -3531,7 +3531,7 @@ def copy_prepped_fastq(
     )
     shutil.copy(fastq_path, new_fastq)
     if fastq_path.suffix == ".gz":
-        cmdg = ["gunzip", f"{new_fastq}"]
+        cmdg = ["gunzip", "-f", f"{new_fastq}"]
         subprocess.run(cmdg)
 
 
