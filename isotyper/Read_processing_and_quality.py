@@ -3400,7 +3400,7 @@ def qc_samples(
     length: Union[str, int] = 32,
     threshold: Union[str, int] = 100,
 ):
-    """Perform QC on samples using QUASR and convert to fastq format with perl script.
+    """Perform QC on samples using QUASR and convert to fasta file with perl script.
 
     Parameters
     ----------
