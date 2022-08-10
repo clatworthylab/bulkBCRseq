@@ -164,7 +164,7 @@ def check_fasta_not_empty(fh):
     return pfh
 
 
-def get_consensus_sequence(u_seq, u_freq, tmp_file, threshold):
+def get_consensus_sequence(u_seq, u_freq, tmp_file):
     """Summary
 
     Parameters
@@ -174,8 +174,6 @@ def get_consensus_sequence(u_seq, u_freq, tmp_file, threshold):
     u_freq : TYPE
         Description
     tmp_file : TYPE
-        Description
-    threshold : TYPE
         Description
 
     Returns
@@ -223,7 +221,7 @@ def get_consensus_sequence(u_seq, u_freq, tmp_file, threshold):
                 f[base_dict[s[i]]] = f[base_dict[s[i]]] + u_freq[max_seqs[s]]
             if f[4] == 0:
                 start == 1
-            if max(f) * 1.0 / sum(f) >= threshold:
+            if max(f) * 1.0 / sum(f) >= THRESHOLD_BARCODE:
                 if bases[f.index(max(f))] != "-":
                     consensus = consensus + bases[f.index(max(f))]
             else:
@@ -315,24 +313,20 @@ def trim_sequences_bcr_tcr(
     TYPE
         Description
     """
-    (rc) = init_rc()
     forward, reverse, barcoded_j, barcoded_v, v_ref = get_primers_split(
-        rc, primer_file
+        primer_file
     )
     fh_out = open(Output_trim, "w")
     fh_out.close()
     fh_out = open(Fail_file, "w")
     fh_out.close()
-    threshold_barcode = 0.80  # Certainty for accepting a barcode
     if barcoded_j == 1 and barcoded_v == 0:
-        inside = 1
         print("J barcoded")
         single_j_barcoded_trimming_clustered(
             forward,
             reverse,
             barcoded_j,
             barcoded_v,
-            rc,
             tmp_Tmp_file,
             Fail_file,
             Output_trim,
@@ -343,28 +337,24 @@ def trim_sequences_bcr_tcr(
             species,
             primer_file,
             primer_tag_file_count,
-            threshold_barcode,
             ref_const,
-            inside,
             v_ref,
         )
     return ()
 
 
-def get_primers_split(rc, primer_file):
+def get_primers_split(primer_file: Path) -> Tuple:
     """Summary
 
     Parameters
     ----------
-    rc : TYPE
-        Description
-    primer_file : TYPE
-        Description
+    primer_file : Path
+        path to primer file.
 
     Returns
     -------
-    TYPE
-        Description
+    Tuple
+        output forward, reverse, barcoded_j, barcoded_v and v_ref
     """
     fh = open(primer_file, "r")
     forward, reverse, v_ref = [], [], []
@@ -392,8 +382,6 @@ def get_primers_split(rc, primer_file):
                     or header.count("REV_CONST") != 0
                     or header.count("REVERSE") != 0
                 ):
-                    # if header.count("REV_CONST") != 0:
-                    #     inside = 1
                     if sequence.count("N") != 0:
                         barcoded_j = 1
                     sequence = sequence.upper()
@@ -428,8 +416,6 @@ def get_primers_split(rc, primer_file):
                     or header.count("REV_CONST") != 0
                     or header.count("REVERSE") != 0
                 ):
-                    # if header.count("CONST") != 0:
-                    #     inside = 1
                     if sequence.count("N") != 0:
                         barcoded_j = 1
                     sequence = sequence.upper()
@@ -448,8 +434,6 @@ def get_primers_split(rc, primer_file):
                     clas = "IMMUNE_REC"
                     v_ref = v_ref + [[sequence, clas, header, words]]
     fh.close()
-    # _ = inside
-    # _ = _
     return (forward, reverse, barcoded_j, barcoded_v, v_ref)
 
 
@@ -500,8 +484,6 @@ def separate_sequences(
             ]
     fh.close()
     fh = open(primer_tag_file, "r")
-    # hk_score, non_hkscore = [], []
-    # seqs, classifications = Tree(), {}
     seqs = Tree()
     for l in fh:
         if l[0] != "#":
@@ -515,11 +497,10 @@ def separate_sequences(
     out, ind = "", 0
     seq_info, seq_uniq = {}, Tree()
     classes = {}
-    threshold = 5
     for s in seqs:
         for id in seqs[s]:
             break
-        scores = assess_gene_score(s, word_dict, threshold)
+        scores = assess_gene_score(s, word_dict)
         if len(scores) > 0:
             if (
                 scores[0][0] > threshold
@@ -568,7 +549,7 @@ def separate_sequences(
     return ()
 
 
-def assess_gene_score(consensus, word_dict, threshold):
+def assess_gene_score(consensus, word_dict):
     """Summary
 
     Parameters
@@ -576,8 +557,6 @@ def assess_gene_score(consensus, word_dict, threshold):
     consensus : TYPE
         Description
     word_dict : TYPE
-        Description
-    threshold : TYPE
         Description
 
     Returns
@@ -589,10 +568,13 @@ def assess_gene_score(consensus, word_dict, threshold):
     for hk in word_dict:
         w = word_dict[hk]
         score = [i for i in range(len(w)) if consensus.count(w[i][0]) != 0]
-        if len(score) > threshold / 2:
+        if len(score) > THRESHOLD_GENE_SCORE:
             if len(score) >= max_score:
                 consensus1 = consensus
-                if hk.count("HOUSEKEEPING") == 0 and len(score) > threshold / 2:
+                if (
+                    hk.count("HOUSEKEEPING") == 0
+                    and len(score) > THRESHOLD_GENE_SCORE
+                ):
                     start = [
                         consensus.index(w[score[i]][0]) - w[score[i]][1]
                         for i in range(len(score))
@@ -613,7 +595,6 @@ def single_j_barcoded_trimming_clustered(
     reverse,
     barcoded_j,
     barcoded_v,
-    rc,
     tmp_Tmp_file,
     Fail_file,
     Output_trim,
@@ -624,9 +605,7 @@ def single_j_barcoded_trimming_clustered(
     species,
     primer_file,
     primer_tag_file_count,
-    threshold_barcode,
     ref_const,
-    inside,
     v_ref,
 ):
     """Summary
@@ -640,8 +619,6 @@ def single_j_barcoded_trimming_clustered(
     barcoded_j : TYPE
         Description
     barcoded_v : TYPE
-        Description
-    rc : TYPE
         Description
     tmp_Tmp_file : TYPE
         Description
@@ -663,11 +640,7 @@ def single_j_barcoded_trimming_clustered(
         Description
     primer_tag_file_count : TYPE
         Description
-    threshold_barcode : TYPE
-        Description
     ref_const : TYPE
-        Description
-    inside : TYPE
         Description
     v_ref : TYPE
         Description
@@ -678,7 +651,6 @@ def single_j_barcoded_trimming_clustered(
         Description
     """
     read_untrimmed_file_single(
-        rc,
         tmp_Tmp_file,
         Fail_file,
         Output_trim,
@@ -698,7 +670,6 @@ def single_j_barcoded_trimming_clustered(
         primer_tag_file,
         Fail_file,
         Output_trim,
-        threshold_barcode,
     )
     separate_sequences(
         primer_tag_file_count, primer_tag_file, Output_trim, ref_const
@@ -707,7 +678,7 @@ def single_j_barcoded_trimming_clustered(
 
 
 def check_barcodes_malbac(
-    primer_tag_file_count, primer_tag_file, Fail_file, Output_trim, threshold
+    primer_tag_file_count, primer_tag_file, Fail_file, Output_trim
 ):
     """Summary
 
@@ -720,8 +691,6 @@ def check_barcodes_malbac(
     Fail_file : TYPE
         Description
     Output_trim : TYPE
-        Description
-    threshold : TYPE
         Description
 
     Returns
@@ -748,12 +717,10 @@ def check_barcodes_malbac(
             seqs[j_tag + "\t" + v_tag][sequence][header].value = 1
     fh.close()
     print(len(seqs), "Unique tags")
-    # min_depth = (1.0 / (1 - threshold))
     total_tags, ind, passed_seqs_total = 0, 0, 0
     fail_less_than_threshold = 0
     outp = ""
     for t1 in seqs:
-        # t, u_seq, u_freq, u_header = 0, [], [], []
         u_seq, u_freq, u_header = [], [], []
         for s in seqs[t1]:
             f = 0
@@ -768,7 +735,6 @@ def check_barcodes_malbac(
             )
         f = sum(u_freq)
         h = h.split(":")[0].split("__")[0] + "__" + str(sum(u_freq))
-        # print t1, sum(u_freq), len(u_freq), u_freq
         if sum(u_freq) > 20:
             print("BC group size:\t", len(u_freq), t1.split())
         if len(u_freq) == 1:
@@ -789,7 +755,7 @@ def check_barcodes_malbac(
                 + "\n"
             )
         elif len(u_freq) < 500:
-            if max(u_freq) > sum(u_freq) * threshold:
+            if max(u_freq) > sum(u_freq) * THRESHOLD_BARCODE:
                 nz = [i for i in range(len(u_freq)) if u_freq[i] != max(u_freq)]
                 passed_seqs_total = passed_seqs_total + f
                 consensus = u_seq[nz[0]]
@@ -825,7 +791,6 @@ def check_barcodes_malbac(
                     len(u_seq[i]),
                     ids,
                     sum(u_freq),
-                    threshold,
                     tmp_file,
                 )
                 if consensus != "" and pass_consensus == 1:
@@ -853,7 +818,7 @@ def check_barcodes_malbac(
                     fail_less_than_threshold = fail_less_than_threshold + 1
             else:
                 consensus, pass_consensus = get_consensus_sequence_cluster(
-                    u_seq, u_freq, tmp_file, threshold
+                    u_seq, u_freq, tmp_file
                 )
                 if consensus.count("_") == 0 and pass_consensus == 1:
                     outp = (
@@ -887,7 +852,7 @@ def check_barcodes_malbac(
     return ()
 
 
-def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
+def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file):
     """Summary
 
     Parameters
@@ -897,8 +862,6 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
     u_freq : TYPE
         Description
     tmp_file : TYPE
-        Description
-    threshold : TYPE
         Description
 
     Returns
@@ -945,7 +908,7 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
             f[base_dict[s[i]]] = f[base_dict[s[i]]] + u_freq[max_seqs[s]]
         if f[4] == 0:
             start == 1
-        if max(f) * 1.0 / sum(f) >= threshold:
+        if max(f) * 1.0 / sum(f) >= THRESHOLD_BARCODE:
             if bases[f.index(max(f))] != "-":
                 consensus = consensus + bases[f.index(max(f))]
         else:
@@ -982,7 +945,7 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file, threshold):
 
 
 def get_consensus_sequence_large(
-    out_cluster, Fail_file, l1, ids, sum_u_freq, threshold, tmp_file
+    out_cluster, Fail_file, l1, ids, sum_u_freq, tmp_file
 ):
     """Summary
 
@@ -997,8 +960,6 @@ def get_consensus_sequence_large(
     ids : TYPE
         Description
     sum_u_freq : TYPE
-        Description
-    threshold : TYPE
         Description
     tmp_file : TYPE
         Description
@@ -1027,14 +988,12 @@ def get_consensus_sequence_large(
         if max_s < f:
             max_clust, max_s = c, f
     consensus, pass_consensus = "", 0
-    if sum_u_freq * threshold < max_s:
+    if sum_u_freq * THRESHOLD_BARCODE < max_s:
         seq_align, s_freq = [], []
         for id in cluster[max_clust]:
             seq_align.append(ids[id][0])
             s_freq.append(ids[id][1])
-        consensus = get_consensus_sequence(
-            seq_align, s_freq, tmp_file, threshold
-        )
+        consensus = get_consensus_sequence(seq_align, s_freq, tmp_file)
         if consensus.count("_") == 0 and len(consensus) > 3:
             pass_consensus = 1
         else:
@@ -1043,7 +1002,6 @@ def get_consensus_sequence_large(
 
 
 def read_untrimmed_file_single(
-    rc,
     tmp_Tmp_file,
     Fail_file,
     Output_trim,
@@ -1062,8 +1020,6 @@ def read_untrimmed_file_single(
 
     Parameters
     ----------
-    rc : TYPE
-        Description
     tmp_Tmp_file : TYPE
         Description
     Fail_file : TYPE
@@ -1100,7 +1056,6 @@ def read_untrimmed_file_single(
         fh = open(f, "w")
         fh.close()
     fh = open(tmp_Tmp_file, "r")
-    # seqs = Tree()
     minl, maxl = 110, 1000000
     if gene == "HEAVY" or gene == "IGH":
         minl = 120
@@ -1108,7 +1063,6 @@ def read_untrimmed_file_single(
         minl = 110
     if gene == "LAMBDA" or gene == "IGL":
         (minl, maxl) = (90, 150)
-    # J_found, v_found, tot, indexing = 0, 0, 0, 0
     seqs1, t = Tree(), 0
     for header, seq in fasta_iterator(fh):
         seq = seq.upper()
@@ -1123,7 +1077,6 @@ def read_untrimmed_file_single(
         for header in seqs1[seq]:
             break
         header = header + ":" + str(len(seqs1[seq]))
-        # number = len(seqs1[seq])
         passes, j_tag, v_tag = 0, "", ""
         type_rev, type_for = "", ""
         primer_rev, primer_for = "", ""
@@ -1131,16 +1084,14 @@ def read_untrimmed_file_single(
         for i in range(0, len(reverse)):
             pj = get_match(reverse[i][2], seq)
             if max(pj + [-1]) == -1 or len(pj) == 0:
-                seq = reverse_comp(seq, rc)
+                seq = reverse_comp(seq)
                 pj = get_match(reverse[i][2], seq)
             if max(pj + [-1]) != -1:
-                bc_len = len(reverse[i][3])  # len(reverse[i][2])/5
+                bc_len = len(reverse[i][3])
                 if pj[0] > bc_len - 3:
                     j_tag = seq[pj[0] - bc_len : pj[0]]
                     if len(j_tag) > bc_len / 2:
-                        # print j_tag, seq[pj[0]-bc_len-5:pj[0]+bc_len], reverse[i][5]
                         seq = seq[pj[0] + bc_len : len(seq)]
-                        # seq = reverse_comp(seq, rc)
                         type_rev, primer_rev = reverse[i][1], reverse[i][5]
                         passes = 1
                         break
@@ -1162,12 +1113,12 @@ def read_untrimmed_file_single(
                         j_tag = seq[pj - bc_len : pj + 1]
                         if len(j_tag) > bc_len / 2:
                             seq = seq[pj + bc_len : len(seq)]
-                            seq = reverse_comp(seq, rc)
+                            seq = reverse_comp(seq)
                             type_rev, primer_rev = reverse[i][1], reverse[i][5]
                             passes = 1
                             break
             if passes != 1:
-                seq = reverse_comp(seq, rc)
+                seq = reverse_comp(seq)
                 for i in range(0, len(reverse)):
                     words = reverse[i][6]
                     p = []
@@ -1185,7 +1136,7 @@ def read_untrimmed_file_single(
                             j_tag = seq[pj - bc_len : pj + 1]
                             if len(j_tag) > bc_len / 2:
                                 seq = seq[pj + bc_len : len(seq)]
-                                seq = reverse_comp(seq, rc)
+                                seq = reverse_comp(seq)
                                 type_rev, primer_rev = (
                                     reverse[i][1],
                                     reverse[i][5],
@@ -1348,7 +1299,7 @@ def trim(s1, s2, l1, l2, indent, length):
     return (s1a, s2a, p, sample1)
 
 
-def join_reads(s1, s2, rc, length):
+def join_reads(s1, s2, length):
     """Summary
 
     Parameters
@@ -1356,8 +1307,6 @@ def join_reads(s1, s2, rc, length):
     s1 : TYPE
         Description
     s2 : TYPE
-        Description
-    rc : TYPE
         Description
     length : TYPE
         Description
@@ -1368,7 +1317,7 @@ def join_reads(s1, s2, rc, length):
         Description
     """
     seq = ""
-    (s2) = reverse_comp(s2, rc)
+    (s2) = reverse_comp(s2)
     (l1, l2) = (len(s1), len(s2))
     failed = 1
     for i in range(0, 100):
@@ -1414,9 +1363,8 @@ def get_paired_reads_overlapping(
     TYPE
         Description
     """
-    (rc) = init_rc()
-    (seqs1) = get_sequences(file1)
-    (seqs2) = get_sequences(file2)
+    seqs1 = get_sequences(file1)
+    seqs2 = get_sequences(file2)
     print("Forward reads:", len(seqs1), "Reverse reads:", len(seqs2))
     out, ind = "", 0
     fh = open(outfile, "w")
@@ -1429,13 +1377,13 @@ def get_paired_reads_overlapping(
     for id in seqs1:
         if id in seqs2:
             total = total + 1
-            (seq, failed) = join_reads(seqs1[id], seqs2[id], rc, length)
+            (seq, failed) = join_reads(seqs1[id], seqs2[id], length)
             if failed == 0 and len(seq) > 180:
                 ind, tot = ind + 1, tot + 1
                 out = out + ">" + id + "\n" + seq + "\n"
             else:
-                seq2 = reverse_comp(seqs2[id], rc)
-                (seq, failed) = join_reads(seqs1[id], seq2, rc, length)
+                seq2 = reverse_comp(seqs2[id])
+                (seq, failed) = join_reads(seqs1[id], seq2, length)
                 if failed == 0 and len(seq) > 180:
                     ind, tot = ind + 1, tot + 1
                     out = out + ">" + id + "\n" + seq + "\n"
@@ -3362,9 +3310,9 @@ def bam_to_fastq(out_path: Path, source_path: Path, sample_id: str):
     Parameters
     ----------
     out_path : Path
-        path to output folder
+        path to output folder.
     source_path : Path
-        path of input file (cram or bam)
+        path of input file (cram or bam).
     sample_id : str
         name of sample. Also the prefix of the file.
     """
@@ -3397,28 +3345,26 @@ def bam_to_fastq(out_path: Path, source_path: Path, sample_id: str):
 def qc_samples(
     out_path: Path,
     sample_id: str,
-    length: Union[str, int] = 100,
-    threshold: Union[str, int] = 32,
+    min_length: Union[str, int] = 100,
+    min_threshold: Union[str, int] = 32,
 ):
     """Perform QC on samples using QUASR and convert to fasta file with perl script.
 
     Parameters
     ----------
     out_path : Path
-        path to output folder
+        path to output folder.
     sample_id : str
         name of sample. Also the prefix of the file.
-    length : Union[str, int], optional
-        Minimum read length cutoff
-    threshold : Union[str, int], optional
-        Minimum median-read-quality cutoff
-
+    min_length : Union[str, int], optional
+        minimum read length cutoff.
+    min_threshold : Union[str, int], optional
+        minimum median-read-quality cutoff.
     """
     reads1 = out_path / f"Sequences_{sample_id}_1.fastq"
     reads2 = out_path / f"Sequences_{sample_id}_2.fastq"
     quasr_qc_jar_path = EXTPATH / "QUASR_v7.01" / "qualityControl.jar"
-    print(str(reads1))
-    print(str(reads2))
+    # see https://github.com/andrewjpage/QUASR for updated version
     cmd1 = [
         "java",
         "-jar",
@@ -3428,9 +3374,9 @@ def qc_samples(
         "-o",
         str(reads1.parent / reads1.stem),
         "-m",
-        str(threshold),
+        str(min_threshold),
         "-l",
-        str(length),
+        str(min_length),
     ]
     cmd2 = [
         "java",
@@ -3441,16 +3387,15 @@ def qc_samples(
         "-o",
         str(reads2.parent / reads2.stem),
         "-m",
-        str(threshold),
+        str(min_threshold),
         "-l",
-        str(length),
+        str(min_length),
     ]
     cmd3 = [
         "perl",
         "-e",
         PERLCMD,
     ]
-
     subprocess.run(cmd1)
     subprocess.run(cmd2)
     subprocess.run(
@@ -3631,7 +3576,7 @@ if command_source.count("1") != 0:
             r1pattern=R1PATTERN,
             r2pattern=R2PATTERN,
         )
-    qc_samples(out_path=OUTFASTQ, sample_id=sample_id, length=length)
+    qc_samples(out_path=OUTFASTQ, sample_id=sample_id, min_length=length)
 
 
 # Tip: it is good to check all the fasta files in the FASTQ_FILES directory have

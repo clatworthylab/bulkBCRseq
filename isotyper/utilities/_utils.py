@@ -3,18 +3,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Tuple, Dict
 
-from isotyper import __path__
-
-# specify global variables
-
-ISOTYPERPREFIX = Path(__path__[0])
-# set up some default paths
-LIBPATH = ISOTYPERPREFIX / "library"
-EXTPATH = ISOTYPERPREFIX / "external"
-PERLCMD = "$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}"
-
-EDGE_LENGTHS = 0.85
-READ_NUMBER_DIVISION = "__"
+from isotyper.utilities._settings import REVERSE_COMPLEMENT_DICT
 
 
 class Tree(defaultdict):
@@ -34,7 +23,8 @@ class Tree(defaultdict):
 
 
 def fasta_iterator(fh1: Path) -> Tuple[str, str]:
-    """Summary
+    """Fasta reader.
+
     Parameters
     ----------
     fh1 : Path
@@ -127,42 +117,23 @@ def get_codons(codon_file: Path) -> Tree:
     return codon
 
 
-def init_rc():
-    """Summary
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    b1 = ["A", "T", "G", "C", "N", "."]
-    b2 = ["T", "A", "C", "G", "N", "."]
-    rc = {}
-    for i in range(0, 6):
-        rc[b1[i]] = b2[i]
-    return rc
-
-
-def reverse_comp(seq, rc):
-    """Summary
+def reverse_comp(seq: str) -> str:
+    """convert nucleotide sequence to reverse complementary.
     Parameters
     ----------
-    seq : TYPE
-        Description
-    rc : TYPE
-        Description
+    seq : str
+        nucleotide sequence
     Returns
     -------
-    TYPE
-        Description
+    str
+        reverse complementary sequence
     """
     s = ""
     l = len(seq)
     for i in range(0, l):
         j = l - i - 1
-        if seq[j] not in rc:
-            print(seq)
-        else:
-            s = s + rc[seq[j]]
+        if seq[j] in REVERSE_COMPLEMENT_DICT:
+            s = s + REVERSE_COMPLEMENT_DICT[seq[j]]
     return s
 
 
