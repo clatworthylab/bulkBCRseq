@@ -21,3 +21,6 @@ REVERSE_COMPLEMENT_DICT = {
     ".": ".",
 }
 MIN_QUAL = 32
+# change here if necessary
+R1PATTERN = "_R1_001"
+R2PATTERN = "_R2_001"

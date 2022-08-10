@@ -11,14 +11,16 @@ from isotyper.utilities._utils import (
 )
 from isotyper.utilities._settings import (
     EDGE_LENGTHS,
-    READ_NUMBER_DIVISION,
-    LIBPATH,
     EXTPATH,
+    LIBPATH,
     MIN_QUAL,
     PERLCMD,
+    R1PATTERN,
+    R2PATTERN,
+    READ_NUMBER_DIVISION,
+    REVERSE_COMPLEMENT_DICT,
     THRESHOLD_BARCODE,
     THRESHOLD_GENE_SCORE,
-    REVERSE_COMPLEMENT_DICT,
 )
 
 __all__ = [
@@ -32,12 +34,14 @@ __all__ = [
     "write_out",
 ] + [
     "EDGE_LENGTHS",
-    "READ_NUMBER_DIVISION",
-    "LIBPATH",
     "EXTPATH",
-    "PERLCMD",
+    "LIBPATH",
     "MIN_QUAL",
+    "PERLCMD",
+    "R1PATTERN",
+    "R2PATTERN",
+    "READ_NUMBER_DIVISION",
+    "REVERSE_COMPLEMENT_DICT",
     "THRESHOLD_BARCODE",
     "THRESHOLD_GENE_SCORE",
-    "REVERSE_COMPLEMENT_DICT",
 ]
