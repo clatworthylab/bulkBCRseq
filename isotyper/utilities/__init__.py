@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from isotyper.utilities._utilities import (
+from isotyper.utilities._utils import (
     deconvolute_same_array,
     fasta_iterator,
     fuzzy_substring,
