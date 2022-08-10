@@ -4,7 +4,6 @@ from isotyper.utilities._utils import (
     fasta_iterator,
     fuzzy_substring,
     get_codons,
-    init_rc,
     reverse_comp,
     translate,
     Tree,
