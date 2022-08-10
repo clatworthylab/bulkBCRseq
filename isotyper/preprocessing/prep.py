@@ -5,6 +5,7 @@ import subprocess
 
 from glob import glob
 from pathlib import Path
+from typing import Union
 
 from isotyper.utilities._settings import R1PATTERN, R2PATTERN, MIN_QUAL, EXTPATH
 from isotyper.utilities._args import (
