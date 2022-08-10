@@ -364,7 +364,7 @@ else:
                 + " "
                 + sources
                 + " "
-                + str(200)
+                + str(32)
                 + " "
                 + primers
                 + " "
@@ -393,7 +393,7 @@ else:
                 + " "
                 + sources
                 + " "
-                + str(200)
+                + str(32)
                 + " "
                 + primers
                 + " "
@@ -422,7 +422,7 @@ else:
                 + " "
                 + sources
                 + " "
-                + str(200)
+                + str(32)
                 + " "
                 + primers
                 + " "
