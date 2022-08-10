@@ -1,35 +1,17 @@
-import re
-import networkx as nx
-from operator import itemgetter, add
-import subprocess
-from functions import *
-import sys
+#!/usr/bin/env python
 import os
+import re
+import shutil
+import subprocess
+import sys
+
+import networkx as nx
+
 from glob import glob
+from operator import itemgetter, add
 from pathlib import Path
 
-# set up some default paths
-# main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
-main_path = ""
-bin_path = main_path + "BIN/"
-lib_path = main_path + "LIBRARY/"
-if not os.path.exists(bin_path):
-    bin_path = os.getcwd() + "/BIN/"
-    if not os.path.exists(bin_path):
-        raise OSError(
-            "Cannot locate path to BIN folder. You are currently in {}".format(
-                os.getcwd()
-            )
-        )
-    sys.path.append(bin_path)
-if not os.path.exists(lib_path):
-    lib_path = os.getcwd() + "/LIBRARY/"
-    if not os.path.exists(lib_path):
-        raise OSError(
-            "Cannot locate path to LIBRARY folder. You are currently in {}".format(
-                os.getcwd()
-            )
-        )
+from isotyper.utilities import *
 
 
 def reduce_sequences(trim2, trim3, primer_file):
@@ -2201,10 +2183,10 @@ def get_similarity_single(clust_seqs, file_out, c):
                                 )
                                 ind1 = ind1 + 1
                 if ind1 >= 100:
-                    write_output(out, file_out)
+                    write_out(out, file_out)
                     ind1 = 0
                     out = ""
-    write_output(out, file_out)
+    write_out(out, file_out)
     del out
     return ()
 
@@ -2325,7 +2307,7 @@ def trim_sequences(s1, s2, l1, l2):
     return (s1, s2, p)
 
 
-def write_output(out, file):
+def write_out(out, file):
     """Summary
 
     Parameters
@@ -2596,14 +2578,14 @@ def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
                                     out = out + c1 + "\t" + c2 + "\n"
                                     indw = indw + 1
                                     if indw > 100:
-                                        write_output(out, tmp_file)
+                                        write_out(out, tmp_file)
                                         out = ""
                                         indw = 0
                                     found = 1
                                     break
                         if ind > comp or found == 1:
                             break
-    write_output(out, tmp_file)
+    write_out(out, tmp_file)
     print(out)
     return ()
 
@@ -2801,7 +2783,7 @@ def decon_identical(
                     mins = s
                 ind = ind + 1
                 if ind > 100:
-                    write_output(out, file_seqs)
+                    write_out(out, file_seqs)
                     out = ""
                     ind = 0
             same[i] = total
@@ -2817,7 +2799,7 @@ def decon_identical(
             .split(read_number_division)[1]
             .split("|")[1]
         )
-    write_output(out, file_seqs)
+    write_out(out, file_seqs)
     del seqs
     print_vertices(
         all,
@@ -2884,10 +2866,10 @@ def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
                 )
                 ind = ind + 1
                 if ind > 300:
-                    write_output(edge, tmp_file)
+                    write_out(edge, tmp_file)
                     edge = ""
                     ind = 0
-    write_output(edge, tmp_file)
+    write_out(edge, tmp_file)
     del edges
     return ()
 
@@ -2963,10 +2945,10 @@ def print_vertices(
             )
             out = out + id1 + "\t" + str(freq) + "\t" + all[id] + "\n"
         if ind > 300:
-            write_output(out, file_vertex)
+            write_out(out, file_vertex)
             ind = 0
             out = ""
-    write_output(out, file_vertex)
+    write_out(out, file_vertex)
     return ()
 
 
@@ -2999,9 +2981,9 @@ def reduce_edges(file_in, file_out):
                 ind = ind + 1
                 if ind > 300:
                     ind = 0
-                    write_output(out, file_out)
+                    write_out(out, file_out)
                     out = ""
-    write_output(out, file_out)
+    write_out(out, file_out)
     del done
     return ()
 
@@ -3162,12 +3144,12 @@ def output_cluster_file(G, cluster_file):
             tc, t = tc + G.rtt[j], t + G.rtt[j]
             nvert = nvert + 1
             if ind2 > 100:
-                write_output(out, cluster_file)
+                write_out(out, cluster_file)
                 out = ""
                 ind2 = 0
         if tc > max_f:
             max_f, nvertmax = tc, nvert
-    write_output(out, cluster_file)
+    write_out(out, cluster_file)
     print(
         file_vertex,
         "Maximum cluster:",
@@ -3223,9 +3205,9 @@ def get_network_input(file_cluster, outfile, edge_file, checked_edges):
                     out = out + l + "\n"
                     ind = ind + 1
         if ind > 300:
-            write_output(out, outfile)
+            write_out(out, outfile)
             (out, ind) = ("", 0)
-    write_output(out, outfile)
+    write_out(out, outfile)
     fh = open(checked_edges, "w")
     fh.close()
     fh = open(edge_file, "r")
@@ -3236,9 +3218,9 @@ def get_network_input(file_cluster, outfile, edge_file, checked_edges):
             out = out + l[0] + "\t" + l[1] + "\t" + l[2] + "\n"
             ind = ind + 1
             if ind > 300:
-                write_output(out, checked_edges)
+                write_out(out, checked_edges)
                 (out, ind) = ("", 0)
-    write_output(out, checked_edges)
+    write_out(out, checked_edges)
     fh.close()
     return ()
 
@@ -3281,10 +3263,10 @@ def reduce_identical_sequences(Reduced_file, file_vertex, read_number_division):
             )
         ind = ind + 1
         if ind > 500:
-            write_output(out, Reduced_file)
+            write_out(out, Reduced_file)
             (ind, out) = (0, "")
     fh.close()
-    write_output(out, Reduced_file)
+    write_out(out, Reduced_file)
     return ()
 
 
@@ -3323,27 +3305,6 @@ def generate_networks(
 ##
 
 
-def write_out(out, file):
-    """Summary
-
-    Parameters
-    ----------
-    out : TYPE
-        Description
-    file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(file, "a")
-    fh.write(out)
-    fh.close()
-    return ()
-
-
 def get_freq(id):
     """Summary
 
@@ -3361,73 +3322,82 @@ def get_freq(id):
     return int(id[1])
 
 
-def intialise_files(dir):
+def intialise_files(out_path: Path):
     """Summary
 
     Parameters
     ----------
-    dir : TYPE
-        Description
+    out_path : Path
+        location of output folder.
     """
     dirs_to_add = [
-        dir + "FASTQ_FILES/",
-        dir + "ORIENTATED_SEQUENCES/",
-        dir + "ORIENTATED_SEQUENCES/TMP/",
-        dir + "ORIENTATED_SEQUENCES/NETWORKS/",
+        out_path / "FASTQ_FILES",
+        out_path / "ORIENTATED_SEQUENCES",
+        out_path / "ORIENTATED_SEQUENCES" / "TMP",
+        out_path / "ORIENTATED_SEQUENCES" / "NETWORKS",
     ]
     for d in dirs_to_add:
-        if not os.path.exists(d):
-            os.makedirs(d)
+        d.mkdir(exist_ok=True)
 
 
-def cram_to_fastq(dir, source, id, pre_QC_bam):
+def cram_to_fastq(cram_path: Path, out_pre_qc_bam_path: Path):
     """Summary
 
     Parameters
     ----------
-    dir : TYPE
-        Description
-    source : TYPE
-        Description
-    id : TYPE
-        Description
-    pre_QC_bam : TYPE
-        Description
+    cram_path : Path
+        path to cram file.
+    out_pre_qc_bam_path : Path
+        path to output bam file.
     """
-    command0 = "samtools view -b -o {} {}".format(pre_QC_bam, source)
-    print(command0)
-    os.system(command0)
+    cmd1 = [
+        "samtools",
+        "view",
+        "-b",
+        "-o",
+        str(out_pre_qc_bam_path),
+        str(cram_path),
+    ]
+    print(cmd)
+    subprocess.run(cmd)
 
 
-def bam_to_fastq(dir, source, id):
+def bam_to_fastq(out_path: Path, source_path: Path, sample_id: str):
     """Summary
 
     Parameters
     ----------
-    dir : TYPE
-        Description
-    source : TYPE
-        Description
-    id : TYPE
-        Description
+    out_path : Path
+        path to output folder
+    source_path : Path
+        path of input file (cram or bam)
+    sample_id : str
+        name of sample. Also the prefix of the file.
     """
     if (
         len(
-            glob(str(Path(source).parent / "*.bam"))
-            + glob(str(Path(source).parent / "*.cram"))
+            glob(str(source_path.parent / "*.bam"))
+            + glob(str(source.parent / "*.cram"))
         )
         != 0
     ):
-        pre_QC_fastq1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fastq"
-        pre_QC_fastq2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fastq"
-        pre_QC_bam = dir + "FASTQ_FILES/Sequences_" + id + ".bam"
-        if len(glob(Path(source).parent / "*.cram")) != 0:
-            cram_to_fastq(dir, source, id, pre_QC_bam)
-            source = pre_QC_bam
-        command1 = "picard SamToFastq I={} FASTQ={} SECOND_END_FASTQ={}".format(
-            source, pre_QC_fastq1, pre_QC_fastq2
+        pre_qc_fastq1 = (
+            out_path / "FASTQ_FILES" / f"Sequences_{sample_id}_1.fastq"
         )
-        os.system(command1)
+        pre_qc_fastq2 = (
+            out_path / "FASTQ_FILES" / f"Sequences_{sample_id}_2.fastq"
+        )
+        pre_qc_bam = out_path / "FASTQ_FILES" / f"Sequences_{sample_id}.bam"
+        if len(glob(Path(source).parent / "*.cram")) != 0:
+            cram_to_fastq(cram_path=source, out_pre_qc_bam_path=pre_QC_bam)
+        command1 = [
+            "picard",
+            "SamToFastq",
+            f"I={str(pre_QC_bam)}",
+            f"FASTQ={pre_QC_fastq1}",
+            f"SECOND_END_FASTQ={pre_QC_fastq2}",
+        ]
+        subprocess.run(command1)
 
 
 def qc_samples(dir, gene, id, source, length, species, barcode_group):
@@ -3458,115 +3428,132 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
     pre = dir + "FASTQ_FILES/Sequences_" + id
     reads1 = pre + "_1.fastq"
     reads2 = pre + "_2.fastq"
-    if 1 == 1:
-        print(reads1)
-        print(reads2)
-        if 1 == 1:
-            threshold, length = "32", "100"
-            # command1 = ("java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f " +
-            #             reads1 + " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-            #             "_1 -m " + threshold + " -l " + length)
-            # command2 = ("java -jar ~sw10/QUASR_v7.01/qualityControl.jar -f " +
-            #             reads2 + " -o " + dir + "FASTQ_FILES/Sequences_" + id +
-            #             "_2 -m " + threshold + " -l " + length)
-            command1 = (
-                "java -jar "
-                + bin_path
-                + "QUASR_v7.01/qualityControl.jar -f "
-                + reads1
-                + " -o "
-                + dir
-                + "FASTQ_FILES/Sequences_"
-                + id
-                + "_1 -m "
-                + threshold
-                + " -l "
-                + length
-            )
-            command2 = (
-                "java -jar "
-                + bin_path
-                + "QUASR_v7.01/qualityControl.jar -f "
-                + reads2
-                + " -o "
-                + dir
-                + "FASTQ_FILES/Sequences_"
-                + id
-                + "_2 -m "
-                + threshold
-                + " -l "
-                + length
-            )
-            perl_cmd = (
-                "perl -e '$i=0;while(<>)"
-                + "{if(/^\@/&&$i==0){s/^\@/\>/;print;}"
-                + "elsif($i==1){s/\./N/g;print;$i=-3}$i++;}' > "
-            )
-            command3 = (
-                "cat "
-                + dir
-                + "FASTQ_FILES/Sequences_"
-                + id
-                + "_1.qc.fq | "
-                + perl_cmd
-                + dir
-                + "FASTQ_FILES/Sequences_"
-                + id
-                + "_1.fasta"
-            )
-            command4 = (
-                "cat "
-                + dir
-                + "FASTQ_FILES/Sequences_"
-                + id
-                + "_2.qc.fq | "
-                + perl_cmd
-                + dir
-                + "FASTQ_FILES/Sequences_"
-                + id
-                + "_2.fasta"
-            )
-            os.system(command1)
-            os.system(command2)
-            os.system(command3)
-            os.system(command4)
-    return ()
+    quasr_qc_jar_path = EXTPATH / "QUASR_v7.01" / qualityControl.jar
+    print(reads1)
+    print(reads2)
+    threshold, length = "32", "100"
+    cmd1 = [
+        "java",
+        "-jar",
+        str(quasr_qc_jar_path),
+        "-f",
+        reads1,
+        "-o",
+        pre + "_1",
+        "-m",
+        threshold,
+        "-l",
+        length,
+    ]
+    cmd2 = [
+        "java",
+        "-jar",
+        str(quasr_qc_jar_path),
+        "-f",
+        reads2,
+        "-o",
+        pre + "_2",
+        "-m",
+        threshold,
+        "-l",
+        length,
+    ]
+    cmd3 = [
+        "cat",
+        pre + "_1.qc.fq",
+        "|",
+        "perl",
+        "-e",
+        PERLCMD,
+        ">",
+        pre,
+        "_1.fasta",
+    ]
+    cmd4 = [
+        "cat",
+        pre + "_2.qc.fq",
+        "|",
+        "perl",
+        "-e",
+        PERLCMD,
+        ">",
+        pre,
+        "_2.fasta",
+    ]
+    subprocess.run(cmd1)
+    subprocess.run(cmd2)
+    subprocess.run(cmd3)
+    subprocess.run(cmd4)
 
 
-def prep_fastqs(dir, source, id, r1pattern, r2pattern):
+def prep_fastqs(out_path, source_path, sample_id, r1pattern, r2pattern):
     """Prepare fastqs for input into the script.
 
     Parameters
     ----------
-    dir : str
-        location of output.
-    source : str
-        location of R1 fastq file.
-    id : str
-        name of sample.
+    out_path : Path
+        location of output folder.
+    source_path : Path
+        location of R1 of fastq file.
+    sample_id : str
+        name of sample. Also the prefix of the file.
     r1pattern : str
         suffix pattern before .fastq to try and match for R1
     r2pattern : str
         suffix pattern before .fastq to try and match for R2
     """
-    if source.count(r1pattern) != 0:
-        r1_original = source
-        r2_original = re.sub(r1pattern, r2pattern, source)
-    if source.count(".gz") != 0:
-        new_r1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fastq.gz"
-        new_r2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fastq.gz"
+    if re.search(r1pattern, str(source_path)):
+        r1_original = source_path
+        r2_original = Path(re.sub(r1pattern, r2pattern, str(source_path)))
     else:
-        new_r1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fastq"
-        new_r2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fastq"
-    cmd1 = "cp {} {}".format(r1_original, new_r1)
-    cmd2 = "cp {} {}".format(r2_original, new_r2)
-    os.system(cmd1)
-    os.system(cmd2)
-    if source.count(".gz") != 0:
-        cmd1g = "gunzip {}".format(new_r1)
-        cmd2g = "gunzip {}".format(new_r2)
-        os.system(cmd1g)
-        os.system(cmd2g)
+        raise ValueError(
+            "Your input file {} does not contain the {} pattern.".format(
+                str(source_path), r1pattern
+            )
+        )
+    copy_prepped_fastq(
+        out_path=out_path,
+        fastq_path=r1_original,
+        sample_id=sample_id,
+        read_num="1",
+    )
+    copy_prepped_fastq(
+        out_path=out_path,
+        fastq_path=r2_original,
+        sample_id=sample_id,
+        read_num="2",
+    )
+
+
+def copy_prepped_fastq(
+    out_path: Path, fastq_path: Path, sample_id: str, read_num: str
+):
+    """Copy and unzip fastq files.
+
+    Parameters
+    ----------
+    out_path : Path
+        location of output folder
+    fastq_path : Path
+        location of original fastq file.
+    sample_id : str
+        name of sample. Also the prefix of the file.
+    read_num : str
+        `1` or `2` to specify read 1 or read 2.
+    """
+    if fastq_path.suffix == ".gz":
+        extension = ".gz"
+    else:
+        extension = ""
+    new_fastq = (
+        out_path
+        / "FASTQ_FILES"
+        / f"Sequences_{sample_id}_{read_num}.fastq{extension}"
+    )
+    shutil.copy(fastq_path, new_fastq)
+    if fastq_path.suffix == ".gz":
+        cmdg = ["gunzip", f"{new_fastq}"]
+        subprocess.run(cmdg)
 
 
 ###########################
