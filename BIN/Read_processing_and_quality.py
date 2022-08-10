@@ -3556,8 +3556,8 @@ def prep_fastqs(dir, source, id, r1pattern, r2pattern):
     else:
         new_r1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fastq"
         new_r2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fastq"
-    cmd1 = f"cp {r1_orginal} {new_r1}"
-    cmd2 = f"cp {r2_orginal} {new_r2}"
+    cmd1 = f"cp {r1_original} {new_r1}"
+    cmd2 = f"cp {r2_original} {new_r2}"
     os.system(cmd1)
     os.system(cmd2)
     if source.count(".gz") != 0:
