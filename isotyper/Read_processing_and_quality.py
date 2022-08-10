@@ -3272,13 +3272,24 @@ def get_freq(id):
 
 
 ###########################
-out_path = Path(sys.argv[1])
-sample_id = sys.argv[2]
+from isotyper.utilities._args import (
+    ORG,
+    OUT_FASTQ,
+    OUT_NET,
+    OUT_ORTSEQ,
+    OUT_ORTSEQ_TMP,
+    OUT_PATH,
+    SAMPLE_ID,
+    SOURCE,
+)
+
+# out_path = Path(sys.argv[1])
+# sample_id = sys.argv[2]
 barcode_group = sys.argv[3]
-gene = sys.argv[4]
+# gene = sys.argv[4]
 paired = sys.argv[5]
-species = sys.argv[6]
-source = sys.argv[7]
+# species = sys.argv[6]
+# source = sys.argv[7]
 length = sys.argv[8]
 primer_file = sys.argv[9]
 method = sys.argv[10]
@@ -3290,50 +3301,44 @@ else:
     reverse_primer_group = "OTHER"
 print("Reverse primer group: ", reverse_primer_group)
 
-OUTFASTQ = out_path / "FASTQ_FILES"
-OUTORTSEQ = out_path / "ORIENTATED_SEQUENCES"
-OUTORTSEQTMP = OUTORTSEQ / "TMP"
-OUTNET = OUTORTSEQ / "NETWORKS"
-
 # Files for QC and filtering
-Seq_file1 = OUTFASTQ / f"Sequences_{sample_id}_1.fasta"
-Seq_file2 = OUTFASTQ / f"Sequences_{sample_id}_2.fasta"
-tmp_Tmp_file = OUTORTSEQTMP / f"Untrimmed_{sample_id}.fasta"
-trim1 = OUTORTSEQTMP / f"trimmed_orientated_all_{sample_id}.fasta"
-trim2 = OUTORTSEQTMP / f"Filtered_J_{sample_id}.fasta"
-trim3 = OUTORTSEQTMP / f"Filtered_reduced_{sample_id}.fasta"
-Fail_file = OUTFASTQ / f"Fail_filtered_{sample_id}.fasta"
+Seq_file1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fasta"
+Seq_file2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fasta"
+tmp_Tmp_file = OUT_ORTSEQ_TMP / f"Untrimmed_{SAMPLE_ID}.fasta"
+trim1 = OUT_ORTSEQ_TMP / f"trimmed_orientated_all_{SAMPLE_ID}.fasta"
+trim2 = OUT_ORTSEQ_TMP / f"Filtered_J_{SAMPLE_ID}.fasta"
+trim3 = OUT_ORTSEQ_TMP / f"Filtered_reduced_{SAMPLE_ID}.fasta"
+Fail_file = OUT_FASTQ / f"Fail_filtered_{SAMPLE_ID}.fasta"
 primer_tag_file = (
-    OUTORTSEQTMP / f"Barcode_filtering_information_{sample_id}.txt"
+    OUT_ORTSEQ_TMP / f"Barcode_filtering_information_{SAMPLE_ID}.txt"
 )
-primer_tag_file_count = OUTORTSEQTMP / f"All_barcodes_{sample_id}.txt"
-Filtered_out1 = OUTORTSEQ / f"Filtered_ORFs_sequences_all_{sample_id}.fasta"
+primer_tag_file_count = OUT_ORTSEQ_TMP / f"All_barcodes_{SAMPLE_ID}.txt"
+Filtered_out1 = OUT_ORTSEQ / f"Filtered_ORFs_sequences_all_{SAMPLE_ID}.fasta"
 nn_orf_filtered = (
-    OUTORTSEQ / f"Nucleotsample_ide_ORF_filtered_all_{sample_id}.fasta"
+    OUT_ORTSEQ / f"Nucleotsample_ide_ORF_filtered_all_{SAMPLE_ID}.fasta"
 )
-tmp_file_orf = OUTORTSEQTMP / f"Blast_matching_{sample_id}"
-filtering_report = OUTORTSEQ / f"Filtering_report_{sample_id}.txt"
+tmp_file_orf = OUT_ORTSEQ_TMP / f"Blast_matching_{SAMPLE_ID}"
+filtering_report = OUT_ORTSEQ / f"Filtering_report_{SAMPLE_ID}.txt"
 # Files for clustering
-att_file = OUTNET / f"Vertex_relations_{sample_id}.txt"
-file_vertex = OUTNET / f"Att_{sample_id}.txt"
-file_edges = OUTNET / f"Edges_{sample_id}.txt"
-cluster_file = OUTNET / f"Cluster_sample_identities_{sample_id}.txt"
-Reduced_file = OUTNET / f"Fully_reduced_{sample_id}.fasta"
-checked_edges = OUTNET / f"Checked_edges_{sample_id}.txt"
-plot_sample_ids_file = OUTNET / f"Plot_sample_ids_{sample_id}.txt"
-file_seqs = OUTNET / f"Sequences_{sample_id}.txt"
-tmp_file0 = OUTNET / f"Decon_0_{sample_id}.txt"
-tmp_pre = OUTNET / "Pre_tmp_{sample_id}"
-tmp_file_1 = OUTNET / f"NN_Tmp_cluster_{sample_id}.1"
-
-tmp_file = OUTNET / f"NN_Tmp_cluster_{sample_id}."
+att_file = OUT_NET / f"Vertex_relations_{SAMPLE_ID}.txt"
+file_vertex = OUT_NET / f"Att_{SAMPLE_ID}.txt"
+file_edges = OUT_NET / f"Edges_{SAMPLE_ID}.txt"
+cluster_file = OUT_NET / f"Cluster_sample_identities_{SAMPLE_ID}.txt"
+Reduced_file = OUT_NET / f"Fully_reduced_{SAMPLE_ID}.fasta"
+checked_edges = OUT_NET / f"Checked_edges_{SAMPLE_ID}.txt"
+plot_sample_ids_file = OUT_NET / f"Plot_sample_ids_{SAMPLE_ID}.txt"
+file_seqs = OUT_NET / f"Sequences_{SAMPLE_ID}.txt"
+tmp_file0 = OUT_NET / f"Decon_0_{SAMPLE_ID}.txt"
+tmp_pre = OUT_NET / f"Pre_tmp_{SAMPLE_ID}"
+tmp_file_1 = OUT_NET / f"NN_Tmp_cluster_{SAMPLE_ID}.1"
+tmp_file = OUT_NET / f"NN_Tmp_cluster_{SAMPLE_ID}."
 
 # Reference files
-refv = str(LIBPATH / f"Reference_nn_{species}_{gene}V.fasta")
-refj = str(LIBPATH / f"Reference_nn_{species}_{gene}J.fasta")
-refvp = str(LIBPATH / f"Reference_protein_{species}_{gene}V.fasta")
-refjp = str(LIBPATH / f"Reference_protein_{species}_{gene}J.fasta")
-ref_const = str(LIBPATH / f"Reference_nn_{species}_{gene}_constant_exon1.fasta")
+refv = str(LIBPATH / f"Reference_nn_{ORG}_IGHV.fasta")
+refj = str(LIBPATH / f"Reference_nn_{ORG}_IGHJ.fasta")
+refvp = str(LIBPATH / f"Reference_protein_{ORG}_IGHV.fasta")
+refjp = str(LIBPATH / f"Reference_protein_{ORG}_IGHJ.fasta")
+ref_const = str(LIBPATH / f"Reference_nn_{ORG}_IGH_constant_exon1.fasta")
 
 # Commands
 if command_source.count("1") != 0:

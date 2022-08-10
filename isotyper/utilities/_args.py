@@ -5,6 +5,7 @@ import sys
 # head output folder
 OUT_PATH = Path(sys.argv[1])
 SAMPLE_ID = sys.argv[2]  # name of sample. Also the prefix of the file.
+ORG = sys.argv[6]  # organism
 SOURCE = Path(sys.argv[7])
 LENGTH = sys.argv[8]
 # output subfolders
