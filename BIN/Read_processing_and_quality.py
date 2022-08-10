@@ -7,6 +7,7 @@ from functions import *
 import sys
 import os
 from glob import glob
+from pathlib import Path
 
 # set up some default paths
 # main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
@@ -3411,10 +3412,16 @@ def bam_to_fastq(dir, source, id):
     id : TYPE
         Description
     """
-    if len(glob("*.bam") + glob("*.cram")) != 0:
+    if (
+        len(
+            glob(str(Path(source).parent / "*.bam"))
+            + glob(str(Path(source).parent / "*.cram"))
+        )
+        != 0
+    ):
         pre_QC_fastq = dir + "FASTQ_FILES/Sequences_" + id + "#.fastq"
         pre_QC_bam = dir + "FASTQ_FILES/Sequences_" + id + ".bam"
-        if len(glob("*.cram")) != 0:
+        if len(glob(Path(source).parent / "*.cram")) != 0:
             cram_to_fastq(dir, source, id, pre_QC_bam)
             source = pre_QC_bam
         command1 = "bam2fastq --force -o {} {}".format(pre_QC_fastq, source)
@@ -3647,14 +3654,20 @@ R2PATTERN = "_R2_001"
 # Commands
 if command_source.count("1") != 0:
     intialise_files(dir)
-    if len(glob("*.bam") + glob("*.cram")) != 0:
+    if (
+        len(
+            glob(str(Path(source).parent / "*.bam*"))
+            + glob(str(Path(source).parent / "*.cram"))
+        )
+        != 0
+    ):
         bam_to_fastq(dir, source, id)
     elif (
         len(
-            glob("*.fastq")
-            + glob("*.fastq.gz")
-            + glob("*.fq*")
-            + glob("*.fq.gz")
+            glob(str(Path(source).parent / "*.fastq"))
+            + glob(str(Path(source).parent / "*.fastq.gz"))
+            + glob(str(Path(source).parent / "*.fq*"))
+            + glob(str(Path(source).parent / "*.fq.gz"))
         )
         != 0
     ):
