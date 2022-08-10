@@ -3322,26 +3322,19 @@ def get_freq(id):
     return int(id[1])
 
 
-def intialise_files(out_path: Path):
-    """Summary
-
-    Parameters
-    ----------
-    out_path : Path
-        location of output folder.
-    """
-    dirs_to_add = [
-        out_path / "FASTQ_FILES",
-        out_path / "ORIENTATED_SEQUENCES",
-        out_path / "ORIENTATED_SEQUENCES" / "TMP",
-        out_path / "ORIENTATED_SEQUENCES" / "NETWORKS",
-    ]
-    for d in dirs_to_add:
+def intialise_files():
+    """Initialise to output folder."""
+    for d in [
+        OUTFASTQ,
+        OUTORTSEQ,
+        OUTORTSEQTMP,
+        OUTNET,
+    ]:
         d.mkdir(exist_ok=True, parents=True)
 
 
-def cram_to_fastq(cram_path: Path, out_pre_qc_bam_path: Path):
-    """Summary
+def cram_to_bam(cram_path: Path, out_pre_qc_bam_path: Path):
+    """Convert cram to bam.
 
     Parameters
     ----------
@@ -3389,7 +3382,7 @@ def bam_to_fastq(out_path: Path, source_path: Path, sample_id: str):
         )
         pre_qc_bam = out_path / "FASTQ_FILES" / f"Sequences_{sample_id}.bam"
         if len(glob(Path(source).parent / "*.cram")) != 0:
-            cram_to_fastq(cram_path=source, out_pre_qc_bam_path=pre_QC_bam)
+            cram_to_bam(cram_path=source, out_pre_qc_bam_path=pre_QC_bam)
         command1 = [
             "picard",
             "SamToFastq",
@@ -3400,67 +3393,60 @@ def bam_to_fastq(out_path: Path, source_path: Path, sample_id: str):
         subprocess.run(command1)
 
 
-def qc_samples(dir, gene, id, source, length, species, barcode_group):
-    """Summary
+def qc_samples(
+    out_path: Path,
+    sample_id: str,
+    length: Union[str, int] = 32,
+    threshold: Union[str, int] = 100,
+):
+    """Perform QC on samples using QUASR and convert to fastq format with perl script.
 
     Parameters
     ----------
-    dir : TYPE
-        Description
-    gene : TYPE
-        Description
-    id : TYPE
-        Description
-    source : TYPE
-        Description
-    length : TYPE
-        Description
-    species : TYPE
-        Description
-    barcode_group : TYPE
-        Description
+    out_path : Path
+        path to output folder
+    sample_id : str
+        name of sample. Also the prefix of the file.
+    length : Union[str, int], optional
+        Minimum read length cutoff
+    threshold : Union[str, int], optional
+        Minimum median-read-quality cutoff
 
-    Returns
-    -------
-    TYPE
-        Description
     """
-    pre = dir + "FASTQ_FILES" / "Sequences_" + id
-    reads1 = pre + "_1.fastq"
-    reads2 = pre + "_2.fastq"
-    quasr_qc_jar_path = EXTPATH / "QUASR_v7.01" / qualityControl.jar
-    print(reads1)
-    print(reads2)
-    threshold, length = "32", "100"
+    reads1 = out_path / f"Sequences_{sample_id}_1.fastq"
+    reads2 = out_path / f"Sequences_{sample_id}_2.fastq"
+    quasr_qc_jar_path = EXTPATH / "QUASR_v7.01" / "qualityControl.jar"
+    print(str(reads1))
+    print(str(reads2))
     cmd1 = [
         "java",
         "-jar",
         str(quasr_qc_jar_path),
         "-f",
-        reads1,
+        str(reads1),
         "-o",
-        pre + "_1",
+        reads1.stem,
         "-m",
-        threshold,
+        str(threshold),
         "-l",
-        length,
+        str(length),
     ]
     cmd2 = [
         "java",
         "-jar",
         str(quasr_qc_jar_path),
         "-f",
-        reads2,
+        str(reads2),
         "-o",
-        pre + "_2",
+        reads2.stem,
         "-m",
-        threshold,
+        str(threshold),
         "-l",
-        length,
+        str(length),
     ]
     cmd3 = [
         "cat",
-        pre + "_1.qc.fq",
+        str(reads1.with_suffix(".qc.fq")),
         "|",
         "perl",
         "-e",
@@ -3471,7 +3457,7 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
     ]
     cmd4 = [
         "cat",
-        pre + "_2.qc.fq",
+        str(reads2.with_suffix(".qc.fq")),
         "|",
         "perl",
         "-e",
@@ -3626,7 +3612,7 @@ R2PATTERN = "_R2_001"
 
 # Commands
 if command_source.count("1") != 0:
-    intialise_files(out_path)
+    intialise_files()
     if (
         len(
             glob(str(Path(source).parent / "*.bam*"))
@@ -3634,7 +3620,7 @@ if command_source.count("1") != 0:
         )
         != 0
     ):
-        bam_to_fastq(out_path, source, sample_id)
+        bam_to_fastq(out_path=out_path, source_path=source, sample_id=sample_id)
     elif (
         len(
             glob(str(Path(source).parent / "*.fastq"))
@@ -3645,10 +3631,15 @@ if command_source.count("1") != 0:
         != 0
     ):
         # rename them to Seqeuence_{sample_id}_1.fastq Seqeuence_{sample_id}_2.fastq
-        prep_fastqs(out_path, source, sample_id, R1PATTERN, R2PATTERN)
-    qc_samples(
-        out_path, gene, sample_id, source, length, species, barcode_group
-    )
+        prep_fastqs(
+            out_path=out_path,
+            source_path=source,
+            sample_id=sample_id,
+            r1pattern=R1PATTERN,
+            r2pattern=R2PATTERN,
+        )
+    qc_samples(out_path=OUTFASTQ, sample_id=sample_id, length=length)
+
 
 # Tip: it is good to check all the fasta files in the FASTQ_FILES directory have
 # been made correctly at this point (with non-zero number of lines)
