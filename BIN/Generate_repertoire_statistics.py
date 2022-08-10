@@ -1,135 +1,4 @@
 #!/usr/bin/env python
-"""Summary
-
-Attributes
-----------
-annot_file : TYPE
-    Description
-annot_file_IMGT : TYPE
-    Description
-annot_file_IMGT3 : TYPE
-    Description
-annot_file_IMGT5 : TYPE
-    Description
-bin_path : TYPE
-    Description
-CDR3_cluster_file : TYPE
-    Description
-CDR3_end_file : TYPE
-    Description
-CDR3_file : TYPE
-    Description
-CDR3_frequency_file : TYPE
-    Description
-CDR3_length_file : TYPE
-    Description
-clonal_selection_file : TYPE
-    Description
-cluster_file : TYPE
-    Description
-cluster_properties_file : TYPE
-    Description
-cluster_size_distribution : TYPE
-    Description
-cluster_statistics : TYPE
-    Description
-codon_file : TYPE
-    Description
-command : TYPE
-    Description
-constant_region : str
-    Description
-constant_region_count_file : TYPE
-    Description
-cRSS_file : TYPE
-    Description
-cRSS_footprint_file : TYPE
-    Description
-custom_reference_blast_file : TYPE
-    Description
-dir : TYPE
-    Description
-edge_file : TYPE
-    Description
-file_D_genes : TYPE
-    Description
-forward_primer_group : TYPE
-    Description
-gene : TYPE
-    Description
-gene_freq_file : TYPE
-    Description
-gene_freq_file2 : TYPE
-    Description
-germline_equiv_file : TYPE
-    Description
-id : TYPE
-    Description
-IMGT_QC_file : TYPE
-    Description
-IMGT_tmp_file : TYPE
-    Description
-isotyper_primer_set : str
-    Description
-largest_cluster_file : TYPE
-    Description
-lib_path : TYPE
-    Description
-loc : TYPE
-    Description
-low_mutational_vj_gene_usage : TYPE
-    Description
-main_path : str
-    Description
-mutational_distribution_file : TYPE
-    Description
-mutational_file : TYPE
-    Description
-network_statistics : TYPE
-    Description
-overall_clonal_ids_file : TYPE
-    Description
-per_chain_repertoire_statistics_file : TYPE
-    Description
-positive_residue_count_file : TYPE
-    Description
-pre_secondary_file : TYPE
-    Description
-pre_seq_file : TYPE
-    Description
-protein_file : TYPE
-    Description
-refd : TYPE
-    Description
-refined_file : TYPE
-    Description
-refj : TYPE
-    Description
-refjp : TYPE
-    Description
-refv : TYPE
-    Description
-refvp : TYPE
-    Description
-region_mutational_file : TYPE
-    Description
-secondary_rearrangement_file_output : TYPE
-    Description
-seq_file : TYPE
-    Description
-seq_length_ditribution : TYPE
-    Description
-species : TYPE
-    Description
-subsample_file : TYPE
-    Description
-syn_to_non_syn_file : TYPE
-    Description
-tmp_file : TYPE
-    Description
-vertex_size_distribution : TYPE
-    Description
-"""
 # import math
 import sys
 import os
@@ -155,7 +24,9 @@ import copy
 # import networkx as nx
 
 # set up some default paths
-main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+# TODO: need to get rid of these paths
+# main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+main_path = ""
 bin_path = main_path + "BIN/"
 lib_path = main_path + "LIBRARY/"
 if not os.path.exists(bin_path):

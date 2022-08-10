@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-"""Summary
-"""
 import os
 from subprocess import call
 

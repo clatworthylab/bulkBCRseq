@@ -1,17 +1,4 @@
 #!/usr/bin/python
-"""Summary
-
-Attributes
-----------
-args : TYPE
-    Description
-mem : TYPE
-    Description
-queue : str
-    Description
-span : str
-    Description
-"""
 # import math
 import sys
 
