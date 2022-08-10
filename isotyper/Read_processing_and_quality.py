@@ -3446,29 +3446,23 @@ def qc_samples(
         str(length),
     ]
     cmd3 = [
-        "cat",
-        str(reads1.with_suffix(".qc.fq")),
-        "|",
         "perl",
         "-e",
         PERLCMD,
-        ">",
-        str(reads1.with_suffix(".fasta")),
     ]
-    cmd4 = [
-        "cat",
-        str(reads2.with_suffix(".qc.fq")),
-        "|",
-        "perl",
-        "-e",
-        PERLCMD,
-        ">",
-        str(reads2.with_suffix(".fasta")),
-    ]
+
     subprocess.run(cmd1)
     subprocess.run(cmd2)
-    subprocess.run(cmd3)
-    subprocess.run(cmd4)
+    subprocess.run(
+        cmd3,
+        stdin=open(reads1.with_suffix(".qc.fq"), "r"),
+        stdout=open(reads1.with_suffix(".fasta"), "w"),
+    )
+    subprocess.run(
+        cmd3,
+        stdin=open(reads2.with_suffix(".qc.fq"), "r"),
+        stdout=open(reads2.with_suffix(".fasta"), "w"),
+    )
 
 
 def prep_fastqs(out_path, source_path, sample_id, r1pattern, r2pattern):
