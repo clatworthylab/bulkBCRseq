@@ -410,8 +410,8 @@ def get_primers_split(rc, primer_file):
                     or header.count("REV_CONST") != 0
                     or header.count("REVERSE") != 0
                 ):
-                    if header.count("REV_CONST") != 0:
-                        inside = 1
+                    # if header.count("REV_CONST") != 0:
+                    #     inside = 1
                     if sequence.count("N") != 0:
                         barcoded_j = 1
                     sequence = sequence.upper()
@@ -446,8 +446,8 @@ def get_primers_split(rc, primer_file):
                     or header.count("REV_CONST") != 0
                     or header.count("REVERSE") != 0
                 ):
-                    if header.count("CONST") != 0:
-                        inside = 1
+                    # if header.count("CONST") != 0:
+                    #     inside = 1
                     if sequence.count("N") != 0:
                         barcoded_j = 1
                     sequence = sequence.upper()
@@ -466,8 +466,8 @@ def get_primers_split(rc, primer_file):
                     clas = "IMMUNE_REC"
                     v_ref = v_ref + [[sequence, clas, header, words]]
     fh.close()
-    _ = inside
-    _ = _
+    # _ = inside
+    # _ = _
     return (forward, reverse, barcoded_j, barcoded_v, v_ref)
 
 
