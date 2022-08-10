@@ -3453,8 +3453,7 @@ def qc_samples(
         "-e",
         PERLCMD,
         ">",
-        pre,
-        "_1.fasta",
+        str(reads1.with_suffix(".fasta")),
     ]
     cmd4 = [
         "cat",
@@ -3464,8 +3463,7 @@ def qc_samples(
         "-e",
         PERLCMD,
         ">",
-        pre,
-        "_2.fasta",
+        str(reads2.with_suffix(".fasta")),
     ]
     subprocess.run(cmd1)
     subprocess.run(cmd2)
