@@ -3411,10 +3411,10 @@ def bam_to_fastq(dir, source, id):
     id : TYPE
         Description
     """
-    if source.count("am") != 0:
+    if len(glob("*.bam") + glob("*.cram")) != 0:
         pre_QC_fastq = dir + "FASTQ_FILES/Sequences_" + id + "#.fastq"
         pre_QC_bam = dir + "FASTQ_FILES/Sequences_" + id + ".bam"
-        if source.count("cram") != 0:
+        if len(glob("*.cram")) != 0:
             cram_to_fastq(dir, source, id, pre_QC_bam)
             source = pre_QC_bam
         command1 = "bam2fastq --force -o {} {}".format(pre_QC_fastq, source)
