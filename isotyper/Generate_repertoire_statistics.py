@@ -8,7 +8,7 @@ import time
 from copy import deepcopy
 from operator import itemgetter
 
-from utilities import (
+from isotyper.utilities import (
     Tree,
     fasta_iterator,
     create_file,
