@@ -10,7 +10,7 @@ import networkx as nx
 from glob import glob
 from operator import itemgetter, add
 from pathlib import Path
-from typing import Union
+from typing import Union, Tuple
 
 from isotyper.utilities import *
 
@@ -3576,7 +3576,12 @@ if command_source.count("1") != 0:
             r1pattern=R1PATTERN,
             r2pattern=R2PATTERN,
         )
-    qc_samples(out_path=OUTFASTQ, sample_id=sample_id, min_length=length)
+    qc_samples(
+        out_path=OUTFASTQ,
+        sample_id=sample_id,
+        min_length=length,
+        min_threshold=MIN_QUAL,
+    )
 
 
 # Tip: it is good to check all the fasta files in the FASTQ_FILES directory have
