@@ -3397,8 +3397,8 @@ def bam_to_fastq(out_path: Path, source_path: Path, sample_id: str):
 def qc_samples(
     out_path: Path,
     sample_id: str,
-    length: Union[str, int] = 32,
-    threshold: Union[str, int] = 100,
+    length: Union[str, int] = 100,
+    threshold: Union[str, int] = 32,
 ):
     """Perform QC on samples using QUASR and convert to fasta file with perl script.
 
