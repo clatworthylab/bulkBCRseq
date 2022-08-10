@@ -13,8 +13,11 @@ PERLCMD = "$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/
 
 
 class Tree(defaultdict):
+    """Tree data structure for nested dictionaries."""
+
     def __init__(self, value=None):
-        """Tree data structure for nested dictionaries
+        """Initialise tree.
+
         Parameters
         ----------
         value : None, optional
