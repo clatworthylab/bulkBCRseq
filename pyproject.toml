@@ -42,12 +42,13 @@ color = true
 [tool.coverage.run]
 parallel = true
 include = [
-    "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py",
+    "isotyper/Network_generation_from_full_reduced_fasta.py",
+    "isotyper/Read_processing_and_quality.py",
     "Processing_sequences_large_scale.py",
 
 ]
 omit = [
-    "orphan/*",
+    "tests/*",
 ]
 
 [tool.coverage.report]
