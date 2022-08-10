@@ -3627,13 +3627,11 @@ edge_lengths = 0.85
 tmp_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/NN_Tmp_cluster_" + id + "."
 read_number_division = "__"
 # Reference files
-refv = lib_path + "Reference_nn_" + species + "_" + gene + "V.fasta"
-refj = lib_path + "Reference_nn_" + species + "_" + gene + "J.fasta"
-refvp = lib_path + "Reference_protein_" + species + "_" + gene + "V.fasta"
-refjp = lib_path + "Reference_protein_" + species + "_" + gene + "J.fasta"
-ref_const = (
-    lib_path + "Reference_nn_" + species + "_" + gene + "_constant_exon1.fasta"
-)
+refv = str(LIBPATH / f"Reference_nn_{species}_{gene}V.fasta")
+refj = str(LIBPATH / f"Reference_nn_{species}_{gene}J.fasta")
+refvp = str(LIBPATH / f"Reference_protein_{species}_{gene}V.fasta")
+refjp = str(LIBPATH / f"Reference_protein_{species}_{gene}J.fasta")
+ref_const = str(LIBPATH / f"Reference_nn_{species}_{gene}_constant_exon1.fasta")
 
 
 # change here if necessary
