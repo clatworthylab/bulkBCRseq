@@ -200,7 +200,8 @@ elif len(args) == 7:
         )
     except:
         (ids_, samples_, directories_) = Get_info_concat(concat_file)
-    dir_source_code = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+    # dir_source_code = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+    dir_source_code = ""
     idss, dirss = "", ""
     commands = []
     for i in range(0, len(samples_)):
@@ -237,7 +238,7 @@ elif len(args) == 7:
         if "3.5" in command:
             command1 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/Network_generation_from_fully_reduced_fasta.py "
                 + directory_
                 + " "
@@ -250,7 +251,7 @@ elif len(args) == 7:
             if "dwnsamp_" in locals():
                 command1 = (
                     "python "
-                    + dir_source_code
+                    # + dir_source_code
                     + "BIN/Network_generation_from_fully_reduced_fasta_V2.py "
                     + directory_
                     + " "
@@ -263,7 +264,7 @@ elif len(args) == 7:
             else:
                 command1 = (
                     "python "
-                    + dir_source_code
+                    # + dir_source_code
                     + "BIN/Network_generation_from_fully_reduced_fasta_V2.py "
                     + directory_
                     + " "
@@ -321,14 +322,14 @@ else:
         reverse_primer_group,
     ) = Get_info(file)
     print(dir)
-    dir_source_code = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
-    if not os.path.exists(dir_source_code):
-        dir_source_code = os.getcwd()
-    if not dir_source_code.endswith("/"):
-        dir_source_code = dir_source_code + "/"
+    # dir_source_code = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
+    # if not os.path.exists(dir_source_code):
+    #     dir_source_code = os.getcwd()
+    # if not dir_source_code.endswith("/"):
+    #     dir_source_code = dir_source_code + "/"
 
-    if not os.path.exists(dir_source_code):
-        raise OSError("Cannot locate path to source code directory.")
+    # if not os.path.exists(dir_source_code):
+    #     raise OSError("Cannot locate path to source code directory.")
 
     idss, dirss = "", ""
     commands = []
@@ -377,7 +378,7 @@ else:
         if "1" in command:
             command1 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/Read_processing_and_quality.py "
                 + dir
                 + " "
@@ -407,7 +408,7 @@ else:
         if "2" in command:
             command1 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/Read_processing_and_quality.py "
                 + dir
                 + " "
@@ -437,7 +438,7 @@ else:
         if "3" in command:
             command1 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/Read_processing_and_quality.py "
                 + dir
                 + " "
@@ -467,7 +468,7 @@ else:
         if "4" in command:
             command2 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/Generate_repertoire_statistics.py "
                 + dir
                 + "ORIENTATED_SEQUENCES/ANNOTATIONS/ "
@@ -495,7 +496,7 @@ else:
         if "4.5" in command:
             command3 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/Local_immune_repertoire_annotator.py "
                 + dir
                 + "ORIENTATED_SEQUENCES/ANNOTATIONS/TEST/ "
@@ -513,7 +514,7 @@ else:
         if "ISO1" in command:
             command1 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/IsoTyper_1.0.py "
                 + id
                 + " "
@@ -529,7 +530,7 @@ else:
         if "NONISO1" in command:
             command1 = (
                 "python "
-                + dir_source_code
+                # + dir_source_code
                 + "BIN/Non_isotyper_1.0.py "
                 + id
                 + " "
@@ -554,7 +555,7 @@ else:
     if "10" in command:
         command10 = (
             "python "
-            + dir_source_code
+            # + dir_source_code
             + "BIN/Get_figure_params.py "
             + dirss
             + " "
@@ -566,7 +567,7 @@ else:
     if "10.5" in command:
         command10 = (
             "python "
-            + dir_source_code
+            # + dir_source_code
             + "BIN/Get_coloured_figures.py "
             + dirss
             + " "
