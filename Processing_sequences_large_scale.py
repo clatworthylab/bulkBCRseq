@@ -186,9 +186,6 @@ elif len(args) == 7:
         )
     except:
         (ids_, samples_, directories_) = Get_info_concat(concat_file)
-    # dir_source_code = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
-    dir_source_code = ""
-    idss, dirss = "", ""
     commands = []
     for i in range(0, len(samples_)):
         if "downsample_" in locals():
@@ -224,8 +221,7 @@ elif len(args) == 7:
         if "3.5" in command:
             command1 = (
                 "python "
-                # + dir_source_code
-                + "BIN/Network_generation_from_fully_reduced_fasta.py "
+                + "isotyper/Network_generation_from_fully_reduced_fasta.py "
                 + directory_
                 + " "
                 + id_
@@ -237,8 +233,7 @@ elif len(args) == 7:
             if "dwnsamp_" in locals():
                 command1 = (
                     "python "
-                    # + dir_source_code
-                    + "BIN/Network_generation_from_fully_reduced_fasta_V2.py "
+                    + "isotyper/Network_generation_from_fully_reduced_fasta_V2.py "
                     + directory_
                     + " "
                     + id_
@@ -250,8 +245,7 @@ elif len(args) == 7:
             else:
                 command1 = (
                     "python "
-                    # + dir_source_code
-                    + "BIN/Network_generation_from_fully_reduced_fasta_V2.py "
+                    + "isotyper/Network_generation_from_fully_reduced_fasta_V2.py "
                     + directory_
                     + " "
                     + id_
@@ -308,16 +302,6 @@ else:
         reverse_primer_group,
     ) = Get_info(file)
     print(dir)
-    # dir_source_code = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
-    # if not os.path.exists(dir_source_code):
-    #     dir_source_code = os.getcwd()
-    # if not dir_source_code.endswith("/"):
-    #     dir_source_code = dir_source_code + "/"
-
-    # if not os.path.exists(dir_source_code):
-    #     raise OSError("Cannot locate path to source code directory.")
-
-    idss, dirss = "", ""
     commands = []
     for i in range(0, len(samples)):
         (
@@ -364,8 +348,7 @@ else:
         if "1" in command:
             command1 = (
                 "python "
-                # + dir_source_code
-                + "BIN/Read_processing_and_quality.py "
+                + "isotyper/Read_processing_and_quality.py "
                 + dir
                 + " "
                 + id
@@ -394,8 +377,7 @@ else:
         if "2" in command:
             command1 = (
                 "python "
-                # + dir_source_code
-                + "BIN/Read_processing_and_quality.py "
+                + "isotyper/Read_processing_and_quality.py "
                 + dir
                 + " "
                 + id
@@ -424,8 +406,7 @@ else:
         if "3" in command:
             command1 = (
                 "python "
-                # + dir_source_code
-                + "BIN/Read_processing_and_quality.py "
+                + "isotyper/Read_processing_and_quality.py "
                 + dir
                 + " "
                 + id
@@ -454,8 +435,7 @@ else:
         if "4" in command:
             command2 = (
                 "python "
-                # + dir_source_code
-                + "BIN/Generate_repertoire_statistics.py "
+                + "isotyper/Generate_repertoire_statistics.py "
                 + dir
                 + "ORIENTATED_SEQUENCES/ANNOTATIONS/ "
                 + id
@@ -479,29 +459,10 @@ else:
                 + reverse_primer_group[i]
             )
             commands.append(bsub + command2)
-        if "4.5" in command:
-            command3 = (
-                "python "
-                # + dir_source_code
-                + "BIN/Local_immune_repertoire_annotator.py "
-                + dir
-                + "ORIENTATED_SEQUENCES/ANNOTATIONS/TEST/ "
-                + id
-                + " "
-                + dir
-                + "ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_"
-                + id
-                + ".fasta "
-                + gene_types
-                + " "
-                + species
-            )
-            commands.append(bsub + command3)
         if "ISO1" in command:
             command1 = (
                 "python "
-                # + dir_source_code
-                + "BIN/IsoTyper_1.0.py "
+                + "isotyper/IsoTyper_1.0.py "
                 + id
                 + " "
                 + id
@@ -513,64 +474,16 @@ else:
                 + reverse_primer_group[i]
             )
             commands.append(bsub + command1)
-        if "NONISO1" in command:
-            command1 = (
-                "python "
-                # + dir_source_code
-                + "BIN/Non_isotyper_1.0.py "
-                + id
-                + " "
-                + id
-                + " "
-                + dir
-                + " "
-                + species
-                + " "
-            )
-            commands.append(bsub + command1)
-        idss, dirss = (
-            idss + "," + id,
-            dirss + "," + dir + "ORIENTATED_SEQUENCES/",
-        )
-        # if("5" in command): ## Generate separate network plots
-        #  desc = file.replace("Samples_","").replace(".txt","")
-        #  command10 = "python BIN/Get_figure_params.py "+dir+"ORIENTATED_SEQUENCES/ "+desc+"_"+id+" "+id
-        #  commands.append(bsub+command10)
-    idss, dirss = idss[1 : len(idss)], dirss[1 : len(dirss)]
-    desc = file.replace("Samples_", "").replace(".txt", "")
-    if "10" in command:
-        command10 = (
-            "python "
-            # + dir_source_code
-            + "BIN/Get_figure_params.py "
-            + dirss
-            + " "
-            + desc
-            + " "
-            + idss
-        )
-        commands.append(bsub + command10)
-    if "10.5" in command:
-        command10 = (
-            "python "
-            # + dir_source_code
-            + "BIN/Get_coloured_figures.py "
-            + dirss
-            + " "
-            + desc
-            + " "
-            + idss
-        )
-        commands.append(bsub + command10)
-    if "11" in command:
-        command11 = (
-            "R CMD BATCH "
-            + dirs[0]
-            + "ORIENTATED_SEQUENCES/Network_generation_"
-            + desc
-            + ".R"
-        )
-        commands.append(bsub + command11)
+    # desc = file.replace("Samples_", "").replace(".txt", "")
+    # if "11" in command:
+    #     command11 = (
+    #         "R CMD BATCH "
+    #         + dirs[0]
+    #         + "ORIENTATED_SEQUENCES/Network_generation_"
+    #         + desc
+    #         + ".R"
+    #     )
+    #     commands.append(bsub + command11)
     for comm in commands:
         if print_command == "Y":
             print(comm, "\n")
