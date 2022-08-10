@@ -26,7 +26,6 @@ __all__ = [
     "fasta_iterator",
     "fuzzy_substring",
     "get_codons",
-    "init_rc",
     "reverse_comp",
     "translate",
     "Tree",
