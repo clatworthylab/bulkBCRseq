@@ -9,7 +9,7 @@ from isotyper.utilities._utils import (
     init_rc,
     LIBPATH,
     PERLCMD,
-    READ_NUMBER_DIVISION
+    READ_NUMBER_DIVISION,
     reverse_comp,
     translate,
     Tree,
@@ -26,7 +26,7 @@ __all__ = [
     "init_rc",
     "LIBPATH",
     "PERLCMD",
-    "READ_NUMBER_DIVISIO"N
+    "READ_NUMBER_DIVISION",
     "reverse_comp",
     "translate",
     "Tree",
