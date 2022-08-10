@@ -3,19 +3,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Tuple, Dict
 
-from isotyper import __path__
-
-# specify global variables
-
-ISOTYPERPREFIX = Path(__path__[0])
-# set up some default paths
-LIBPATH = ISOTYPERPREFIX / "library"
-EXTPATH = ISOTYPERPREFIX / "external"
-PERLCMD = "$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}"
-
-EDGE_LENGTHS = 0.85
-READ_NUMBER_DIVISION = "__"
-
 
 class Tree(defaultdict):
     """Tree data structure for nested dictionaries."""

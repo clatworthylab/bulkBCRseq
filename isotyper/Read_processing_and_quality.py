@@ -13,6 +13,16 @@ from pathlib import Path
 from typing import Union
 
 from isotyper.utilities import *
+from isotyper import __path__
+
+# specify global variables
+ISOTYPERPREFIX = Path(__path__[0])
+LIBPATH = ISOTYPERPREFIX / "library"
+EXTPATH = ISOTYPERPREFIX / "external"
+PERLCMD = "$i=0;while(<>){if(/^\@/&&$i==0){s/^\@/\>/;print;}elsif($i==1){s/\./N/g;print;$i=-3}$i++;}"
+
+EDGE_LENGTHS = 0.85
+READ_NUMBER_DIVISION = "__"
 
 
 def reduce_sequences(trim2, trim3, primer_file):
