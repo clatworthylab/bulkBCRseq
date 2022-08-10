@@ -3425,7 +3425,7 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
     TYPE
         Description
     """
-    pre = dir + "FASTQ_FILES/Sequences_" + id
+    pre = dir + "FASTQ_FILES" / "Sequences_" + id
     reads1 = pre + "_1.fastq"
     reads2 = pre + "_2.fastq"
     quasr_qc_jar_path = EXTPATH / "QUASR_v7.01" / qualityControl.jar
@@ -3557,8 +3557,8 @@ def copy_prepped_fastq(
 
 
 ###########################
-dir = sys.argv[1]
-id = sys.argv[2]
+out_path = Path(sys.argv[1])
+sample_id = sys.argv[2]
 barcode_group = sys.argv[3]
 gene = sys.argv[4]
 paired = sys.argv[5]
@@ -3574,58 +3574,45 @@ if len(sys.argv) > 13:
 else:
     reverse_primer_group = "OTHER"
 print("Reverse primer group: ", reverse_primer_group)
+
+OUTFASTQ = out_path / "FASTQ_FILES"
+OUTORTSEQ = out_path / "ORIENTATED_SEQUENCES"
+OUTORTSEQTMP = OUTORTSEQ / "TMP"
+OUTNET = OUTORTSEQ / "NETWORKS"
+
 # Files for QC and filtering
-Seq_file1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fasta"
-Seq_file2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fasta"
-tmp_Tmp_file = dir + "ORIENTATED_SEQUENCES/TMP/Untrimmed_" + id + ".fasta"
-trim1 = dir + "ORIENTATED_SEQUENCES/TMP/trimmed_orientated_all_" + id + ".fasta"
-trim2 = dir + "ORIENTATED_SEQUENCES/TMP/Filtered_J_" + id + ".fasta"
-trim3 = dir + "ORIENTATED_SEQUENCES/TMP/Filtered_reduced_" + id + ".fasta"
-Fail_file = dir + "FASTQ_FILES/Fail_filtered_" + id + ".fasta"
+Seq_file1 = OUTFASTQ / f"Sequences_{sample_id}_1.fasta"
+Seq_file2 = OUTFASTQ / f"Sequences_{sample_id}_2.fasta"
+tmp_Tmp_file = OUTORTSEQTMP / f"Untrimmed_{sample_id}.fasta"
+trim1 = OUTORTSEQTMP / f"trimmed_orientated_all_{sample_id}.fasta"
+trim2 = OUTORTSEQTMP / f"Filtered_J_{sample_id}.fasta"
+trim3 = OUTORTSEQTMP / f"Filtered_reduced_{sample_id}.fasta"
+Fail_file = OUTFASTQ / f"Fail_filtered_{sample_id}.fasta"
 primer_tag_file = (
-    dir
-    + "ORIENTATED_SEQUENCES/TMP/Barcode_filtering_information_"
-    + id
-    + ".txt"
+    OUTORTSEQTMP / f"Barcode_filtering_information_{sample_id}.txt"
 )
-primer_tag_file_count = (
-    dir + "ORIENTATED_SEQUENCES/TMP/All_barcodes_" + id + ".txt"
-)
-Filtered_out1 = (
-    dir + "ORIENTATED_SEQUENCES/Filtered_ORFs_sequences_all_" + id + ".fasta"
-)
+primer_tag_file_count = OUTORTSEQTMP / f"All_barcodes_{sample_id}.txt"
+Filtered_out1 = OUTORTSEQ / f"Filtered_ORFs_sequences_all_{sample_id}.fasta"
 nn_orf_filtered = (
-    dir + "ORIENTATED_SEQUENCES/Nucleotide_ORF_filtered_all_" + id + ".fasta"
+    OUTORTSEQ / f"Nucleotsample_ide_ORF_filtered_all_{sample_id}.fasta"
 )
-tmp_file_orf = dir + "ORIENTATED_SEQUENCES/TMP/Blast_matching_" + id
-filtering_report = dir + "ORIENTATED_SEQUENCES/Filtering_report_" + id + ".txt"
+tmp_file_orf = OUTORTSEQTMP / f"Blast_matching_{sample_id}"
+filtering_report = OUTORTSEQ / f"Filtering_report_{sample_id}.txt"
 # Files for clustering
-att_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/Vertex_relations_" + id + ".txt"
-file_vertex = dir + "ORIENTATED_SEQUENCES/NETWORKS/Att_" + id + ".txt"
-file_edges = dir + "ORIENTATED_SEQUENCES/NETWORKS/Edges_" + id + ".txt"
-cluster_file = (
-    dir + "ORIENTATED_SEQUENCES/NETWORKS/Cluster_identities_" + id + ".txt"
-)
-Reduced_file = (
-    dir + "ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_" + id + ".fasta"
-)
-checked_edges = (
-    dir + "ORIENTATED_SEQUENCES/NETWORKS/Checked_edges_" + id + ".txt"
-)
-plot_ids_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/Plot_ids_" + id + ".txt"
-file_seqs = dir + "ORIENTATED_SEQUENCES/NETWORKS/Sequences_" + id + ".txt"
-tmp_file0 = dir + "ORIENTATED_SEQUENCES/NETWORKS/Decon_0_" + id + ".txt"
-tmp_reduced_sequences = (
-    dir
-    + "ORIENTATED_SEQUENCES/NETWORKS/Primary_reduced_sequences"
-    + id
-    + ".fasta"
-)
-tmp_pre = dir + "ORIENTATED_SEQUENCES/NETWORKS/Pre_tmp_" + id
-tmp_file_1 = dir + "ORIENTATED_SEQUENCES/NETWORKS/NN_Tmp_cluster_" + id + ".1"
-edge_lengths = 0.85
-tmp_file = dir + "ORIENTATED_SEQUENCES/NETWORKS/NN_Tmp_cluster_" + id + "."
-read_number_division = "__"
+att_file = OUTNET / f"Vertex_relations_{sample_id}.txt"
+file_vertex = OUTNET / f"Att_{sample_id}.txt"
+file_edges = OUTNET / f"Edges_{sample_id}.txt"
+cluster_file = OUTNET / f"Cluster_sample_identities_{sample_id}.txt"
+Reduced_file = OUTNET / f"Fully_reduced_{sample_id}.fasta"
+checked_edges = OUTNET / f"Checked_edges_{sample_id}.txt"
+plot_sample_ids_file = OUTNET / f"Plot_sample_ids_{sample_id}.txt"
+file_seqs = OUTNET / f"Sequences_{sample_id}.txt"
+tmp_file0 = OUTNET / f"Decon_0_{sample_id}.txt"
+tmp_pre = OUTNET / "Pre_tmp_{sample_id}"
+tmp_file_1 = OUTNET / f"NN_Tmp_cluster_{sample_id}.1"
+
+tmp_file = OUTNET / f"NN_Tmp_cluster_{sample_id}."
+
 # Reference files
 refv = str(LIBPATH / f"Reference_nn_{species}_{gene}V.fasta")
 refj = str(LIBPATH / f"Reference_nn_{species}_{gene}J.fasta")
@@ -3633,14 +3620,13 @@ refvp = str(LIBPATH / f"Reference_protein_{species}_{gene}V.fasta")
 refjp = str(LIBPATH / f"Reference_protein_{species}_{gene}J.fasta")
 ref_const = str(LIBPATH / f"Reference_nn_{species}_{gene}_constant_exon1.fasta")
 
-
 # change here if necessary
 R1PATTERN = "_R1_001"
 R2PATTERN = "_R2_001"
 
 # Commands
 if command_source.count("1") != 0:
-    intialise_files(dir)
+    intialise_files(out_path)
     if (
         len(
             glob(str(Path(source).parent / "*.bam*"))
@@ -3648,7 +3634,7 @@ if command_source.count("1") != 0:
         )
         != 0
     ):
-        bam_to_fastq(dir, source, id)
+        bam_to_fastq(out_path, source, sample_id)
     elif (
         len(
             glob(str(Path(source).parent / "*.fastq"))
@@ -3658,9 +3644,11 @@ if command_source.count("1") != 0:
         )
         != 0
     ):
-        # rename them to Seqeuence_{id}_1.fastq Seqeuence_{id}_2.fastq
-        prep_fastqs(dir, source, id, R1PATTERN, R2PATTERN)
-    qc_samples(dir, gene, id, source, length, species, barcode_group)
+        # rename them to Seqeuence_{sample_id}_1.fastq Seqeuence_{sample_id}_2.fastq
+        prep_fastqs(out_path, source, sample_id, R1PATTERN, R2PATTERN)
+    qc_samples(
+        out_path, gene, sample_id, source, length, species, barcode_group
+    )
 
 # Tip: it is good to check all the fasta files in the FASTQ_FILES directory have
 # been made correctly at this point (with non-zero number of lines)
@@ -3669,7 +3657,7 @@ if command_source.count("1") != 0:
 if command_source.count("2") != 0:
     if gene.count("IG") != 0:
         get_paired_reads_overlapping(
-            Seq_file1, Seq_file2, tmp_Tmp_file, gene, paired, id, method
+            Seq_file1, Seq_file2, tmp_Tmp_file, gene, paired, sample_id, method
         )
         trim_sequences_bcr_tcr(
             tmp_Tmp_file,
@@ -3682,7 +3670,7 @@ if command_source.count("2") != 0:
             primer_tag_file,
             tmp_file,
             primer_tag_file_count,
-            id,
+            sample_id,
             ref_const,
             reverse_primer_group,
         )
@@ -3699,7 +3687,7 @@ if command_source.count("2") != 0:
             trim3,
             Filtered_out1,
             nn_orf_filtered,
-            dir,
+            out_path,
             gene,
             refv,
             refj,
@@ -3714,10 +3702,10 @@ if command_source.count("2") != 0:
             trim1,
             nn_orf_filtered,
             filtering_report,
-            id,
+            sample_id,
             species,
             gene,
-            dir,
+            out_path,
             primer_tag_file_count,
             primer_file,
             method,
@@ -3727,7 +3715,7 @@ if command_source.count("2") != 0:
 # Clustering reads
 if command_source.count("3") != 0:
     generate_networks(
-        nn_orf_filtered, tmp_file_1, edge_lengths, tmp_file, att_file
+        nn_orf_filtered, tmp_file_1, EDGE_LENGTHS, tmp_file, att_file
     )
     deconvolute_edges(
         nn_orf_filtered,
@@ -3736,8 +3724,8 @@ if command_source.count("3") != 0:
         file_seqs,
         tmp_file0,
         file_edges,
-        read_number_division,
+        READ_NUMBER_DIVISION,
     )
     get_network_clusters(file_vertex, file_edges, cluster_file)
-    reduce_identical_sequences(Reduced_file, file_vertex, read_number_division)
+    reduce_identical_sequences(Reduced_file, file_vertex, READ_NUMBER_DIVISION)
     get_network_input(cluster_file, plot_ids_file, file_edges, checked_edges)
