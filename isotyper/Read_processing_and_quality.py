@@ -3279,7 +3279,6 @@ from isotyper.utilities._args import (
     OUT_ORTSEQ,
     OUT_ORTSEQ_TMP,
     OUT_PATH,
-    PRIMER_FILE,
     SAMPLE_ID,
     SOURCE,
 )
