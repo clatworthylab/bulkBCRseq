@@ -42,9 +42,10 @@ color = true
 [tool.coverage.run]
 parallel = true
 include = [
-    "isotyper/Network_generation_from_full_reduced_fasta.py",
-    "isotyper/Read_processing_and_quality.py",
-    "Processing_sequences_large_scale.py",
+    "bulkBCRseq/isotyper/Network_generation_from_full_reduced_fasta.py",
+    "bulkBCRseq/isotyper/Read_processing_and_quality.py",
+    "bulkBCRseq/isotyper/Generate_repertoire_statistics.py",
+    "bulkBCRseq/Processing_sequences_large_scale.py",
 
 ]
 omit = [
