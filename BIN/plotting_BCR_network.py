@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-"""Summary
-"""
 import sys
 import pandas as pd
 import numpy as np

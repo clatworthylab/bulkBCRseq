@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-"""Summary
-"""
 import re
 import networkx as nx
 from operator import itemgetter, add

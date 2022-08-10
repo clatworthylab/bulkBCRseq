@@ -1,58 +1,16 @@
 #!/usr/bin/env python
-"""Summary
-
-Attributes
-----------
-att_file : TYPE
-    Description
-bin_path : str
-    Description
-checked_edges : TYPE
-    Description
-cluster_file : TYPE
-    Description
-concat_names : TYPE
-    Description
-dir : TYPE
-    Description
-edge_lengths : float
-    Description
-file_edges : TYPE
-    Description
-file_seqs : TYPE
-    Description
-file_vertex : TYPE
-    Description
-id : TYPE
-    Description
-lib_path : str
-    Description
-plot_ids_file : TYPE
-    Description
-read_number_division : str
-    Description
-Reduced_file : TYPE
-    Description
-tmp_file : TYPE
-    Description
-tmp_file0 : TYPE
-    Description
-tmp_file1 : TYPE
-    Description
-tmp_pre : TYPE
-    Description
-tmp_reduced_sequences : TYPE
-    Description
-"""
 import sys
 import os
 from collections import defaultdict
 
+# TODO: need to get rid of these paths
 # sys.path.append('/lustre/scratch118/infgen/team146/rbr1/BCR_TCR_REPERTOIRE_FILTERING_PIPELINE/BIN/')
 # sys.path.append('/nfs/users/nfs_k/kt16/BCRSeq/BIN/')
 # sys.path.append('/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/')
-bin_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/"
-lib_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/"
+# bin_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/"
+# lib_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/"
+bin_path = "BIN/"
+lib_path = "LIBRARY/"
 if not os.path.exists(bin_path):
     bin_path = os.getcwd() + "/BIN/"
 if not os.path.exists(bin_path):
