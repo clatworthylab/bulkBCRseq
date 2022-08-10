@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from pathlib import Path
 from isotyper import __path__
-from isotyper.utilities_args import ORG
+from isotyper.utilities._args import ORG
 
 ISOTYPERPREFIX = Path(__path__[0])
 # set up some default paths
