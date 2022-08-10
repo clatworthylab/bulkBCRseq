@@ -3279,6 +3279,7 @@ from isotyper.utilities._args import (
     OUT_ORTSEQ,
     OUT_ORTSEQ_TMP,
     OUT_PATH,
+    PRIMER_FILE,
     SAMPLE_ID,
     SOURCE,
 )
@@ -3291,7 +3292,7 @@ paired = sys.argv[5]
 # species = sys.argv[6]
 # source = sys.argv[7]
 length = sys.argv[8]
-primer_file = sys.argv[9]
+# primer_file = sys.argv[9]
 method = sys.argv[10]
 command_source = sys.argv[11]
 command_source = command_source.split(",")
@@ -3363,7 +3364,7 @@ if command_source.count("2") != 0:
             gene,
             paired,
             species,
-            primer_file,
+            PRIMER_FILE,
             primer_tag_file,
             tmp_file,
             primer_tag_file_count,
@@ -3375,11 +3376,11 @@ if command_source.count("2") != 0:
             trim1,
             trim2,
             refj,
-            primer_file,
+            PRIMER_FILE,
             ref_const,
             primer_tag_file_count,
         )
-        reduce_sequences(trim2, trim3, primer_file)
+        reduce_sequences(trim2, trim3, PRIMER_FILE)
         orf_calculation_single(
             trim3,
             Filtered_out1,
@@ -3404,7 +3405,7 @@ if command_source.count("2") != 0:
             gene,
             out_path,
             primer_tag_file_count,
-            primer_file,
+            PRIMER_FILE,
             method,
             barcode_group,
         )

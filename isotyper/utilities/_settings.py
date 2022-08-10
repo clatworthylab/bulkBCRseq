@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from pathlib import Path
 from isotyper import __path__
+from isotyper.utilities_args import ORG
 
 ISOTYPERPREFIX = Path(__path__[0])
 # set up some default paths
@@ -24,3 +25,4 @@ MIN_QUAL = 32
 # change here if necessary
 R1PATTERN = "_R1_001"
 R2PATTERN = "_R2_001"
+PRIMER_FILE = LIBPATH / f"Primers_{ORG}_IG_RBR_Constant_region_MPLX_table.txt"
