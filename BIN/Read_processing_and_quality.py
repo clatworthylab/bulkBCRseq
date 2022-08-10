@@ -6,6 +6,7 @@ import subprocess
 from functions import *
 import sys
 import os
+from glob import glob
 
 # set up some default paths
 # main_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/"
@@ -3523,7 +3524,7 @@ def qc_samples(dir, gene, id, source, length, species, barcode_group):
     return ()
 
 
-def prep_fastqs(dir, source, id, r1pattern):
+def prep_fastqs(dir, source, id, r1pattern, r2pattern):
     """Prepare fastqs for input into the script.
 
     Parameters
@@ -3535,11 +3536,13 @@ def prep_fastqs(dir, source, id, r1pattern):
     id : str
         name of sample.
     r1pattern : str
-        suffix pattern before .fastq to try and match
+        suffix pattern before .fastq to try and match for R1
+    r2pattern : str
+        suffix pattern before .fastq to try and match for R2
     """
     if source.count(r1pattern) != 0:
         r1_original = source
-        r2_original = re.sub(r1pattern, "_R2_001", source)
+        r2_original = re.sub(r1pattern, r2pattern, source)
     if source.count(".gz") != 0:
         new_r1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fastq.gz"
         new_r2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fastq.gz"
@@ -3639,15 +3642,24 @@ ref_const = (
 
 # change here if necessary
 R1PATTERN = "_R1_001"
+R2PATTERN = "_R2_001"
 
 # Commands
 if command_source.count("1") != 0:
     intialise_files(dir)
-    if source.count("am") != 0:
+    if len(glob("*.bam") + glob("*.cram")) != 0:
         bam_to_fastq(dir, source, id)
-    elif (source.count(".fastq") != 0) or (source.count(".fq") != 0):
+    elif (
+        len(
+            glob("*.fastq")
+            + glob("*.fastq.gz")
+            + glob("*.fq*")
+            + glob("*.fq.gz")
+        )
+        != 0
+    ):
         # rename them to Seqeuence_{id}_1.fastq Seqeuence_{id}_2.fastq
-        prep_fastqs(dir, source, id, R1PATTERN)
+        prep_fastqs(dir, source, id, R1PATTERN, R2PATTERN)
     qc_samples(dir, gene, id, source, length, species, barcode_group)
 
 # Tip: it is good to check all the fasta files in the FASTQ_FILES directory have
