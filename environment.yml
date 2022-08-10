@@ -13,7 +13,7 @@ dependencies:
 - blast
 - mafft
 - samtools
-- bam2fastq
+- picard-slim
 - cd-hit
 - pip:
   - pytest-cov

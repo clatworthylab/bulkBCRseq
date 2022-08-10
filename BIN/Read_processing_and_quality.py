@@ -3418,12 +3418,16 @@ def bam_to_fastq(dir, source, id):
         )
         != 0
     ):
-        pre_QC_fastq = dir + "FASTQ_FILES/Sequences_" + id + "#.fastq"
+        # pre_QC_fastq = dir + "FASTQ_FILES/Sequences_" + id + "#.fastq"
+        pre_QC_fastq1 = dir + "FASTQ_FILES/Sequences_" + id + "_1.fastq"
+        pre_QC_fastq2 = dir + "FASTQ_FILES/Sequences_" + id + "_2.fastq"
         pre_QC_bam = dir + "FASTQ_FILES/Sequences_" + id + ".bam"
         if len(glob(Path(source).parent / "*.cram")) != 0:
             cram_to_fastq(dir, source, id, pre_QC_bam)
             source = pre_QC_bam
-        command1 = "bam2fastq --force -o {} {}".format(pre_QC_fastq, source)
+        command1 = "picard SamToFastq I={} FASTQ={} SECOND_END_FASTQ={}".format(
+            source, pre_QC_fastq1, pre_QC_fastq2
+        )
         os.system(command1)
 
 
