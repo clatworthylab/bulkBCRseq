@@ -4,7 +4,6 @@ channels:
 - bioconda
 - anaconda
 - defaults
-- yuxiang
 dependencies:
 - numpy
 - networkx
