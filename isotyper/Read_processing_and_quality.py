@@ -175,6 +175,8 @@ def get_consensus_sequence(u_seq, u_freq):
     fh.close()
     main_cmd = [
         "mafft",
+        "--quiet",
+        "--auto",
         "--retree",
         "2",
     ]
@@ -763,6 +765,7 @@ def check_barcodes_malbac(
     print(total_tags, passed_seqs_total, fail_less_than_threshold)
 
 
+# TODO: this function looks a lot that is duplicated in get_consensus_sequence. maybe can combine?
 def get_consensus_sequence_cluster(u_seq, u_freq):
     """Summary
 
@@ -786,6 +789,8 @@ def get_consensus_sequence_cluster(u_seq, u_freq):
     fh.close()
     main_cmd = [
         "mafft",
+        "--quiet",
+        "--auto",
         "--retree",
         "2",
     ]
