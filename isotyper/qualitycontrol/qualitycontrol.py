@@ -1663,6 +1663,7 @@ def get_read_report(
 
 
 def main():
+    """main function in step 2."""
     get_paired_reads_overlapping(
         seq_file1=SEQ_FASTA_FILE1,
         seq_file2=SEQ_FASTA_FILE2,
