@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Union, Tuple
 
 from isotyper.utilities import *
+from isotyper.qualitycontrol import *
 
 
 def reduce_sequences(trim2, trim3):
@@ -256,9 +257,7 @@ def get_consensus_sequence(u_seq, u_freq):
 
 def trim_sequences_bcr_tcr(
     tmp_Tmp_file,
-    Fail_file,
     Output_trim,
-    paired,
     primer_tag_file,
     tmp_file,
     primer_tag_file_count,
@@ -270,8 +269,6 @@ def trim_sequences_bcr_tcr(
     Parameters
     ----------
     tmp_Tmp_file : TYPE
-        Description
-    Fail_file : TYPE
         Description
     Output_trim : TYPE
         Description
@@ -298,7 +295,7 @@ def trim_sequences_bcr_tcr(
     )
     fh_out = open(Output_trim, "w")
     fh_out.close()
-    fh_out = open(Fail_file, "w")
+    fh_out = open(FAIL_FILE, "w")
     fh_out.close()
     if barcoded_j == 1 and barcoded_v == 0:
         single_j_barcoded_trimming_clustered(
@@ -307,11 +304,9 @@ def trim_sequences_bcr_tcr(
             barcoded_j,
             barcoded_v,
             tmp_Tmp_file,
-            Fail_file,
             Output_trim,
             primer_tag_file,
             tmp_file,
-            paired,
             primer_tag_file_count,
             ref_const,
             v_ref,
@@ -565,11 +560,9 @@ def single_j_barcoded_trimming_clustered(
     barcoded_j,
     barcoded_v,
     tmp_Tmp_file,
-    Fail_file,
     Output_trim,
     primer_tag_file,
     tmp_file,
-    paired,
     primer_tag_file_count,
     ref_const,
     v_ref,
@@ -588,15 +581,11 @@ def single_j_barcoded_trimming_clustered(
         Description
     tmp_Tmp_file : TYPE
         Description
-    Fail_file : TYPE
-        Description
     Output_trim : TYPE
         Description
     primer_tag_file : TYPE
         Description
     tmp_file : TYPE
-        Description
-    paired : TYPE
         Description
     species : TYPE
         Description
@@ -611,9 +600,8 @@ def single_j_barcoded_trimming_clustered(
     """
     read_untrimmed_file_single(
         tmp_Tmp_file,
-        Fail_file,
+        FAIL_FILE,
         Output_trim,
-        paired,
         primer_tag_file,
         tmp_file,
         primer_tag_file_count,
@@ -624,7 +612,7 @@ def single_j_barcoded_trimming_clustered(
     check_barcodes_malbac(
         primer_tag_file_count,
         primer_tag_file,
-        Fail_file,
+        FAIL_FILE,
         Output_trim,
     )
     separate_sequences(
@@ -632,9 +620,7 @@ def single_j_barcoded_trimming_clustered(
     )
 
 
-def check_barcodes_malbac(
-    primer_tag_file_count, primer_tag_file, Fail_file, Output_trim
-):
+def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Output_trim):
     """Summary
 
     Parameters
@@ -642,8 +628,6 @@ def check_barcodes_malbac(
     primer_tag_file_count : TYPE
         Description
     primer_tag_file : TYPE
-        Description
-    Fail_file : TYPE
         Description
     Output_trim : TYPE
         Description
@@ -741,7 +725,6 @@ def check_barcodes_malbac(
                     ids[u_header[i]] = [u_seq[i], u_freq[i]]
                 consensus, pass_consensus = get_consensus_sequence_large(
                     out_cluster,
-                    Fail_file,
                     len(u_seq[i]),
                     ids,
                     sum(u_freq),
@@ -892,14 +875,12 @@ def get_consensus_sequence_cluster(u_seq, u_freq):
     return (consensus, pass_consensus)
 
 
-def get_consensus_sequence_large(out_cluster, Fail_file, l1, ids, sum_u_freq):
+def get_consensus_sequence_large(out_cluster, l1, ids, sum_u_freq):
     """Summary
 
     Parameters
     ----------
     out_cluster : TYPE
-        Description
-    Fail_file : TYPE
         Description
     l1 : TYPE
         Description
@@ -913,12 +894,16 @@ def get_consensus_sequence_large(out_cluster, Fail_file, l1, ids, sum_u_freq):
     TYPE
         Description
     """
-    fh = open(Fail_file, "w")
+    fh = open(FAIL_FILE, "w")
     fh.write(out_cluster)
     fh.close()
-    cluster_i(Fail_file, Fail_file + "cls", (l1 - 3.0) / l1)
+    cluster_i(
+        input_file=FAIL_FILE,
+        clustered_file=FAIL_FILE.with_suffix(FAIL_FILE.suffix + "cls"),
+        identity=(l1 - 3.0) / l1,
+    )
     cluster = Tree()
-    fh = open(Fail_file + "cls.bak.clstr", "r")
+    fh = open(FAIL_FILE.with_suffix(FAIL_FILE.suffix + "cls.bak.clstr"), "r")
     for l in fh:
         l = l.strip().split()
         clust, id = l[0], l[2].replace("...", "").replace(">", "")
@@ -947,9 +932,7 @@ def get_consensus_sequence_large(out_cluster, Fail_file, l1, ids, sum_u_freq):
 
 def read_untrimmed_file_single(
     tmp_Tmp_file,
-    Fail_file,
     Output_trim,
-    paired,
     primer_tag_file,
     tmp_file,
     primer_tag_file_count,
@@ -963,11 +946,7 @@ def read_untrimmed_file_single(
     ----------
     tmp_Tmp_file : TYPE
         Description
-    Fail_file : TYPE
-        Description
     Output_trim : TYPE
-        Description
-    paired : TYPE
         Description
     primer_tag_file : TYPE
         Description
@@ -1156,18 +1135,18 @@ def read_untrimmed_file_single(
     )
 
 
-def get_sequences(file):
-    """Summary
+def get_sequences(file: Path) -> Dict:
+    """Extract sequences from fasta file.
 
     Parameters
     ----------
-    file : TYPE
-        Description
+    file : Path
+        path to fasta file.
 
     Returns
     -------
-    TYPE
-        Description
+    Dict
+        dictionary holding fasta header and sequence as key and record respectively.
     """
     fh = open(file, "r")
     seqs = {}
@@ -1175,7 +1154,6 @@ def get_sequences(file):
         header = header.replace(":", "").split()[0].replace("-", "")
         header = header.split("#")[0].split("/")[0]
         seqs[header] = sequence
-        # if(len(seqs)>100000):break ####### remove
     fh.close()
     return seqs
 
@@ -1257,19 +1235,17 @@ def join_reads(s1, s2, length):
     return (seq, failed)
 
 
-def get_paired_reads_overlapping(file1, file2, outfile, paired):
+def get_paired_reads_overlapping(file1: Path, file2: Path, outfile: Path):
     """Summary
 
     Parameters
     ----------
-    file1 : TYPE
-        Description
-    file2 : TYPE
-        Description
-    outfile : TYPE
-        Description
-    paired : TYPE
-        Description
+    file1 : Path
+        path to pre-QC read 1 in fasta format.
+    file2 : Path
+        path to pre-QC read 2 in fasta format.
+    outfile : Path
+        path to untrimmed seqeunces in fasta format.
     """
     seqs1 = get_sequences(file1)
     seqs2 = get_sequences(file2)
@@ -1905,31 +1881,42 @@ def get_read_report(
     print(out)
 
 
-def cluster_i(Reduced_file, tmp_file, diff):
-    """Summary
+def cluster_i(input_file: Path, clustered_file: Path, identity: float):
+    """Run CD-HIT clustering
 
     Parameters
     ----------
-    Reduced_file : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-    diff : TYPE
-        Description
+    input_file : Path
+        input file to run CD-HIT clustering.
+    clustered_file : Path
+        output file of CD-HIT.
+    identity : float
+        sequence identity threshold.
     """
-    # cd_hit_directory = "/nfs/users/nfs_k/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
-    # cd_hit_directory = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/cd-hit-v4.5.7-2011-12-16/"
-    # cd_hit_directory = bin_path + "cd-hit-v4.5.7-2011-12-16/"
-    command = (
-        "cd-hit -i "
-        + Reduced_file
-        + " -o "
-        + tmp_file
-        + " -c "
-        + str(diff)
-        + " -g 1 -d 180 -T 10 -M 0 -AL 40 -bak 1 -p 1"
-    )
-    os.system(command)
+    command = [
+        "cd-hit",
+        "-i",
+        str(input_file),
+        "-o",
+        str(clustered_file),
+        "-c",
+        str(identity),
+        "-g",
+        "1",
+        "-d",
+        "180",
+        "-T",
+        "10",
+        "-M",
+        "0",
+        "-AL",
+        "40",
+        "-bak",
+        "1",
+        "-p",
+        "1",
+    ]
+    subprocess.run(command)
 
 
 def get_seqs_single(file):
@@ -3198,7 +3185,7 @@ from isotyper.utilities._args import (
 # sample_id = sys.argv[2]
 barcode_group = sys.argv[3]
 # gene = sys.argv[4]
-paired = sys.argv[5]
+paired = "OVERLAPPING"
 # species = sys.argv[6]
 # source = sys.argv[7]
 length = sys.argv[8]
@@ -3213,9 +3200,9 @@ else:
 print("Reverse primer group: ", reverse_primer_group)
 
 # Files for QC and filtering
-Seq_file1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fasta"
-Seq_file2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fasta"
-tmp_Tmp_file = OUT_ORTSEQ_TMP / f"Untrimmed_{SAMPLE_ID}.fasta"
+# Seq_file1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fasta"
+# Seq_file2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fasta"
+# tmp_Tmp_file = OUT_ORTSEQ_TMP / f"Untrimmed_{SAMPLE_ID}.fasta"
 trim1 = OUT_ORTSEQ_TMP / f"trimmed_orientated_all_{SAMPLE_ID}.fasta"
 trim2 = OUT_ORTSEQ_TMP / f"Filtered_J_{SAMPLE_ID}.fasta"
 trim3 = OUT_ORTSEQ_TMP / f"Filtered_reduced_{SAMPLE_ID}.fasta"
@@ -3263,12 +3250,12 @@ if command_source.count("1") != 0:
 
 # Filtering and processing reads
 if command_source.count("2") != 0:
-    get_paired_reads_overlapping(Seq_file1, Seq_file2, tmp_Tmp_file, paired)
+    get_paired_reads_overlapping(
+        SEQ_FASTA_FILE1, SEQ_FASTA_FILE2, UNTRIMMED_FASTA
+    )
     trim_sequences_bcr_tcr(
         tmp_Tmp_file,
-        Fail_file,
         trim1,
-        paired,
         primer_tag_file,
         tmp_file,
         primer_tag_file_count,
