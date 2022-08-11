@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 from isotyper.utilities._utils import (
+    check_fasta_not_empty,
     deconvolute_same_array,
     fasta_iterator,
     fuzzy_substring,
     get_codons,
+    get_freq,
     join_reads,
     reverse_comp,
     translate,
     Tree,
-    trim,
     write_out,
 )
 from isotyper.utilities._settings import (
@@ -26,15 +27,16 @@ from isotyper.utilities._settings import (
 )
 
 __all__ = [
+    "check_fasta_not_empty",
     "deconvolute_same_array",
     "fasta_iterator",
     "fuzzy_substring",
     "get_codons",
+    "get_freq",
     "join_reads",
     "reverse_comp",
     "translate",
     "Tree",
-    "trim",
     "write_out",
 ] + [
     "EDGE_LENGTHS",

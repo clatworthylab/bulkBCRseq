@@ -3,7 +3,10 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Tuple, Dict
 
-from isotyper.utilities._settings import REVERSE_COMPLEMENT_DICT
+from isotyper.utilities._settings import (
+    REVERSE_COMPLEMENT_DICT,
+    READ_NUMBER_DIVISION,
+)
 
 
 class Tree(defaultdict):
@@ -315,3 +318,44 @@ def trim(
         s2a = s2a[0:min_len]
         p = 1
     return (s1a, s2a, p, sample1)
+
+
+def check_fasta_not_empty(file: Path) -> int:
+    """Checks if fasta is empty.
+
+    Parameters
+    ----------
+    file : Path
+        path to fasta file
+
+    Returns
+    -------
+    int
+        whether file is empty. 1 is not empty, 0 is empty.
+    """
+    fh = open(file, "r")
+    pfh = 0
+    for l in fh:
+        print(l)
+        if len(l) != 0:
+            pfh = 1
+        break
+    fh.close()
+    return pfh
+
+
+def get_freq(header: str) -> int:
+    """Get frequncy of isotype assignments.
+
+    Parameters
+    ----------
+    header : str
+        header of sequence.
+
+    Returns
+    -------
+    int
+        frequency
+    """
+    header = header.split(READ_NUMBER_DIVISION)
+    return int(header[1])
