@@ -14,27 +14,7 @@ from typing import Union, Tuple, Dict
 
 from isotyper.utilities import *
 from isotyper.qualitycontrol import *
-
-
-def get_seqs_single(file):
-    """Summary
-
-    Parameters
-    ----------
-    file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(file, "r")
-    seqs = {}
-    for header, sequence in fasta_iterator(fh):
-        seqs[header.split(READ_NUMBER_DIVISION)[0]] = sequence
-    fh.close()
-    return seqs
+from isotyper.network import *
 
 
 def get_similarity_single(clust_seqs, file_out, c):
@@ -47,11 +27,6 @@ def get_similarity_single(clust_seqs, file_out, c):
     file_out : TYPE
         Description
     c : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     done = Tree()
@@ -114,11 +89,9 @@ def get_similarity_single(clust_seqs, file_out, c):
                     ind1 = 0
                     out = ""
     write_out(out, file_out)
-    del out
-    return ()
 
 
-def get_diff(s1, s2, mismatch):
+def get_diff(s1, s2, mismatch) -> Tuple:
     """Summary
 
     Parameters
@@ -176,7 +149,7 @@ def do_counting(s1, s2, mismatch):
     return mm
 
 
-def trim_sequences(s1, s2, l1, l2):
+def trim_sequences(s1, s2, l1, l2) -> Tuple:
     """Summary
 
     Parameters
@@ -234,27 +207,6 @@ def trim_sequences(s1, s2, l1, l2):
     return (s1, s2, p)
 
 
-# def write_out(out, file):
-#     """Summary
-
-#     Parameters
-#     ----------
-#     out : TYPE
-#         Description
-#     file : TYPE
-#         Description
-
-#     Returns
-#     -------
-#     TYPE
-#         Description
-#     """
-#     fh = open(file, "a")
-#     fh.write(out)
-#     fh.close()
-#     return ()
-
-
 def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
     """Summary
 
@@ -269,11 +221,6 @@ def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
     file_out : TYPE
         Description
     inv : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     fh = open(file_out, "w")
@@ -310,21 +257,20 @@ def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
                 if len(clust_seqs) > 500:
                     print(len(clust_seqs), total, ind)
                 get_similarity_single(clust_seqs, file_out, c)
-    return ()
 
 
-def get_clusters(file):
-    """Summary
+def get_clusters(file: Path) -> "Tree":
+    """Retrieve clusters from file.
 
     Parameters
     ----------
-    file : TYPE
-        Description
+    file : Path
+        path to clustered file after CD-HIT.
 
     Returns
     -------
-    TYPE
-        Description
+    Tree
+        Clustering information in a tree data structure (dictionary).
     """
     fh = open(file, "r")
     cluster = Tree()
@@ -338,17 +284,17 @@ def get_clusters(file):
     return cluster
 
 
-def get_cluster_sizes_single(file):
+def get_cluster_sizes_single(file: Path) -> Tuple:
     """Summary
 
     Parameters
     ----------
-    file : TYPE
+    file : Path
         Description
 
     Returns
     -------
-    TYPE
+    Tuple
         Description
     """
     (cluster) = get_clusters(file + ".bak.clstr")
@@ -363,7 +309,7 @@ def get_cluster_sizes_single(file):
     return (s, cluster)
 
 
-def get_vaguely_similar_seqs(s1, s2, mis):
+def get_vaguely_similar_seqs(s1, s2, mis) -> Tuple:
     """Summary
 
     Parameters
@@ -377,7 +323,7 @@ def get_vaguely_similar_seqs(s1, s2, mis):
 
     Returns
     -------
-    TYPE
+    Tuple
         Description
     """
     l1 = len(s1)
@@ -402,7 +348,7 @@ def get_vaguely_similar_seqs(s1, s2, mis):
     return (s1, s2, p)
 
 
-def count_diffs(s1, s2, mis):
+def count_diffs(s1, s2, mis) -> Tuple:
     """Summary
 
     Parameters
@@ -455,11 +401,6 @@ def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
     seqs : TYPE
         Description
     tmp_file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     coclust = Tree()
@@ -518,10 +459,9 @@ def get_similar_clusters(s_sizes, cluster, seqs, tmp_file):
                             break
     write_out(out, tmp_file)
     print(out)
-    return ()
 
 
-def get_coclustered(file):
+def get_coclustered(file) -> Tuple:
     """Summary
 
     Parameters
@@ -561,11 +501,6 @@ def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
         Description
     seq_file : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     fh = open(seq_file, "r")
     freq_id = {}
@@ -587,8 +522,6 @@ def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
             edges[id2][id1].value = 1
     fh1.close()
     print_single_edges(file_edges, inverse, edges, tmp_file_1, raw)
-    del inverse, edges, edges23
-    return ()
 
 
 def get_inverse_ids(file_seqs, file_vertex, freq_id):
@@ -650,11 +583,6 @@ def decon_identical(
         Description
     read_number_division : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     fh = open(seq_file, "r")
     all, seqs, freq_id = {}, {}, {}
@@ -673,7 +601,6 @@ def decon_identical(
             same1[cluster][l1[2]][l1[1]].value = 1
             same1[cluster][l1[1]][l1[2]].value = 1
     fh1.close()
-    # same, inverse, inv, out, ind, length = {}, {}, {}, '', 0, {}
     same, inverse, out, ind, length = {}, {}, "", 0, {}
     fh = open(file_seqs, "w")
     fh1.close()
@@ -744,7 +671,6 @@ def decon_identical(
             .split("|")[1]
         )
     write_out(out, file_seqs)
-    del seqs
     print_vertices(
         all,
         inverse,
@@ -755,7 +681,6 @@ def decon_identical(
         info,
         freq_id,
     )
-    return ()
 
 
 def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
@@ -772,11 +697,6 @@ def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
     tmp_file : TYPE
         Description
     raw : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     fh = open(tmp_file, "w")
@@ -814,8 +734,6 @@ def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
                     edge = ""
                     ind = 0
     write_out(edge, tmp_file)
-    del edges
-    return ()
 
 
 def print_vertices(
@@ -840,11 +758,6 @@ def print_vertices(
     info : TYPE
         Description
     freq_id : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     out = ""
@@ -893,7 +806,6 @@ def print_vertices(
             ind = 0
             out = ""
     write_out(out, file_vertex)
-    return ()
 
 
 def reduce_edges(file_in, file_out):
@@ -904,11 +816,6 @@ def reduce_edges(file_in, file_out):
     file_in : TYPE
         Description
     file_out : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     done, out, ind = Tree(), "", 0
@@ -928,8 +835,6 @@ def reduce_edges(file_in, file_out):
                     write_out(out, file_out)
                     out = ""
     write_out(out, file_out)
-    del done
-    return ()
 
 
 def deconvolute_edges(
@@ -959,11 +864,6 @@ def deconvolute_edges(
         Description
     read_number_division : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     decon_identical(
         seq_file,
@@ -975,7 +875,6 @@ def deconvolute_edges(
     )
     decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file)
     reduce_edges(tmp_file_1, file_edges)
-    return ()
 
 
 def get_network_clusters(file_vertex, file_edges, cluster_file):
@@ -989,15 +888,9 @@ def get_network_clusters(file_vertex, file_edges, cluster_file):
         Description
     cluster_file : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     (G, scale) = read_graphical_inputs(file_vertex, file_edges)
     output_cluster_file(G, cluster_file)
-    return ()
 
 
 def read_graphical_inputs(file_vertex, file_edges):
@@ -1053,11 +946,6 @@ def output_cluster_file(G, cluster_file):
         Description
     cluster_file : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     con = nx.connected_components(G)
     ind = 0
@@ -1102,7 +990,6 @@ def output_cluster_file(G, cluster_file):
         nvertmax,
         "vertices",
     )
-    return ()
 
 
 def get_network_input(file_cluster, outfile, edge_file, checked_edges):
@@ -1117,11 +1004,6 @@ def get_network_input(file_cluster, outfile, edge_file, checked_edges):
     edge_file : TYPE
         Description
     checked_edges : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     fh = open(outfile, "w")
@@ -1166,7 +1048,6 @@ def get_network_input(file_cluster, outfile, edge_file, checked_edges):
                 (out, ind) = ("", 0)
     write_out(out, checked_edges)
     fh.close()
-    return ()
 
 
 def reduce_identical_sequences(Reduced_file, file_vertex, read_number_division):
@@ -1179,11 +1060,6 @@ def reduce_identical_sequences(Reduced_file, file_vertex, read_number_division):
     file_vertex : TYPE
         Description
     read_number_division : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     fh = open(Reduced_file, "w")
@@ -1211,7 +1087,6 @@ def reduce_identical_sequences(Reduced_file, file_vertex, read_number_division):
             (ind, out) = (0, "")
     fh.close()
     write_out(out, Reduced_file)
-    return ()
 
 
 def generate_networks(
@@ -1231,11 +1106,6 @@ def generate_networks(
         Description
     file_out : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     cluster_i(Sequence_file, tmp_file_1, edge_lengths)
     (s_sizes, cluster) = get_cluster_sizes_single(tmp_file_1)
@@ -1243,7 +1113,6 @@ def generate_networks(
     get_similar_clusters(s_sizes, cluster, seqs, tmp_file + "_coclustered")
     (inv, coclust) = get_coclustered(tmp_file + "_coclustered")
     get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv)
-    return ()
 
 
 ###########################
