@@ -175,18 +175,19 @@ def fuzzy_substring(needle, haystack):
     return min(row1)
 
 
-def translate(seq, codon):
-    """Summary
+def translate(seq: str, codon: Dict) -> str:
+    """Translate sequence to amino acid.
+
     Parameters
     ----------
-    seq : TYPE
-        Description
-    codon : TYPE
-        Description
+    seq : str
+        sequence to translate.
+    codon : Dict
+        dictionary of codons.
     Returns
     -------
-    TYPE
-        Description
+    str
+        translated sequence.
     """
     p_seq = ""
     for cod in range(0, int(len(seq) / 3 - 1)):
@@ -197,52 +198,120 @@ def translate(seq, codon):
     return p_seq
 
 
-def write_out(out, file):
-    """Summary
+def write_out(out: str, file: Path):
+    """Generic writer in append mode.
+
     Parameters
     ----------
-    out : TYPE
-        Description
-    file : TYPE
-        Description
-    Returns
-    -------
-    TYPE
-        Description
+    out : str
+        string to write.
+    file : Path
+        path of file to write.
     """
     fh = open(file, "a")
     fh.write(out)
     fh.close()
-    return ()
 
 
-def create_file(file):
-    """Summary
+def create_file(file: Path):
+    """Create a file.
+
     Parameters
     ----------
-    file : TYPE
-        Description
-    Returns
-    -------
-    TYPE
-        Description
+    file : Path
+        path of file to create.
     """
     fh = open(file, "w")
     fh.close()
-    return ()
 
 
 def intialise_tmp_directory(loc: Path):
-    """Summary
+    """Initialise temporary directories.
+
     Parameters
     ----------
-    dir : TYPE
-        Description
-    Returns
-    -------
-    TYPE
-        Description
+    loc : Path
+        path to create directories.
     """
     dirs_to_add = [loc, loc / "TMP"]
     for d in dirs_to_add:
         d.mkdir(exist_ok=True, parents=True)
+
+
+def join_reads(s1: str, s2: str, length: int) -> Tuple[str, int]:
+    """Join reads.
+
+    Parameters
+    ----------
+    s1 : str
+        sequence 1
+    s2 : str
+        sequence 2
+    length : int
+        length to trim
+
+    Returns
+    -------
+    Tuple[str, int]
+        joint read and log of whether it failed.
+    """
+    seq = ""
+    (s2) = reverse_comp(s2)
+    (l1, l2) = (len(s1), len(s2))
+    failed = 1
+    for i in range(0, 100):
+        ind = (i * 5) + 5
+        if ind < (l1 - length):
+            (s11, s22, p, overlap) = trim(s1, s2, l1, l2, ind, length)
+            if p == 1:
+                seq = (
+                    s1[0 : s1.index(overlap)]
+                    + s2[(s2.index(overlap)) : l2].lower()
+                )
+                if len(seq) > 120:
+                    failed = 0
+                    break
+        # else:break
+    return (seq, failed)
+
+
+def trim(
+    s1: str, s2: str, l1: int, l2: int, indent: float, length: int
+) -> Tuple[str, str, int, str]:
+    """Trim sequences.
+
+    Parameters
+    ----------
+    s1 : str
+        Description
+    s2 : str
+        Description
+    l1 : int
+        Description
+    l2 : int
+        Description
+    indent : float
+        Description
+    length : int
+        Description
+
+    Returns
+    -------
+    Tuple[str, str, int, str]
+        trimmed sequences.
+    """
+    (i, p) = (indent, 0)
+    sample1 = s1[i : i + length]
+    # print sample1, "\t",s1, s2,"\n"
+    index = s2.find(sample1)
+    s1a, s2a = s1, s2
+    if index != -1:
+        if index > i:
+            s2a = s2a[index - i : l2]
+        else:
+            s1a = s1a[i - index : l1]
+        min_len = min([len(s1), len(s2)])
+        s1a = s1a[0:min_len]
+        s2a = s2a[0:min_len]
+        p = 1
+    return (s1a, s2a, p, sample1)

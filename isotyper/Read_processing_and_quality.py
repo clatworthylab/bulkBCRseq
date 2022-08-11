@@ -1124,83 +1124,6 @@ def get_sequences(file: Path) -> Dict:
     return seqs
 
 
-def trim(s1, s2, l1, l2, indent, length):
-    """Summary
-
-    Parameters
-    ----------
-    s1 : TYPE
-        Description
-    s2 : TYPE
-        Description
-    l1 : TYPE
-        Description
-    l2 : TYPE
-        Description
-    indent : TYPE
-        Description
-    length : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    (i, p) = (indent, 0)
-    sample1 = s1[i : i + length]
-    # print sample1, "\t",s1, s2,"\n"
-    index = s2.find(sample1)
-    s1a, s2a = s1, s2
-    if index != -1:
-        if index > i:
-            s2a = s2a[index - i : l2]
-        else:
-            s1a = s1a[i - index : l1]
-        min_len = min([len(s1), len(s2)])
-        s1a = s1a[0:min_len]
-        s2a = s2a[0:min_len]
-        p = 1
-    return (s1a, s2a, p, sample1)
-
-
-def join_reads(s1, s2, length):
-    """Summary
-
-    Parameters
-    ----------
-    s1 : TYPE
-        Description
-    s2 : TYPE
-        Description
-    length : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    seq = ""
-    (s2) = reverse_comp(s2)
-    (l1, l2) = (len(s1), len(s2))
-    failed = 1
-    for i in range(0, 100):
-        ind = (i * 5) + 5
-        if ind < (l1 - length):
-            (s11, s22, p, overlap) = trim(s1, s2, l1, l2, ind, length)
-            if p == 1:
-                seq = (
-                    s1[0 : s1.index(overlap)]
-                    + s2[(s2.index(overlap)) : l2].lower()
-                )
-                if len(seq) > 120:
-                    failed = 0
-                    break
-        # else:break
-    return (seq, failed)
-
-
 def get_paired_reads_overlapping(
     seq_file1: Path, seq_file2: Path, outfile: Path
 ):
@@ -3115,6 +3038,11 @@ if command_source.count("1") != 0:
     from isotyper.qualitycontrol import preliminary
 
     preliminary.main()
+
+# if command_source.count("2") != 0:
+#     from isotyper.qualitycontrol import qualitycontrol
+
+#     qualitycontrol.main()
 
 
 # Tip: it is good to check all the fasta files in the FASTQ_FILES directory have

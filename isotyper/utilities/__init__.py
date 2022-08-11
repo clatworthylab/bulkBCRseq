@@ -4,9 +4,11 @@ from isotyper.utilities._utils import (
     fasta_iterator,
     fuzzy_substring,
     get_codons,
+    join_reads,
     reverse_comp,
     translate,
     Tree,
+    trim,
     write_out,
 )
 from isotyper.utilities._settings import (
@@ -28,9 +30,11 @@ __all__ = [
     "fasta_iterator",
     "fuzzy_substring",
     "get_codons",
+    "join_reads",
     "reverse_comp",
     "translate",
     "Tree",
+    "trim",
     "write_out",
 ] + [
     "EDGE_LENGTHS",
