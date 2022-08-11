@@ -186,77 +186,6 @@ def trim_library(s1, s2, l1, l2):
     return (s1, s2, p)
 
 
-def blast_match_d(
-    out, refd, tmp_file, seqs, passed, file_D_genes, batch_number
-):
-    """Summary
-    Parameters
-    ----------
-    out : TYPE
-        Description
-    refd : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-    seqs : TYPE
-        Description
-    passed : TYPE
-        Description
-    file_D_genes : TYPE
-        Description
-    batch_number : TYPE
-        Description
-    """
-    fh = open(tmp_file, "w")
-    fh.write(out)
-    fh.close()
-    command1 = (
-        "blastn -a 1 -d "
-        + refd
-        + " -e 2 -i "
-        + tmp_file
-        + " -o "
-        + tmp_file
-        + "_dblast -b 1 -m 8 -W 4"
-    )
-    os.system(command1)
-    fh = open(tmp_file + "_dblast", "r")
-    out = ""
-    if batch_number == 0:
-        out = "#ID\tD_gene\tD_location\tD_sequence\tD_orientation\n"
-    genes = {}
-    for l in fh:
-        l = l.strip().split()
-        if l[0] in genes:
-            score_orig = genes[l[0]][1]
-            if score_orig < float(l[11]):
-                genes[l[0]] = [l[1], float(l[11]), int(l[6]), int(l[7])]
-        else:
-            #            D gene, score, start, end
-            genes[l[0]] = [l[1], float(l[11]), int(l[6]), int(l[7])]
-    fh.close()
-    for id in genes:
-        a = genes[id]
-        start, end = a[2] + seqs[id][1], a[3] + seqs[id][1]
-        out = (
-            out
-            + id
-            + "\t"
-            + a[0]
-            + "\t"
-            + str(start)
-            + "\t"
-            + str(end)
-            + "\t"
-            + seqs[id][0][a[2] : a[3]]
-            + "\n"
-        )
-        passed = passed + 1
-    write_out(out, file_D_genes)
-    out = ""
-    return passed
-
-
 def locate_CDR3_start_site_igh(
     CDR3_prot, seq, shift, codon, cdr3_ends, cdr3_ends_near
 ):
@@ -433,29 +362,50 @@ def blast_match(
     fh = open(tmp_file, "w")
     fh.write(out)
     fh.close()
-    command1 = (
-        "blastn -a 10 -d "
-        + refv
-        + " -e 1e-5 -i "
-        + tmp_file
-        + " -o "
-        + tmp_file
-        + "_vblast -b 1 -m 8 -W 10"
-    )
-    command2 = (
-        "blastn -a 10 -d "
-        + refj
-        + " -e 10 -i "
-        + tmp_file
-        + " -o "
-        + tmp_file
-        + "_jblast -b 1 -m 8 -W 4"
-    )
-    os.system(command1)
+    command1 = [
+        "blastn",
+        "-num_threads",
+        "10",
+        "-db",
+        f"{str(refv)}",
+        "-evalue",
+        str(1e-5),
+        "-query",
+        f"{str(tmp_file)}",
+        "-out",
+        f"{str(tmp_file.with_suffix(tmp_file.suffix + '_vblast'))}",
+        "-num_alignments",
+        "1",
+        "-outfmt",
+        "6",
+        "-word_size",
+        "10",
+    ]
+    command2 = [
+        "blastn",
+        "-num_threads",
+        "10",
+        "-db",
+        f"{str(refv)}",
+        "-evalue",
+        str(10),
+        "-query",
+        f"{str(tmp_file)}",
+        "-out",
+        f"{str(tmp_file.with_suffix(tmp_file.suffix + '_jblast'))}",
+        "-num_alignments",
+        "1",
+        "-outfmt",
+        "6",
+        "-word_size",
+        "4",
+    ]
+
+    subprocess.run(command1, stderr=subprocess.DEVNULL)
     fh = open(tmp_file, "w")
     fh.write(out1)
     fh.close()
-    os.system(command2)
+    subprocess.run(command2, stderr=subprocess.DEVNULL)
     fh = open(tmp_file + "_jblast", "r")
     passesv, passesj = {}, {}
     for l in fh:
@@ -536,39 +486,19 @@ def blast_match(
                         CDR3_prot_potential = CDR3_prot_potential[
                             shift : len(CDR3_prot_potential)
                         ]
-                        if gene == "IGH":
-                            (
-                                CDR3_p,
-                                passed,
-                                nn_start,
-                                CDR3_nn,
-                            ) = locate_CDR3_start_site_igh(
-                                CDR3_prot_potential,
-                                seqs[l[0]],
-                                shift,
-                                codon,
-                                cdr3_ends,
-                                cdr3_ends_near,
-                            )
-                        if gene.count("TCR") == 1:
-                            # CDR3_p, passed, nn_start, CDR3_nn = Locate_CDR3_start_site_TCR(
-                            #     CDR3_prot_potential, seqs[l[0]], shift, codon)
-                            (
-                                CDR3_start,
-                                CDR3,
-                                additional_mutations,
-                                CDR3_found,
-                                CDR3_nn,
-                                nn_start,
-                            ) = (
-                                v_end_query,
-                                "-",
-                                v_end_query,
-                                "NO",
-                                "-",
-                                v_end_query,
-                            )
-                            passed = 0
+                        (
+                            CDR3_p,
+                            passed,
+                            nn_start,
+                            CDR3_nn,
+                        ) = locate_CDR3_start_site_igh(
+                            CDR3_prot_potential,
+                            seqs[l[0]],
+                            shift,
+                            codon,
+                            cdr3_ends,
+                            cdr3_ends_near,
+                        )
                         if passed != 0:
                             (
                                 CDR3_start,
@@ -684,12 +614,8 @@ def get_annotation(
     gene : TYPE
         Description
     """
-    # head = (
-    #     "#ID\tIGHV\tFR1s\tFR1e\tCDR1s\tCDR1e\tFR2s\tFR2e\tCDR2s\tCDR2e\tFR3s\tFR3e\t",
-    #     "IGHV_end\tIGHJ\tIGHJ_start\tCDR3s\tCDR3e\tCDR3_prot\tCDR3_nn\n")
     out = ""
     for id in seqs:
-        # o=id.split(READ_NUMBER_DIVISION)[0] ################# remove
         o = id
         if id in passesv:
             v_found = [
@@ -775,17 +701,12 @@ def get_region_boundaries(species, loc):
         Description
     """
     regions = {}
-    if species == "HOMO_SAPIENS":
+    if ORG == "HOMO_SAPIENS":
         fh = open(loc + "human.ndm.imgt2", "r")
         J_ref = loc + "human.ndm.imgt.CDR3.end"
-    elif species == "MUS_MUSCULUS":
+    elif ORG == "MUS_MUSCULUS":
         fh = open(loc + "mouse.ndm.imgt", "r")
         J_ref = loc + "mouse.ndm.imgt.CDR3.end"
-    elif species == "LLAMA_GLAMA":
-        fh = open(loc + "llama.ndm.imgt", "r")
-        J_ref = loc + "llama.ndm.imgt.CDR3.end"
-    else:
-        print("Reference kabat not found")
     for l in fh:
         l = l.strip().split()
         id = l[0]
@@ -837,86 +758,6 @@ def get_protein_sequences(protein_file):
         seqs[header.split(READ_NUMBER_DIVISION)[0]] = seq.upper()
     fh.close()
     return seqs
-
-
-def identify_D_genes(annot_file, file_D_genes, refd, tmp_file, seq_file):
-    """Summary
-    Parameters
-    ----------
-    annot_file : TYPE
-        Description
-    file_D_genes : TYPE
-        Description
-    refd : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-    seq_file : TYPE
-        Description
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    fh = open(file_D_genes, "w")
-    fh.close()
-    fh = open(annot_file, "r")
-    out, ind, seqs, passed, total, batch, batch_number = (
-        "",
-        0,
-        {},
-        0,
-        0,
-        1000,
-        0,
-    )
-    D_approx_region = {}
-    for l in fh:
-        if l[0] != "#":
-            l = l.strip().split()
-            if len(l) > 19:
-                if l[15].count("CDR3_") == 0:
-                    V_end, J_start = int(l[12]), int(l[14])
-                    # CDR3_start = int(l[15])
-                    D_approx_region[l[0]] = [V_end, J_start, V_end]
-    fh.close()
-    fh = open(seq_file, "r")
-    for header, seq in fasta_iterator(fh):
-        if header in D_approx_region:
-            seq_d_poss = seq[
-                D_approx_region[header][0] : D_approx_region[header][1]
-            ]
-            if len(seq_d_poss) > 5:
-                out = out + ">" + header + "\n" + seq_d_poss + "\n"
-                seqs[header] = [seq_d_poss, D_approx_region[header][2]]
-                ind, total = ind + 1, total + 1
-                if ind > batch:
-                    passed = blast_match_d(
-                        out,
-                        refd,
-                        tmp_file,
-                        seqs,
-                        passed,
-                        file_D_genes,
-                        batch_number,
-                    )
-                    batch_number = batch_number + 1
-                    del seqs, out
-                    seqs, out, ind = {}, "", 0
-                    # print("\r", batch_number, end=' ')
-                    print("\r" + batch_number)
-                    # if(batch_number>30): break
-    fh.close()
-    print(
-        "\nTotal:",
-        total,
-        "Passed:",
-        passed,
-        "% Passed:",
-        passed * 100.0 / total,
-    )
-    os.system("rm " + tmp_file + " " + tmp_file + "_dblast")
-    return ()
 
 
 def Get_CDR3_ends(CDR3_end_file, gene):

@@ -2,6 +2,7 @@
 from isotyper.utilities._utils import (
     check_fasta_not_empty,
     cluster_i,
+    create_file,
     deconvolute_same_array,
     fasta_iterator,
     fuzzy_substring,
@@ -33,6 +34,7 @@ from isotyper.utilities._settings import (
 __all__ = [
     "check_fasta_not_empty",
     "cluster_i",
+    "create_file",
     "deconvolute_same_array",
     "fasta_iterator",
     "fuzzy_substring",
