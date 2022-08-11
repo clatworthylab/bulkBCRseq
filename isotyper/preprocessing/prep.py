@@ -141,6 +141,60 @@ def prep_fastqs(source_path: Path, r1pattern: str, r2pattern: str):
     )
 
 
+def run_quasr(
+    fastq: Path,
+    min_length: Union[str, int] = 100,
+    min_threshold: Union[str, int] = 32,
+):
+    """Run QUASR to perform read QC.
+
+    Parameters
+    ----------
+    fastq : Path
+        path to input fastq file.
+    min_length : Union[str, int], optional
+        minimum read length cutoff.
+    min_threshold : Union[str, int], optional
+        minimum median-read-quality cutoff.
+    """
+    # see https://github.com/andrewjpage/QUASR for updated version
+    quasr_qc_jar_path = EXTPATH / "QUASR_v7.01" / "qualityControl.jar"
+    cmd = [
+        "java",
+        "-jar",
+        str(quasr_qc_jar_path),
+        "-f",
+        str(fastq),
+        "-o",
+        str(fastq.parent / fastq.stem),
+        "-m",
+        str(min_threshold),
+        "-l",
+        str(min_length),
+    ]
+    subprocess.run(cmd)
+
+
+def perl_convert_fasta(fastq: Path):
+    """Convert fastq to fasta file using perl.
+
+    Parameters
+    ----------
+    fastq : Path
+        path to input fastq file.
+    """
+    cmd = [
+        "perl",
+        "-e",
+        PERLCMD,
+    ]
+    subprocess.run(
+        cmd,
+        stdin=open(fastq.with_suffix(".qc.fq"), "r"),
+        stdout=open(fastq.with_suffix(".fasta"), "w"),
+    )
+
+
 def qc_samples(
     out_path: Path,
     min_length: Union[str, int] = 100,
@@ -157,53 +211,12 @@ def qc_samples(
     min_threshold : Union[str, int], optional
         minimum median-read-quality cutoff.
     """
-    reads1 = out_path / f"Sequences_{SAMPLE_ID}_1.fastq"
-    reads2 = out_path / f"Sequences_{SAMPLE_ID}_2.fastq"
-    quasr_qc_jar_path = EXTPATH / "QUASR_v7.01" / "qualityControl.jar"
-    # see https://github.com/andrewjpage/QUASR for updated version
-    cmd1 = [
-        "java",
-        "-jar",
-        str(quasr_qc_jar_path),
-        "-f",
-        str(reads1),
-        "-o",
-        str(reads1.parent / reads1.stem),
-        "-m",
-        str(min_threshold),
-        "-l",
-        str(min_length),
-    ]
-    cmd2 = [
-        "java",
-        "-jar",
-        str(quasr_qc_jar_path),
-        "-f",
-        str(reads2),
-        "-o",
-        str(reads2.parent / reads2.stem),
-        "-m",
-        str(min_threshold),
-        "-l",
-        str(min_length),
-    ]
-    cmd3 = [
-        "perl",
-        "-e",
-        PERLCMD,
-    ]
-    subprocess.run(cmd1)
-    subprocess.run(cmd2)
-    subprocess.run(
-        cmd3,
-        stdin=open(reads1.with_suffix(".qc.fq"), "r"),
-        stdout=open(reads1.with_suffix(".fasta"), "w"),
-    )
-    subprocess.run(
-        cmd3,
-        stdin=open(reads2.with_suffix(".qc.fq"), "r"),
-        stdout=open(reads2.with_suffix(".fasta"), "w"),
-    )
+    for read in ["1", "2"]:
+        inreads = out_path / f"Sequences_{SAMPLE_ID}_{read}.fastq"
+        run_quasr(
+            fastq=inreads, min_length=min_length, min_threshold=min_threshold
+        )
+        perl_convert_fasta(fastq=inreads)
 
 
 def main():
