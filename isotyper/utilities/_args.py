@@ -9,10 +9,10 @@ ORG = sys.argv[6]  # organism
 SOURCE = Path(sys.argv[7])
 LENGTH = sys.argv[8]
 COMMAND_MODE = sys.argv[11]
-if len(sys.argv) > 13:
-    REVERSE_PRIMER_GROUP = sys.argv[13]
-else:
-    REVERSE_PRIMER_GROUP = "OTHER"
+# if len(sys.argv) > 13:
+#     REVERSE_PRIMER_GROUP = sys.argv[13]
+# else:
+#     REVERSE_PRIMER_GROUP = "OTHER"
 # output subfolders
 OUT_FASTQ = OUT_PATH / "FASTQ_FILES"
 OUT_ORTSEQ = OUT_PATH / "ORIENTATED_SEQUENCES"
