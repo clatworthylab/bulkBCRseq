@@ -8,6 +8,7 @@ SAMPLE_ID = sys.argv[2]  # name of sample. Also the prefix of the file.
 ORG = sys.argv[6]  # organism
 SOURCE = Path(sys.argv[7])
 LENGTH = sys.argv[8]
+COMMAND_MODE = sys.argv[11]
 if len(sys.argv) > 13:
     REVERSE_PRIMER_GROUP = sys.argv[13]
 else:

@@ -1,12 +1,33 @@
 #!/usr/bin/env python
+import networkx as nx
+
 from operator import itemgetter
 from pathlib import Path
 from typing import Dict, Tuple, List
 
-from isotyper.utilities import fasta_iterator, cluster_i, write_out, Tree
-from isotyper.utilities import READ_NUMBER_DIVISION, EDGE_LENGTHS
+from isotyper.utilities import (
+    Tree,
+    cluster_i,
+    fasta_iterator,
+    write_out,
+    EDGE_LENGTHS,
+    READ_NUMBER_DIVISION,
+)
 from isotyper.qualitycontrol import FILTERED_OUT_NT
-from isotyper.network._settings import COCLUSTERED, CLUSTERED_TMP_FILE, ATT_FILE
+from isotyper.network._settings import (
+    ATT_FILE,
+    CHKEDGES_FILE,
+    CLUSTERED_TMP_FILE,
+    CLUSTER_FILE,
+    COCLUSTERED,
+    DECON_FILE0,
+    EDGES_FILE,
+    PLOT_IDS_FILE,
+    REDUCED_FILE,
+    SEQS_FILE,
+    VERTEX_REL_FILE,
+)
+from isotyper.network._decon import deconvolute_edges
 
 
 def generate_networks(
@@ -170,16 +191,16 @@ def get_vaguely_similar_seqs(
     Parameters
     ----------
     s1 : str
-        Description
+        sequence 1
     s2 : str
-        Description
+        sequence 2
     mis : int
-        Description
+        mismatch
 
     Returns
     -------
     Tuple[str, str, int]
-        Description
+        vaguely similar sequences.
     """
     l1 = len(s1)
     l2 = len(s2)
@@ -258,10 +279,10 @@ def get_similar_clusters(
                         ind = ind + 1
                         for s1 in seqs1:
                             (s1, s2, p) = get_vaguely_similar_seqs(
-                                s1, seqs[seq_id], mis
+                                s1=s1, s2=seqs[seq_id], mis=mis
                             )
                             if p == 1:
-                                (mm, q) = count_diffs(s1, s2, mis)
+                                (mm, q) = count_diffs(s1=s1, s2=s2, mis=mis)
                                 if q == 1:
                                     out = out + c1 + "\t" + c2 + "\n"
                                     indw = indw + 1
@@ -550,6 +571,218 @@ def get_cluster_similarities_single(
                 )
 
 
+def read_graphical_inputs(
+    att_file: Path, file_edges: Path
+) -> Tuple[nx.Graph, int]:
+    """Load network into networkx.
+
+    Parameters
+    ----------
+    att_file : Path
+        path to Att.txt (final node table)
+    file_edges : Path
+        path to Edges.txt (final edge table)
+
+    Returns
+    -------
+    Tuple[nx.Graph, int]
+        networkx graph holding the BCR network.
+    """
+    fh = open(att_file, "r")
+    freq = {}
+    size = []
+    ind = 0
+    G = nx.Graph()
+    G.rtt = {}
+    for l in fh:
+        l = l.strip()
+        l = l.split()
+        f = int(l[1])
+        freq[l[0]] = f
+        size.append(f)
+        G.add_node(l[0])
+        G.rtt[l[0]] = int(f)
+        ind = ind + 1
+    scale1 = max(size)
+    fh.close()
+    fh = open(file_edges, "r")
+    for l in fh:
+        l = l.strip()
+        l = l.split()
+        if l[0] in freq and l[1] in freq:
+            G.add_edge(l[0], l[1])
+    fh.close()
+    return (G, scale1)
+
+
+def output_cluster_file(graph: nx.Graph, cluster_file: Path):
+    """Write out cluster file.
+
+    Parameters
+    ----------
+    graph : nx.Graph
+        networkx graph.
+    cluster_file : Path
+        path to Cluster_sample_identities.txt
+    """
+    con = nx.connected_components(graph)
+    ind = 0
+    ind1 = 0
+    ind2 = 0
+    fh = open(cluster_file, "w")
+    fh.close()
+    out = "# Connected_components\n"
+    max_f, t, nvertmax = 0, 0, 0
+    for i in con:
+        ind = ind + 1
+        tc = 0
+        nvert = 0
+        for j in i:
+            ind1 = ind1 + 1
+            ind2 = ind2 + 1
+            out = (
+                out
+                + str(ind1)
+                + "\t"
+                + str(ind)
+                + "\t"
+                + j
+                + "\t"
+                + str(graph.rtt[j])
+                + "\n"
+            )
+            tc, t = tc + graph.rtt[j], t + graph.rtt[j]
+            nvert = nvert + 1
+            if ind2 > 100:
+                write_out(out, cluster_file)
+                out = ""
+                ind2 = 0
+        if tc > max_f:
+            max_f, nvertmax = tc, nvert
+    write_out(out, cluster_file)
+    print(
+        file_vertex,
+        "Maximum cluster:",
+        max_f * 100.0 / t,
+        "%",
+        nvertmax,
+        "vertices",
+    )
+
+
+def get_network_clusters(att_file: Path, file_edges: Path, cluster_file: Path):
+    """Get network clusters.
+
+    Parameters
+    ----------
+    att_file : Path
+        path to Att.txt (final node table)
+    file_edges : Path
+        path to Edges.txt (final edge table)
+    cluster_file : Path
+        path to Cluster_sample_identities.txt
+    """
+    (G, scale) = read_graphical_inputs(att_file=att_file, file_edges=file_edges)
+    output_cluster_file(graph=G, cluster_file=cluster_file)
+
+
+def reduce_identical_sequences(reduced_file: Path, att_file: Path):
+    """Summary
+
+    Parameters
+    ----------
+    reduced_file : Path
+        path to Fully reduced fasta file.
+    att_file : Path
+        path to Att.txt (final node table)
+    """
+    fh = open(reduced_file, "w")
+    fh.close()
+    fh = open(att_file, "r")
+    (ind, out) = (0, "")
+    for l in fh:
+        l = l.strip().split()
+        if l[0].count("|") >= 1:
+            out = out + ">" + l[0] + "\n" + l[2] + "\n"
+        else:
+            out = (
+                out
+                + ">"
+                + l[0].split(READ_NUMBER_DIVISION)[0]
+                + READ_NUMBER_DIVISION
+                + l[1]
+                + "\n"
+                + l[2]
+                + "\n"
+            )
+        ind = ind + 1
+        if ind > 500:
+            write_out(out, reduced_file)
+            (ind, out) = (0, "")
+    fh.close()
+    write_out(out, reduced_file)
+
+
+def get_network_input(
+    file_cluster: Path, outfile: Path, edge_file: Path, checked_edges: Path
+):
+    """Summary
+
+    Parameters
+    ----------
+    file_cluster : Path
+        Description
+    outfile : Path
+        path to Plot_ids.txt
+    edge_file : Path
+        path to Edges.txt (final edge table)
+    checked_edges : Path
+        path to Checked_edges.txt
+    """
+    fh = open(outfile, "w")
+    fh.close()
+    fh = open(file_cluster, "r")
+    cluster = Tree()
+    ids = {}
+    for l in fh:
+        if l[0] != "#":
+            l = l.strip().split()
+            cluster[l[1]][l[1] + "\t" + l[2] + "\t" + l[3]].value = 1
+            ids[l[2]] = 1
+    fh.close()
+    (out, ind) = ("", 0)
+    for c in cluster:
+        if len(cluster[c]) > 1:
+            for l in cluster[c]:
+                out = out + l + "\n"
+                ind = ind + 1
+                if int(l.split("\t")[2]) > 1000:
+                    print(l)
+        else:
+            for l in cluster[c]:
+                if int(l.split("\t")[2]) > 1:
+                    out = out + l + "\n"
+                    ind = ind + 1
+        if ind > 300:
+            write_out(out, outfile)
+            (out, ind) = ("", 0)
+    write_out(out, outfile)
+    fh = open(checked_edges, "w")
+    fh.close()
+    fh = open(edge_file, "r")
+    (out, ind) = ("", 0)
+    for l in fh:
+        l = l.strip().split()
+        if l[0] in ids and l[1] in ids:
+            out = out + l[0] + "\t" + l[1] + "\t" + l[2] + "\n"
+            ind = ind + 1
+            if ind > 300:
+                write_out(out, checked_edges)
+                (out, ind) = ("", 0)
+    write_out(out, checked_edges)
+    fh.close()
+
+
 def main():
     """main function in step 3."""
     generate_networks(
@@ -557,16 +790,24 @@ def main():
         clustered_file=CLUSTERED_TMP_FILE,
         identity=EDGE_LENGTHS,
         coclustered_file=COCLUSTERED,
-        file_out=ATT_FILE,
+        file_out=VERTEX_REL_FILE,
     )
     deconvolute_edges(
         seq_file=FILTERED_OUT_NT,
+        file_vertex=VERTEX_REL_FILE,
         att_file=ATT_FILE,
-        file_vertex=file_vertex,
-        file_seqs=file_seqs,
-        tmp_file0=tmp_file0,
-        file_edges=file_edges,
-        read_number_division=READ_NUMBER_DIVISION,
+        file_seqs=SEQS_FILE,
+        file_edges=EDGES_FILE,
+    )
+    get_network_clusters(
+        att_file=ATT_FILE, file_edge=EDGES_FILE, cluster_file=CLUSTER_FILE
+    )
+    reduce_identical_sequences(reduced_file=REDUCED_FILE, att_file=ATT_FILE)
+    get_network_input(
+        file_cluster=CLUSTER_FILE,
+        outfile=PLOT_IDS_FILE,
+        edge_file=EDGES_FILE,
+        checked_edges=CHKEDGES_FILE,
     )
 
 
