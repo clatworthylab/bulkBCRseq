@@ -20,6 +20,7 @@ from isotyper.utilities._settings import (
     R2PATTERN,
     READ_NUMBER_DIVISION,
     REVERSE_COMPLEMENT_DICT,
+    TEMP_FILE,
     THRESHOLD_BARCODE,
     THRESHOLD_GENE_SCORE,
 )
@@ -44,6 +45,7 @@ __all__ = [
     "R2PATTERN",
     "READ_NUMBER_DIVISION",
     "REVERSE_COMPLEMENT_DICT",
+    "TEMP_FILE",
     "THRESHOLD_BARCODE",
     "THRESHOLD_GENE_SCORE",
 ]
