@@ -62,7 +62,7 @@ jobs:
     
     - name: Test with pytest
       run: |
-        pytest --cov=BIN --cov-report=xml
+        pytest --cov=isotyper --cov-report=xml
 
     - name: Show coverage
       run: |

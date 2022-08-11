@@ -15,17 +15,17 @@ from collections import defaultdict
 # sys.path.append('/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/')
 # bin_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/BIN/"
 # lib_path = "/lustre/scratch117/cellgen/team297/kt16/BCRSeq/LIBRARY/"
-bin_path = "BIN/"
-lib_path = "LIBRARY/"
-if not os.path.exists(bin_path):
-    bin_path = os.getcwd() + "/BIN/"
-if not os.path.exists(bin_path):
-    raise OSError("Cannot locate path to BIN folder")
-if not os.path.exists(lib_path):
-    lib_path = os.getcwd() + "/LIBRARY/"
-if not os.path.exists(lib_path):
-    raise OSError("Cannot locate path to LIBRARY folder")
-sys.path.append(bin_path)
+# bin_path = "BIN/"
+# lib_path = "LIBRARY/"
+# if not os.path.exists(bin_path):
+#     bin_path = os.getcwd() + "/BIN/"
+# if not os.path.exists(bin_path):
+#     raise OSError("Cannot locate path to BIN folder")
+# if not os.path.exists(lib_path):
+#     lib_path = os.getcwd() + "/LIBRARY/"
+# if not os.path.exists(lib_path):
+#     raise OSError("Cannot locate path to LIBRARY folder")
+# sys.path.append(bin_path)
 
 
 def fasta_iterator(fh1):
