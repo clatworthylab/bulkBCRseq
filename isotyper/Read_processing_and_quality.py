@@ -256,10 +256,10 @@ def get_consensus_sequence(u_seq, u_freq):
 
 
 def trim_sequences_bcr_tcr(
-    untrimmed_file,
-    Output_trim,
-    primer_tag_file,
-    primer_tag_file_count,
+    untrimmed_file: Path,
+    output_trim: Path,
+    primer_tag_file: Path,
+    primer_tag_file_count: Path,
     ref_const,
     reverse_primer_group,
 ):
@@ -267,45 +267,38 @@ def trim_sequences_bcr_tcr(
 
     Parameters
     ----------
-    untrimmed_file : TYPE
+    untrimmed_file : Path
         Description
-    Output_trim : TYPE
+    output_trim : Path
         Description
-    paired : TYPE
+    primer_tag_file : Path
         Description
-    primer_tag_file : TYPE
-        Description
-    primer_tag_file_count : TYPE
+    primer_tag_file_count : Path
         Description
     ref_const : TYPE
         Description
     reverse_primer_group : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     forward, reverse, barcoded_j, barcoded_v, v_ref = get_primers_split(
         PRIMER_FILE
     )
-    fh_out = open(Output_trim, "w")
+    fh_out = open(output_trim, "w")
     fh_out.close()
     fh_out = open(FAIL_FILE, "w")
     fh_out.close()
     if barcoded_j == 1 and barcoded_v == 0:
         single_j_barcoded_trimming_clustered(
-            forward,
-            reverse,
-            barcoded_j,
-            barcoded_v,
-            untrimmed_file,
-            Output_trim,
-            primer_tag_file,
-            primer_tag_file_count,
-            ref_const,
-            v_ref,
+            forward=forward,
+            reverse=reverse,
+            barcode_j=barcoded_j,
+            barcoded_v=barcoded_v,
+            untrimmed_file=untrimmed_file,
+            output_trim=output_trim,
+            primer_tag_file=primer_tag_file,
+            primer_tag_file_count=primer_tag_file_count,
+            ref_const=ref_const,
+            v_ref=v_ref,
         )
 
 
@@ -404,17 +397,20 @@ def get_primers_split(primer_file: Path) -> Tuple:
 
 
 def separate_sequences(
-    primer_tag_file_count, primer_tag_file, Output_trim, ref_const
+    primer_tag_file_count: Path,
+    primer_tag_file: Path,
+    output_trim: Path,
+    ref_const,
 ):
     """Summary
 
     Parameters
     ----------
-    primer_tag_file_count : TYPE
+    primer_tag_file_count : Path
         Description
-    primer_tag_file : TYPE
+    primer_tag_file : Path
         Description
-    Output_trim : TYPE
+    output_trim : Path
         Description
     ref_const : TYPE
         Description
@@ -555,10 +551,10 @@ def single_j_barcoded_trimming_clustered(
     reverse,
     barcoded_j,
     barcoded_v,
-    untrimmed_file,
-    Output_trim,
-    primer_tag_file,
-    primer_tag_file_count,
+    untrimmed_file: Path,
+    output_trim: Path,
+    primer_tag_file: Path,
+    primer_tag_file_count: Path,
     ref_const,
     v_ref,
 ):
@@ -574,17 +570,13 @@ def single_j_barcoded_trimming_clustered(
         Description
     barcoded_v : TYPE
         Description
-    untrimmed_file : TYPE
+    untrimmed_file : Path
         Description
-    Output_trim : TYPE
+    output_trim : Path
         Description
-    primer_tag_file : TYPE
+    primer_tag_file : Path
         Description
-    species : TYPE
-        Description
-    primer_file : TYPE
-        Description
-    primer_tag_file_count : TYPE
+    primer_tag_file_count : Path
         Description
     ref_const : TYPE
         Description
@@ -592,27 +584,28 @@ def single_j_barcoded_trimming_clustered(
         Description
     """
     read_untrimmed_file_single(
-        untrimmed_file,
-        # Output_trim,
-        # primer_tag_file,
-        # tmp_file,
-        primer_tag_file_count,
-        forward,
-        reverse,
-        v_ref,
+        untrimmed_file=untrimmed_file,
+        primer_tag_file_count=primer_tag_file_count,
+        forward=forward,
+        reverse=reverse,
+        v_ref=v_ref,
     )
     check_barcodes_malbac(
-        primer_tag_file_count,
-        primer_tag_file,
-        FAIL_FILE,
-        Output_trim,
+        primer_tag_file_count=primer_tag_file_count,
+        primer_tag_file=primer_tag_file,
+        output_trim=output_trim,
     )
     separate_sequences(
-        primer_tag_file_count, primer_tag_file, Output_trim, ref_const
+        primer_tag_file_count=primer_tag_file_count,
+        primer_tag_file=primer_tag_file,
+        output_trim=output_trim,
+        ref_const=ref_const,
     )
 
 
-def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Output_trim):
+def check_barcodes_malbac(
+    primer_tag_file_count: Path, primer_tag_file: Path, output_trim: Path
+):
     """Summary
 
     Parameters
@@ -621,7 +614,7 @@ def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Output_trim):
         Description
     primer_tag_file : TYPE
         Description
-    Output_trim : TYPE
+    output_trim : TYPE
         Description
     """
     header_txt = (
@@ -629,7 +622,7 @@ def check_barcodes_malbac(primer_tag_file_count, primer_tag_file, Output_trim):
         + "bp_mismatches_to_consensus\tBC_accepted\tconsensus\tsequence\n"
     )
     outs = ["", header_txt]
-    files = [Output_trim, primer_tag_file]
+    files = [output_trim, primer_tag_file]
     for i in range(0, len(files)):
         fh = open(files[i], "w")
         fh.write(outs[i])
@@ -924,10 +917,7 @@ def get_consensus_sequence_large(out_cluster, l1, ids, sum_u_freq):
 
 def read_untrimmed_file_single(
     untrimmed_file: Path,
-    # Output_trim,
-    # primer_tag_file,
-    # tmp_file,
-    primer_tag_file_count,
+    primer_tag_file_count: Path,
     forward,
     reverse,
     v_ref,
@@ -936,15 +926,9 @@ def read_untrimmed_file_single(
 
     Parameters
     ----------
-    untrimmed_file : TYPE
+    untrimmed_file : Path
         Description
-    # Output_trim : TYPE
-    #     Description
-    # primer_tag_file : TYPE
-    #     Description
-    # tmp_file : TYPE
-    #    Description
-    primer_tag_file_count : TYPE
+    primer_tag_file_count : Path
         Description
     forward : TYPE
         Description
@@ -1281,7 +1265,7 @@ def get_paired_reads_overlapping(file1: Path, file2: Path, outfile: Path):
     )
 
 
-def calculate_orf_length(codon, sequence, type, gene):
+def calculate_orf_length(codon, sequence, type):
     """Summary
 
     Parameters
@@ -1291,8 +1275,6 @@ def calculate_orf_length(codon, sequence, type, gene):
     sequence : TYPE
         Description
     type : TYPE
-        Description
-    gene : TYPE
         Description
 
     Returns
@@ -1434,7 +1416,6 @@ def orf_calculation_single(
     Filtered_out1,
     nn_orf_filtered,
     dir_ind,
-    gene,
     ref,
     refj,
     ref_protein,
@@ -1452,8 +1433,6 @@ def orf_calculation_single(
     nn_orf_filtered : TYPE
         Description
     dir_ind : TYPE
-        Description
-    gene : TYPE
         Description
     ref : TYPE
         Description
@@ -1471,7 +1450,6 @@ def orf_calculation_single(
         Filtered_out1,
         nn_orf_filtered,
         dir_ind,
-        gene,
         ref,
         refj,
         ref_protein,
@@ -1483,7 +1461,6 @@ def orf_calculation_single(
         Filtered_out1,
         nn_orf_filtered,
         dir_ind,
-        gene,
         ref,
         refj,
         ref_protein,
@@ -1497,7 +1474,6 @@ def get_protein_sequences(
     Filtered_out1,
     nn_orf_filtered,
     dir_ind,
-    gene,
     ref,
     refj,
     ref_protein,
@@ -1515,8 +1491,6 @@ def get_protein_sequences(
     nn_orf_filtered : TYPE
         Description
     dir_ind : TYPE
-        Description
-    gene : TYPE
         Description
     ref : TYPE
         Description
@@ -1557,7 +1531,7 @@ def get_protein_sequences(
                 header = (
                     header.replace(":", "") + READ_NUMBER_DIVISION + str(freq)
                 )
-            (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene)
+            (ORF1, accept1) = calculate_orf_length(codon, seq, "V")
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
             if accept1 == 0:
@@ -1612,7 +1586,6 @@ def get_nucleotide_sequences(
     Filtered_out1,
     nn_orf_filtered,
     dir_ind,
-    gene,
     ref,
     refj,
     ref_protein,
@@ -1630,8 +1603,6 @@ def get_nucleotide_sequences(
     nn_orf_filtered : TYPE
         Description
     dir_ind : TYPE
-        Description
-    gene : TYPE
         Description
     ref : TYPE
         Description
@@ -1773,8 +1744,8 @@ def count_barcodes(primer_tag_file):
 
 
 def get_read_report(
-    Seq_file1,
-    Seq_file2,
+    seq_file1,
+    seq_file2,
     untrimmed_file,
     trim1,
     nn_orf_filtered,
@@ -1789,9 +1760,9 @@ def get_read_report(
 
     Parameters
     ----------
-    Seq_file1 : TYPE
+    seq_file1 : TYPE
         Description
-    Seq_file2 : TYPE
+    seq_file2 : TYPE
         Description
     untrimmed_file : TYPE
         Description
@@ -1821,8 +1792,8 @@ def get_read_report(
     ) = count_barcodes(primer_tag_file)
     print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
     raw1, raw2, joined, gene_matching = (
-        get_number_sequences(Seq_file1),
-        get_number_sequences(Seq_file2),
+        get_number_sequences(seq_file1),
+        get_number_sequences(seq_file2),
         get_number_sequences(untrimmed_file),
         get_reduced_number_sequences_multi_constants(trim1),
     )
@@ -3191,16 +3162,16 @@ else:
 print("Reverse primer group: ", reverse_primer_group)
 
 # Files for QC and filtering
-# Seq_file1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fasta"
-# Seq_file2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fasta"
+# seq_file1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fasta"
+# seq_file2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fasta"
 # untrimmed_file = OUT_ORTSEQ_TMP / f"Untrimmed_{SAMPLE_ID}.fasta"
-trim1 = OUT_ORTSEQ_TMP / f"trimmed_orientated_all_{SAMPLE_ID}.fasta"
+# trim1 = OUT_ORTSEQ_TMP / f"trimmed_orientated_all_{SAMPLE_ID}.fasta"
 trim2 = OUT_ORTSEQ_TMP / f"Filtered_J_{SAMPLE_ID}.fasta"
 trim3 = OUT_ORTSEQ_TMP / f"Filtered_reduced_{SAMPLE_ID}.fasta"
-Fail_file = OUT_FASTQ / f"Fail_filtered_{SAMPLE_ID}.fasta"
-primer_tag_file = (
-    OUT_ORTSEQ_TMP / f"Barcode_filtering_information_{SAMPLE_ID}.txt"
-)
+# Fail_file = OUT_FASTQ / f"Fail_filtered_{SAMPLE_ID}.fasta"
+# primer_tag_file = (
+#     OUT_ORTSEQ_TMP / f"Barcode_filtering_information_{SAMPLE_ID}.txt"
+# )
 # primer_tag_file_count = OUT_ORTSEQ_TMP / f"All_barcodes_{SAMPLE_ID}.txt"
 Filtered_out1 = OUT_ORTSEQ / f"Filtered_ORFs_sequences_all_{SAMPLE_ID}.fasta"
 nn_orf_filtered = (
@@ -3220,14 +3191,8 @@ file_seqs = OUT_NET / f"Sequences_{SAMPLE_ID}.txt"
 tmp_file0 = OUT_NET / f"Decon_0_{SAMPLE_ID}.txt"
 tmp_pre = OUT_NET / f"Pre_tmp_{SAMPLE_ID}"
 tmp_file_1 = OUT_NET / f"NN_Tmp_cluster_{SAMPLE_ID}.1"
-tmp_file = OUT_NET / f"NN_Tmp_cluster_{SAMPLE_ID}."
+# tmp_file = OUT_NET / f"NN_Tmp_cluster_{SAMPLE_ID}."
 
-# Reference files
-refv = str(LIBPATH / f"Reference_nn_{ORG}_IGHV.fasta")
-refj = str(LIBPATH / f"Reference_nn_{ORG}_IGHJ.fasta")
-refvp = str(LIBPATH / f"Reference_protein_{ORG}_IGHV.fasta")
-refjp = str(LIBPATH / f"Reference_protein_{ORG}_IGHJ.fasta")
-ref_const = str(LIBPATH / f"Reference_nn_{ORG}_IGH_constant_exon1.fasta")
 
 # Commands
 if command_source.count("1") != 0:
@@ -3242,48 +3207,46 @@ if command_source.count("1") != 0:
 # Filtering and processing reads
 if command_source.count("2") != 0:
     get_paired_reads_overlapping(
-        SEQ_FASTA_FILE1, SEQ_FASTA_FILE2, UNTRIMMED_FASTA
+        file1=SEQ_FASTA_FILE1, file2=SEQ_FASTA_FILE2, outfile=UNTRIMMED_FASTA
     )
     trim_sequences_bcr_tcr(
-        UNTRIMMED_FASTA,
-        trim1,
-        primer_tag_file,
-        PRIMER_TAG_FILE,
-        ref_const,
-        reverse_primer_group,
+        untrimmed_file=UNTRIMMED_FASTA,
+        output_trim=TRIM1,
+        primer_tag_file=PRIMER_TAG_FILE,
+        primer_tag_file_count=PRIMER_TAG_FILE_COUNT,
+        ref_const=REF_CONST,
+        reverse_primer_group=reverse_primer_group,
     )
     filter_igj_genes(
-        trim1,
+        TRIM1,
         trim2,
-        refj,
-        ref_const,
-        primer_tag_file_count,
+        REFJ,
+        REF_CONST,
+        PRIMER_TAG_FILE_COUNT,
     )
     reduce_sequences(trim2, trim3)
     orf_calculation_single(
         trim3,
         Filtered_out1,
         nn_orf_filtered,
-        out_path,
-        gene,
-        refv,
-        refj,
-        refvp,
-        refjp,
+        OUT_PATH,
+        REFV,
+        REFJ,
+        REFVP,
+        REFJP,
         tmp_file_orf,
     )
     get_read_report(
-        Seq_file1,
-        Seq_file2,
+        SEQ_FASTA_FILE1,
+        SEQ_FASTA_FILE2,
         UNTRIMMED_FASTA,
-        trim1,
+        TRIM1,
         nn_orf_filtered,
         filtering_report,
-        sample_id,
-        species,
-        gene,
-        out_path,
-        primer_tag_file_count,
+        SAMPLE_ID,
+        SPECIES,
+        OUT_PATH,
+        PRIMER_TAG_FILE_COUNT,
         barcode_group,
     )
 
