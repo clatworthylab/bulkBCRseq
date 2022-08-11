@@ -1613,15 +1613,7 @@ def get_read_report(
         total_sequences_included_before_bc,
     ) = count_barcodes(primer_tag_file=primer_tag_file)
     print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
-    (
-        raw1,
-        raw2,
-        joined,
-        number_unique_seqs,
-        gene_matching,
-        orf,
-        number_unique_seqs,
-    ) = (
+    (raw1, raw2, joined, number_unique_seqs, gene_matching, orf,) = (
         get_number_sequences(file=seq_file1),
         get_number_sequences(file=seq_file2),
         get_number_sequences(file=untrimmed_file),
