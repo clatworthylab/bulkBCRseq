@@ -1387,7 +1387,7 @@ def blast_match_j(
         "-i",
         f"{str(blasted_j_file)}",
         "-o",
-        f"{blasted_j_results}",
+        f"{str(blasted_j_results)}",
         "-b",
         "1",
         "-m",
