@@ -795,7 +795,7 @@ def main():
         file_edges=EDGES_FILE,
     )
     get_network_clusters(
-        att_file=ATT_FILE, file_edge=EDGES_FILE, cluster_file=CLUSTER_FILE
+        att_file=ATT_FILE, file_edges=EDGES_FILE, cluster_file=CLUSTER_FILE
     )
     reduce_identical_sequences(reduced_file=REDUCED_FILE, att_file=ATT_FILE)
     get_network_input(
