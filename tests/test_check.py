@@ -39,7 +39,10 @@ def test_call_script(option, expected2, expected3, expected4):
         len(glob(str(TESTOUTFOLDER / "FASTQ_FILES" / "Fail*.fasta")))
         == expected2
     )
-    assert len(glob(str(TESTOUTFOLDER / "NETWORKS" / "Att*.txt"))) == expected3
+    assert (
+        len(glob(str(TESTOUTFOLDER / "NETWORKS" / "Fully_reduced*.fasta")))
+        == expected3
+    )
 
 
 def test_clean_up():
