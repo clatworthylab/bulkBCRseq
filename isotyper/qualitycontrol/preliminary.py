@@ -44,15 +44,19 @@ def bam_to_fastq(source_path: Path):
         pre_qc_fastq1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fastq"
         pre_qc_fastq2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fastq"
         pre_qc_bam = OUT_FASTQ / f"Sequences_{SAMPLE_ID}.bam"
-        if len(glob(source_path.parent / "*.cram")) != 0:
+        if len(glob(str(source_path.parent / "*.cram"))) != 0:
             cram_to_bam(cram_path=source_path, out_pre_qc_bam_path=pre_qc_bam)
         command1 = [
             "picard",
             "SamToFastq",
-            f"I={str(pre_qc_bam)}",
-            f"FASTQ={pre_qc_fastq1}",
-            f"SECOND_END_FASTQ={pre_qc_fastq2}",
+            "-I",
+            f"{str(pre_qc_bam)}",
+            "-FASTQ",
+            f"{pre_qc_fastq1}",
+            "-SECOND_END_FASTQ",
+            f"{pre_qc_fastq2}",
         ]
+        print(" ".join(command1))
         subprocess.run(command1)
 
 
@@ -87,6 +91,7 @@ def cram_to_bam(cram_path: Path, out_pre_qc_bam_path: Path):
     out_pre_qc_bam_path : Path
         path to output bam file.
     """
+    print("Converting cram to fastq with:\n")
     cmd1 = [
         "samtools",
         "view",
@@ -95,8 +100,8 @@ def cram_to_bam(cram_path: Path, out_pre_qc_bam_path: Path):
         str(out_pre_qc_bam_path),
         str(cram_path),
     ]
-    print(cmd)
-    subprocess.run(cmd)
+    print(" ".join(cmd1))
+    subprocess.run(cmd1)
 
 
 def intialise_files():
