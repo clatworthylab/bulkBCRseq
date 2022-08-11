@@ -6,6 +6,7 @@ import pytest
 
 @pytest.mark.parametrize("option", [1, 2, 3, 4])
 def test_call_script(option):
+    """Basic call script."""
     cmd = [
         "python",
         "Processing_sequences_large_scale.py",
