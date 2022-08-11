@@ -926,7 +926,7 @@ def read_untrimmed_file_single(
     untrimmed_file: Path,
     # Output_trim,
     # primer_tag_file,
-    tmp_file,
+    # tmp_file,
     primer_tag_file_count,
     forward,
     reverse,
