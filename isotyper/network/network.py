@@ -614,7 +614,7 @@ def read_graphical_inputs(
     return (G, scale1)
 
 
-def output_cluster_file(graph: nx.Graph, cluster_file: Path):
+def output_cluster_file(graph: nx.Graph, cluster_file: Path, file_vertex: Path):
     """Write out cluster file.
 
     Parameters
@@ -623,6 +623,8 @@ def output_cluster_file(graph: nx.Graph, cluster_file: Path):
         networkx graph.
     cluster_file : Path
         path to Cluster_sample_identities.txt
+    file_vertex : Path
+        path to Att.txt (final node table)
     """
     con = nx.connected_components(graph)
     ind = 0
@@ -659,7 +661,7 @@ def output_cluster_file(graph: nx.Graph, cluster_file: Path):
             max_f, nvertmax = tc, nvert
     write_out(out, cluster_file)
     print(
-        file_vertex,
+        str(file_vertex),
         "Maximum cluster:",
         max_f * 100.0 / t,
         "%",
@@ -681,7 +683,9 @@ def get_network_clusters(att_file: Path, file_edges: Path, cluster_file: Path):
         path to Cluster_sample_identities.txt
     """
     (G, scale) = read_graphical_inputs(att_file=att_file, file_edges=file_edges)
-    output_cluster_file(graph=G, cluster_file=cluster_file)
+    output_cluster_file(
+        graph=G, cluster_file=cluster_file, file_vertex=att_file
+    )
 
 
 def reduce_identical_sequences(reduced_file: Path, att_file: Path):
