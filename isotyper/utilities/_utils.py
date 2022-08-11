@@ -101,7 +101,7 @@ def deconvolute_same_array(tree: Tree) -> Tuple[Tree, Dict]:
     return (decon, inv)
 
 
-def get_codons(codon_file: Path) -> Tree:
+def get_codons(codon_file: Path) -> Dict:
     """Get codons from codon table file.
     Parameters
     ----------
@@ -113,12 +113,12 @@ def get_codons(codon_file: Path) -> Tree:
         Codons in a Tree data structure.
     """
     fh = open(codon_file, "r")
-    codon = Tree()
+    codon = {}
     for l in fh:
         l = l.strip()
         l1 = l.split()
         l2 = list(l1[0])
-        codon[l2[0]][l2[1]][l2[2]][l1[1]].value = 1
+        codon[l2[0] + l2[1] + l2[2]] = l1[1]
     fh.close()
     return codon
 
