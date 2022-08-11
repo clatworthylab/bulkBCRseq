@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from isotyper.utilities._args import COMMAND_MODE  # , REVERSE_PRIMER_GROUP,
+from .isotyper.utilities._args import COMMAND_MODE  # , REVERSE_PRIMER_GROUP,
 
 # print("Reverse primer group: ", REVERSE_PRIMER_GROUP)
 
