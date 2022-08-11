@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from isotyper.qualitycontrol._qc_settings import (
+from isotyper.qualitycontrol._settings import (
     CODON_FILE,
     FAIL_FILE,
     FILTERED_OUT,

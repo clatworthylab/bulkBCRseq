@@ -19,7 +19,7 @@ from isotyper.utilities._settings import (
     THRESHOLD_BARCODE,
     THRESHOLD_GENE_SCORE,
 )
-from isotyper.qualitycontrol._qc_settings import *
+from isotyper.qualitycontrol._settings import *
 
 
 def get_sequences(file: Path) -> Dict:
