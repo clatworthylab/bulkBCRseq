@@ -837,7 +837,6 @@ def get_consensus_sequence_cluster(u_seq, u_freq):
         main_cmd,
         stdout=open(TMP_FILE.with_suffix(".aligned"), "w"),
     )
-    os.system(command1)
     fh = open(TMP_FILE.with_suffix(".aligned"), "r")
     max_seqs = {}
     for header, sequence in fasta_iterator(fh):
