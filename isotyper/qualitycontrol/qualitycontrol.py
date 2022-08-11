@@ -9,6 +9,7 @@ from isotyper.utilities._utils import (
     check_fasta_not_empty,
     cluster_i,
     fasta_iterator,
+    get_codons,
     get_freq,
     get_match,
     join_reads,
