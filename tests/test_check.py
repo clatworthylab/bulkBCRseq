@@ -39,12 +39,15 @@ def test_call_script(option, expected2, expected3, expected4):
         len(glob(str(TESTOUTFOLDER / "FASTQ_FILES" / "Fail*.fasta")))
         == expected2
     )
-    assert len(glob(str(TESTOUTFOLDER / "NETWORKS" / "*.aligned"))) == expected3
+    assert (
+        len(glob(str(TESTOUTFOLDER / "NETWORKS" / "Fully_reduced*")))
+        == expected3
+    )
 
 
-# def test_clean_up():
-#     for out in ["FASTQ_FILES", "ORIENTATED_SEQUENCES"]:
-#         shutil.rmtree(TESTOUTFOLDER / out)
+def test_clean_up():
+    for out in ["FASTQ_FILES", "ORIENTATED_SEQUENCES"]:
+        shutil.rmtree(TESTOUTFOLDER / out)
 
 
 # @pytest.mark.parametrize("option", [1, 2, 3, 4])

@@ -14,6 +14,7 @@ from isotyper.utilities._utils import (
     get_match,
     join_reads,
     reverse_comp,
+    translate,
     Tree,
     write_out,
 )

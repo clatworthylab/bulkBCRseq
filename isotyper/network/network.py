@@ -20,7 +20,6 @@ from isotyper.network._settings import (
     CLUSTERED_TMP_FILE,
     CLUSTER_FILE,
     COCLUSTERED,
-    DECON_FILE0,
     EDGES_FILE,
     PLOT_IDS_FILE,
     REDUCED_FILE,
