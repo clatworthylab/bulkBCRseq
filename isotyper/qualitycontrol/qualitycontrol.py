@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, Tuple, List
 
 from isotyper.utilities._utils import (
+    Tree,
     reverse_comp,
     fasta_iterator,
     get_freq,
