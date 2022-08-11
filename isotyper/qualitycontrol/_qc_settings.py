@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 from isotyper.utilities._settings import LIBPATH
-from isotyper.utilities._args import ORG, SAMPLE_ID, OUT_NET, OUT_FASTQ
+from isotyper.utilities._args import (
+    ORG,
+    SAMPLE_ID,
+    OUT_NET,
+    OUT_FASTQ,
+    OUT_ORTSEQ_TMP,
+)
 
 
 # Files for Step2
