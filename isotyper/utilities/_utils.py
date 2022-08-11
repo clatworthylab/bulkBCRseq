@@ -103,14 +103,16 @@ def deconvolute_same_array(tree: Tree) -> Tuple[Tree, Dict]:
 
 def get_codons(codon_file: Path) -> Dict:
     """Get codons from codon table file.
+
     Parameters
     ----------
     codon_file : Path
         path to codon file e.g. Codon_table2.txt
+
     Returns
     -------
-    Tree
-        Codons in a Tree data structure.
+    Dict
+        Codons in a dictionary.
     """
     fh = open(codon_file, "r")
     codon = {}
@@ -119,6 +121,30 @@ def get_codons(codon_file: Path) -> Dict:
         l1 = l.split()
         l2 = list(l1[0])
         codon[l2[0] + l2[1] + l2[2]] = l1[1]
+    fh.close()
+    return codon
+
+
+def get_codons_tree(codon_file: Path) -> Tree:
+    """Get codons from codon table file.
+
+    Parameters
+    ----------
+    codon_file : Path
+        path to codon file e.g. Codon_table2.txt
+
+    Returns
+    -------
+    Tree
+        Codons in a Tree data structure.
+    """
+    fh = open(codon_file, "r")
+    codon = Tree()
+    for l in fh:
+        l = l.strip()
+        l1 = l.split()
+        l2 = list(l1[0])
+        codon[l2[0]][l2[1]][l2[2]][l1[1]].value = 1
     fh.close()
     return codon
 
@@ -201,6 +227,29 @@ def translate(seq: str, codon: Dict) -> str:
         c1 = seq[cod + 0] + seq[cod + 1] + seq[cod + 2]
         if c1 in codon:
             p_seq = p_seq + str(codon[c1])
+    return p_seq
+
+
+def translate_tree(seq: str, codon: Tree) -> str:
+    """Translate sequence to amino acid.
+
+    Parameters
+    ----------
+    seq : str
+        sequence to translate.
+    codon : Tree
+        tree dictionary of codons.
+
+    Returns
+    -------
+    str
+        translated sequence.
+    """
+    p_seq = ""
+    for cod in range(0, int(len(seq) / 3 - 1)):
+        cod = cod * 3
+        for c in codon[seq[cod + 0]][seq[cod + 1]][seq[cod + 2]]:
+            p_seq = p_seq + str(c)
     return p_seq
 
 

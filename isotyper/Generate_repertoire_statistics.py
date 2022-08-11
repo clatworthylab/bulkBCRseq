@@ -14,6 +14,8 @@ from isotyper.utilities import (
     create_file,
     write_out,
     intialise_tmp_directory,
+    translate_tree,
+    get_codons_tree,
 )
 
 from isotyper.qualitycontrol import CODON_FILE
@@ -365,7 +367,7 @@ def locate_CDR3_start_site_igh(
         if passed != 2:
             CDR3_prot_trim = CDR3_prot
         for i in [0, 1, 2]:
-            prot = translate(seq[i : len(seq)], codon)
+            prot = translate_tree(seq[i : len(seq)], codon)
             if prot.count(score[0][0]) != 0:
                 ind = i + prot.index(score[0][0]) * 3
                 end = min([ind + ((len(CDR3_prot_trim) + 1) * 3), len(seq)])
@@ -1011,7 +1013,7 @@ def assign_sequences(
     (samev, lengthv) = get_library(refv, "end", 50)
     (samej, lengthj) = get_library(refj, "start", 30)
     (regions, CDR3_end) = get_region_boundaries(species, loc)
-    codon = get_codons(CODON_FILE)
+    codon = get_codons_tree(CODON_FILE)
     fh = open(Seq_file, "r")
     out, out1, t, ind, batch_number, batch, t1 = (
         "",
