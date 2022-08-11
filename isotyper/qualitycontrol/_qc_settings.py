@@ -5,6 +5,7 @@ from isotyper.utilities._args import (
     SAMPLE_ID,
     OUT_NET,
     OUT_FASTQ,
+    OUT_ORTSEQ,
     OUT_ORTSEQ_TMP,
 )
 
