@@ -1699,3 +1699,7 @@ def main():
         species=SPECIES,
         out_path=OUT_PATH,
     )
+
+
+if __name__ == "__main__":
+    main()

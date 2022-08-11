@@ -359,3 +359,26 @@ def get_freq(header: str) -> int:
     """
     header = header.split(READ_NUMBER_DIVISION)
     return int(header[1])
+
+
+def get_match(primer: str, seq: str) -> List:
+    """Find sequence in primer.
+
+    Parameters
+    ----------
+    primer : str
+        primer sequence
+    seq : str
+        sequence
+
+    Returns
+    -------
+    List
+        List of matches.
+    """
+    loc = []
+    if seq.count(primer) != 0:
+        for m in re.finditer(primer, seq):
+            loc = loc + [m.start()]
+            # loc = seq.index(primer)
+    return loc
