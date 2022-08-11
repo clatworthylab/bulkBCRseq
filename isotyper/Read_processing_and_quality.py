@@ -282,7 +282,7 @@ def trim_sequences_bcr_tcr(
         single_j_barcoded_trimming_clustered(
             forward=forward,
             reverse=reverse,
-            barcode_j=barcoded_j,
+            barcoded_j=barcoded_j,
             barcoded_v=barcoded_v,
             untrimmed_file=untrimmed_file,
             output_trim=output_trim,
