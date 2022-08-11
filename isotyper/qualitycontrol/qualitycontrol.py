@@ -1703,7 +1703,7 @@ def main():
         nn_orf_filtered=FILTERED_OUT_NT,
         filtering_report=FILTERING_REPORT,
         sample_id=SAMPLE_ID,
-        species=SPECIES,
+        species=ORG,
         out_path=OUT_PATH,
     )
 
