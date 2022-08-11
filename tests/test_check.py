@@ -22,9 +22,9 @@ def test_call_script(option):
         "Y",
     ]
     run(cmd)
-    assert len(glob(TESTOUTFOLDER / "FASTQ_FILES")) == 1
-    assert len(glob(TESTOUTFOLDER / "ORIENTATED_SEQUENCES")) == 1
-    assert len(glob(TESTOUTFOLDER / "FASTQ_FILES" / "*.qc.fq")) > 0
+    assert len(glob(str(TESTOUTFOLDER / "FASTQ_FILES"))) == 1
+    assert len(glob(str(TESTOUTFOLDER / "ORIENTATED_SEQUENCES"))) == 1
+    assert len(glob(str(TESTOUTFOLDER / "FASTQ_FILES" / "*.qc.fq"))) > 0
 
 
 @pytest.mark.parametrize("option", [1, 2, 3, 4])
@@ -40,7 +40,7 @@ def test_call_script_fastq_gz(option):
         "Y",
     ]
     run(cmd)
-    assert len(glob(TESTOUTFOLDER / "FASTQ_FILES" / "*test1*.qc.fq")) > 0
+    assert len(glob(str(TESTOUTFOLDER / "FASTQ_FILES" / "*test1*.qc.fq"))) > 0
 
 
 def test_prep_fastq():
