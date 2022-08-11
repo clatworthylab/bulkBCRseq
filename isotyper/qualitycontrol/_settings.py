@@ -2,11 +2,12 @@
 from isotyper.utilities._settings import LIBPATH
 from isotyper.utilities._args import (
     ORG,
-    SAMPLE_ID,
-    OUT_NET,
     OUT_FASTQ,
+    OUT_NET,
     OUT_ORTSEQ,
     OUT_ORTSEQ_TMP,
+    OUT_PATH,  # for import into main script
+    SAMPLE_ID,
 )
 
 # primer file
