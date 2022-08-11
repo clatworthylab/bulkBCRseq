@@ -4,13 +4,14 @@ from pathlib import Path
 from typing import Dict, Tuple, List
 
 from isotyper.utilities._utils import (
-    Tree,
     check_fasta_not_empty,
+    cluster_i,
     fasta_iterator,
     get_freq,
     get_match,
     join_reads,
     reverse_comp,
+    Tree,
     write_out,
 )
 from isotyper.utilities._settings import (

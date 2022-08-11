@@ -382,3 +382,41 @@ def get_match(primer: str, seq: str) -> List:
             loc = loc + [m.start()]
             # loc = seq.index(primer)
     return loc
+
+
+def cluster_i(input_file: Path, clustered_file: Path, identity: float):
+    """Run CD-HIT clustering
+
+    Parameters
+    ----------
+    input_file : Path
+        input file to run CD-HIT clustering.
+    clustered_file : Path
+        output file of CD-HIT.
+    identity : float
+        sequence identity threshold.
+    """
+    command = [
+        "cd-hit",
+        "-i",
+        str(input_file),
+        "-o",
+        str(clustered_file),
+        "-c",
+        str(identity),
+        "-g",
+        "1",
+        "-d",
+        "180",
+        "-T",
+        "10",
+        "-M",
+        "0",
+        "-AL",
+        "40",
+        "-bak",
+        "1",
+        "-p",
+        "1",
+    ]
+    subprocess.run(command)
