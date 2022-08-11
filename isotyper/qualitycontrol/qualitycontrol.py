@@ -5,12 +5,13 @@ from typing import Dict, Tuple, List
 
 from isotyper.utilities._utils import (
     Tree,
-    reverse_comp,
+    check_fasta_not_empty,
     fasta_iterator,
     get_freq,
+    get_match,
     join_reads,
+    reverse_comp,
     write_out,
-    check_fasta_not_empty,
 )
 from isotyper.utilities._settings import (
     READ_NUMBER_DIVISION,
