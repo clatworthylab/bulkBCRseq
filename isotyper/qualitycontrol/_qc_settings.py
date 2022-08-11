@@ -11,6 +11,7 @@ from isotyper.utilities._args import (
 
 # primer file
 PRIMER_FILE = LIBPATH / f"Primers_{ORG}_IG_RBR_Constant_region_MPLX_table.txt"
+CODON_FILE = LIBPATH / f"Codon_table2.txt"
 
 # reference files
 REFJ = LIBPATH / f"Reference_nn_{ORG}_IGHJ.fasta"

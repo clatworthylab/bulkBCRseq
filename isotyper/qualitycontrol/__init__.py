@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from isotyper.qualitycontrol._qc_settings import (
+    CODON_FILE,
     FAIL_FILE,
     FILTERED_OUT,
     FILTERED_OUT_NT,
@@ -20,6 +21,7 @@ from isotyper.qualitycontrol._qc_settings import (
 )
 
 __all__ = [
+    "CODON_FILE",
     "FAIL_FILE",
     "FILTERED_OUT",
     "FILTERED_OUT_NT",

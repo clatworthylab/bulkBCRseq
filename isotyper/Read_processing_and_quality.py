@@ -1387,8 +1387,7 @@ def get_protein_sequences(
     fh.close()
     fh = open(nn_orf_filtered, "w")
     fh.close()
-    (codon) = get_codons()
-    # (word, v_match) = (4, 45)
+    codon = get_codons(CODON_FILE)
     (word) = 4
     (dict1) = get_sequences_ref(ref_protein, word)
     fh = open(output_trim, "r")

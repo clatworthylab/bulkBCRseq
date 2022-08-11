@@ -16,6 +16,8 @@ from isotyper.utilities import (
     intialise_tmp_directory,
 )
 
+from isotyper.qualitycontrol import CODON_FILE
+
 
 def reduce(seq):
     """Summary
@@ -971,7 +973,6 @@ def assign_sequences(
     refj,
     loc,
     CDR3_end_file,
-    codon_file: Path,
 ):
     """Summary
     Parameters
@@ -996,8 +997,6 @@ def assign_sequences(
         Description
     CDR3_end_file : TYPE
         Description
-    codon_file : Path
-        path to codon file e.g. Codon_table2.txt
     """
     head = (
         "#ID\tIGHV\tFR1s\tFR1e\tCDR1s\tCDR1e\tFR2s\tFR2e\tCDR2s\tCDR2e\tFR3s\tFR3e\t"
@@ -1012,7 +1011,7 @@ def assign_sequences(
     (samev, lengthv) = get_library(refv, "end", 50)
     (samej, lengthj) = get_library(refj, "start", 30)
     (regions, CDR3_end) = get_region_boundaries(species, loc)
-    codon = get_codons(codon_file)
+    codon = get_codons(CODON_FILE)
     fh = open(Seq_file, "r")
     out, out1, t, ind, batch_number, batch, t1 = (
         "",
