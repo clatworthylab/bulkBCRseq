@@ -1578,6 +1578,7 @@ def get_read_report(
     sample_id: str,
     species: str,
     out_path: Path,
+    primer_tag_file: Path,
 ):
     """Generate report.
 
@@ -1601,6 +1602,8 @@ def get_read_report(
         organism
     out_path : Path
         location of output.
+    primer_tag_file : Path
+        path to primer tag file.
     """
     barcoded_j, barcoded_v = 1, 0
     print(barcoded_j, barcoded_v)
@@ -1705,6 +1708,7 @@ def main():
         sample_id=SAMPLE_ID,
         species=ORG,
         out_path=OUT_PATH,
+        primer_tag_file=PRIMER_TAG_FILE,
     )
 
 
