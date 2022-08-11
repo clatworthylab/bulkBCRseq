@@ -6,7 +6,7 @@ import pytest
 
 TESTFOLDER = Path("tests")
 TESTDATFOLDER = TESTFOLDER / "data"
-TESTOUTFOLDER = TESTFOLDER / "out"
+TESTOUTFOLDER = TESTFOLDER / "output"
 
 
 @pytest.mark.parametrize("option", [1, 2, 3, 4])
