@@ -10,7 +10,7 @@ import networkx as nx
 from glob import glob
 from operator import itemgetter, add
 from pathlib import Path
-from typing import Union, Tuple
+from typing import Union, Tuple, Dict
 
 from isotyper.utilities import *
 from isotyper.qualitycontrol import *
