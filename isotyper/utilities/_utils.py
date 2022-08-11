@@ -75,7 +75,7 @@ def deconvolute_same_array(tree: Tree) -> Tuple[Tree, Dict]:
     index = 0
     for i in tree:
         if i not in inv:
-            index = index + 1
+            index += 1
             decon[i][i].value = 1
             inv[i] = i
             array = []

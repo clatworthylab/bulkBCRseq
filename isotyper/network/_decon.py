@@ -85,7 +85,7 @@ def print_vertices(
     fh.close()
     ind = 0
     for seq_id in all_seqs:
-        ind = ind + 1
+        ind += 1
         if seq_id in inverse:
             if seq_id in same:
                 id1 = (
@@ -216,7 +216,7 @@ def decon_identical(
                 s = seqs[j.split(READ_NUMBER_DIVISION)[0]]
                 if len(s) < len(mins):
                     mins = s
-                ind = ind + 1
+                ind += 1
                 if ind > 100:
                     write_out(out, file_seqs)
                     out = ""
@@ -281,7 +281,7 @@ def get_inverse_ids(
                 l[1].split(READ_NUMBER_DIVISION)[0]
             ]
             raw[l[1].split(READ_NUMBER_DIVISION)[0]] = 1
-            ind = ind + 1
+            ind += 1
     fh.close()
     fh = open(att_file, "r")
     for l in fh:
@@ -339,7 +339,7 @@ def print_single_edges(
                     + id2
                     + "\n"
                 )
-                ind = ind + 1
+                ind += 1
                 if ind > 300:
                     write_out(edge, tmp_file)
                     edge = ""
@@ -420,7 +420,7 @@ def reduce_edges(file_in: Path, file_out: Path):
             if l[0] != l[1]:
                 out = out + l[0] + "\t" + l[1] + "\t" + l[2] + "\n"
                 done[l[0]][l[1]].value = 1
-                ind = ind + 1
+                ind += 1
                 if ind > 300:
                     ind = 0
                     write_out(out, file_out)

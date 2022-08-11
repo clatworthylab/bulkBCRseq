@@ -164,18 +164,18 @@ def count_diffs(s1: str, s2: str, mis: int) -> Tuple[int, int]:
     p = 1
     for i in range(0, len(s2) - 1):
         if s1[i1] == s2[i2]:
-            i1 = i1 + 1
-            i2 = i2 + 1
+            i1 += 1
+            i2 += 1
         else:
             if s1[i1 + 1] == s2[i2]:
-                i1 = i1 + 1
-                mm = mm + 1
+                i1 += 1
+                mm += 1
             else:
                 if s1[i1] == s2[i2 + 1]:
-                    i2 = i2 + 1
-                    mm = mm + 1
+                    i2 += 1
+                    mm += 1
                 else:
-                    mm = mm + 1
+                    mm += 1
         if mm > mis:
             p = 0
             break
@@ -261,7 +261,7 @@ def get_similar_clusters(
                 if seq_id in seqs:
                     s1 = seqs[seq_id]
                     seqs1.append(s1)
-                    ind = ind + 1
+                    ind += 1
                     if ind > comp:
                         break
             for i2 in range(i + 1, len(s_sizes)):
@@ -275,7 +275,7 @@ def get_similar_clusters(
                         # If sequence is different > X% then move onto next cluster
                         # If sequence is less different than Y% then co-cluster the clusters
                         p = 0
-                        ind = ind + 1
+                        ind += 1
                         for s1 in seqs1:
                             (s1, s2, p) = get_vaguely_similar_seqs(
                                 s1=s1, s2=seqs[seq_id], mis=mis
@@ -284,7 +284,7 @@ def get_similar_clusters(
                                 (mm, q) = count_diffs(s1=s1, s2=s2, mis=mis)
                                 if q == 1:
                                     out = out + c1 + "\t" + c2 + "\n"
-                                    indw = indw + 1
+                                    indw += 1
                                     if indw > 100:
                                         write_out(out, coclustered_file)
                                         out = ""
@@ -403,12 +403,12 @@ def do_counting(s1: str, s2: str, mismatch: int) -> int:
     l = min([len(s1), len(s2)])
     for i in range(0, l - 2):
         if s1[i1] == s2[i2]:
-            i1 = i1 + 1
-            i2 = i2 + 1
+            i1 += 1
+            i2 += 1
         else:
-            mm = mm + 1
-            i2 = i2 + 1
-            i1 = i1 + 1
+            mm += 1
+            i2 += 1
+            i1 += 1
         if mm > mismatch + 1:
             break
     return mm
@@ -487,7 +487,7 @@ def get_similarity_single(clust_seqs: List, file_out: Path, c: str):
                                 + str(l2)
                                 + "\n"
                             )
-                            ind1 = ind1 + 1
+                            ind1 += 1
                         else:
                             (p, mm) = get_diff(s1=s1, s2=s2, mismatch=mismatch)
                             if p == 1 and mm <= mismatch:
@@ -506,7 +506,7 @@ def get_similarity_single(clust_seqs: List, file_out: Path, c: str):
                                     + str(l2)
                                     + "\n"
                                 )
-                                ind1 = ind1 + 1
+                                ind1 += 1
                 if ind1 >= 100:
                     write_out(out, file_out)
                     ind1 = 0
@@ -539,7 +539,7 @@ def get_cluster_similarities_single(
     t = 0
     for c in cluster:
         if c not in inv:
-            ind = ind + 1
+            ind += 1
             clust_seqs = []
             t = 0
             for id in cluster[c]:
@@ -550,7 +550,7 @@ def get_cluster_similarities_single(
                         len(seqs[id.split(READ_NUMBER_DIVISION)[0]]),
                     )
                 )
-                t = t + 1
+                t += 1
             for c1 in coclust[c]:
                 for id in cluster[c1]:
                     clust_seqs.append(
@@ -560,7 +560,7 @@ def get_cluster_similarities_single(
                             len(seqs[id.split(READ_NUMBER_DIVISION)[0]]),
                         )
                     )
-                    t = t + 1
+                    t += 1
             clust_seqs = sorted(clust_seqs, key=itemgetter(2), reverse=True)
             if len(clust_seqs) > 1:
                 if len(clust_seqs) > 500:
@@ -601,7 +601,7 @@ def read_graphical_inputs(
         size.append(f)
         G.add_node(l[0])
         G.rtt[l[0]] = int(f)
-        ind = ind + 1
+        ind += 1
     scale1 = max(size)
     fh.close()
     fh = open(file_edges, "r")
@@ -633,12 +633,12 @@ def output_cluster_file(graph: nx.Graph, cluster_file: Path):
     out = "# Connected_components\n"
     max_f, t, nvertmax = 0, 0, 0
     for i in con:
-        ind = ind + 1
+        ind += 1
         tc = 0
         nvert = 0
         for j in i:
-            ind1 = ind1 + 1
-            ind2 = ind2 + 1
+            ind1 += 1
+            ind2 += 1
             out = (
                 out
                 + str(ind1)
@@ -651,7 +651,7 @@ def output_cluster_file(graph: nx.Graph, cluster_file: Path):
                 + "\n"
             )
             tc, t = tc + graph.rtt[j], t + graph.rtt[j]
-            nvert = nvert + 1
+            nvert += 1
             if ind2 > 100:
                 write_out(out, cluster_file)
                 out = ""
@@ -714,7 +714,7 @@ def reduce_identical_sequences(reduced_file: Path, att_file: Path):
                 + l[2]
                 + "\n"
             )
-        ind = ind + 1
+        ind += 1
         if ind > 500:
             write_out(out, reduced_file)
             (ind, out) = (0, "")
@@ -754,14 +754,14 @@ def get_network_input(
         if len(cluster[c]) > 1:
             for l in cluster[c]:
                 out = out + l + "\n"
-                ind = ind + 1
+                ind += 1
                 if int(l.split("\t")[2]) > 1000:
                     print(l)
         else:
             for l in cluster[c]:
                 if int(l.split("\t")[2]) > 1:
                     out = out + l + "\n"
-                    ind = ind + 1
+                    ind += 1
         if ind > 300:
             write_out(out, outfile)
             (out, ind) = ("", 0)
@@ -774,7 +774,7 @@ def get_network_input(
         l = l.strip().split()
         if l[0] in ids and l[1] in ids:
             out = out + l[0] + "\t" + l[1] + "\t" + l[2] + "\n"
-            ind = ind + 1
+            ind += 1
             if ind > 300:
                 write_out(out, checked_edges)
                 (out, ind) = ("", 0)

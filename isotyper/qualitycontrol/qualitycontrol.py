@@ -72,24 +72,26 @@ def get_paired_reads_overlapping(
     tot, f_joining, total, length, fail_no_pair = 0, 0, 0, 30, 0
     for seq_id in seqs1:
         if seq_id in seqs2:
-            total = total + 1
+            total += 1
             (seq, failed) = join_reads(seqs1[seq_id], seqs2[seq_id], length)
             if failed == 0 and len(seq) > 180:
-                ind, tot = ind + 1, tot + 1
+                ind += 1
+                tot += 1
                 out = out + ">" + seq_id + "\n" + seq + "\n"
             else:
                 seq2 = reverse_comp(seqs2[seq_id])
                 (seq, failed) = join_reads(seqs1[seq_id], seq2, length)
                 if failed == 0 and len(seq) > 180:
-                    ind, tot = ind + 1, tot + 1
+                    ind += 1
+                    tot += 1
                     out = out + ">" + seq_id + "\n" + seq + "\n"
                 else:
-                    f_joining = f_joining + 1
+                    f_joining += 1
             if ind > 100:
                 write_out(out, outfile)
                 out, ind = "", 0
         else:
-            fail_no_pair = fail_no_pair + 1
+            fail_no_pair += 1
     write_out(out, outfile)
     del out, ind
     print(
@@ -342,14 +344,14 @@ def check_barcodes_malbac(
         for s in seqs[t1]:
             f = 0
             for h in seqs[t1][s]:
-                f = f + int(h.split(":")[1])
-            total_tags, u_seq, u_freq, u_header, ind = (
-                total_tags + f,
+                f += int(h.split(":")[1])
+            u_seq, u_freq, u_header = (
                 u_seq + [s],
                 u_freq + [f],
                 u_header + [h],
-                ind + 1,
             )
+            total_tags += f
+            ind += 1
         f = sum(u_freq)
         h = (
             h.split(":")[0].split(READ_NUMBER_DIVISION)[0]
@@ -359,7 +361,7 @@ def check_barcodes_malbac(
         if sum(u_freq) > 20:
             print("BC group size:\t", len(u_freq), t1.split())
         if len(u_freq) == 1:
-            passed_seqs_total = passed_seqs_total + f
+            passed_seqs_total += f
             outp = (
                 outp
                 + h
@@ -378,7 +380,7 @@ def check_barcodes_malbac(
         elif len(u_freq) < 500:
             if max(u_freq) > sum(u_freq) * THRESHOLD_BARCODE:
                 nz = [i for i in range(len(u_freq)) if u_freq[i] != max(u_freq)]
-                passed_seqs_total = passed_seqs_total + f
+                passed_seqs_total += f
                 consensus = u_seq[nz[0]]
                 outp = (
                     outp
@@ -432,9 +434,9 @@ def check_barcodes_malbac(
                         )
                         + "\n"
                     )
-                    passed_seqs_total = passed_seqs_total + f
+                    passed_seqs_total += f
                 else:
-                    fail_less_than_threshold = fail_less_than_threshold + 1
+                    fail_less_than_threshold += 1
             else:
                 consensus, pass_consensus = get_consensus_sequence_cluster(
                     u_seq, u_freq
@@ -459,9 +461,9 @@ def check_barcodes_malbac(
                         )
                         + "\n"
                     )
-                    passed_seqs_total = passed_seqs_total + f
+                    passed_seqs_total += f
                 else:
-                    fail_less_than_threshold = fail_less_than_threshold + 1
+                    fail_less_than_threshold += 1
         if ind > 200:
             write_out(outp, primer_tag_file)
             outp, ind = "", 0
@@ -740,7 +742,7 @@ def read_untrimmed_file_single(
     for header, seq in fasta_iterator(fh):
         seq = seq.upper()
         seqs1[seq][header].value = 1
-        t = t + 1
+        t += 1
     out, ind = (
         "#ID\tJ_tag\tV_tag\tSequence\ttype_rev\ttype_for\tprimer_rev\tprimer_for\n",
         0,
@@ -753,7 +755,7 @@ def read_untrimmed_file_single(
         passes, j_tag, v_tag = 0, "", ""
         type_rev, type_for = "", ""
         primer_rev, primer_for = "", ""
-        total = total + 1
+        total += 1
         for i in range(0, len(reverse)):
             pj = get_match(reverse[i][2], seq)
             if max(pj + [-1]) == -1 or len(pj) == 0:
@@ -817,7 +819,7 @@ def read_untrimmed_file_single(
                                 passes = 1
                                 break
         if passes == 1:
-            pass_r = pass_r + 1
+            pass_r += 1
             for i in range(0, len(forward)):
                 pv = get_match(forward[i][0], seq)
                 if max(pv + [-1]) != -1:
@@ -834,7 +836,7 @@ def read_untrimmed_file_single(
                         pv = get_match(w[0], seq)
                         if max(pv + [-1]) != -1 and len(pv) > 0:
                             if pv[0] < len(seq) / 2:
-                                p = p + 1
+                                p += 1
                             else:
                                 pv[0] = -1
                     if max(pv + [-1]) != -1 and len(pv) > 0 and p > 1:
@@ -862,7 +864,7 @@ def read_untrimmed_file_single(
                     type_for, primer_for = v_ref[i][1], v_ref[i][2]
                     passes = 2
         if passes == 2:
-            pass_f = pass_f + 1
+            pass_f += 1
             if len(seq) > minl and len(seq) < maxl:
                 if seq.count("N") == 0:
                     # if(type_rev==type_for):
@@ -885,8 +887,8 @@ def read_untrimmed_file_single(
                         )
                         + "\n"
                     )
-                    pass_all = pass_all + 1
-                    ind = ind + 1
+                    pass_all += 1
+                    ind += 1
                     if ind > 200:
                         write_out(out, primer_tag_file_count)
                         out, ind = "", 0
@@ -1007,7 +1009,7 @@ def separate_sequences(
                 + s
                 + "\n"
             )
-            ind = ind + 1
+            ind += 1
             if ind > 100:
                 write_out(out, output_trim)
                 out, ind = "", 0
@@ -1167,7 +1169,7 @@ def get_max_orf(orf_all: str, word: str, dt: Dict) -> Tuple:
             sc = 0
             for i in range(1, len(s) - word):
                 if s[i : (i + word)] in dt:
-                    sc = sc + 1
+                    sc += 1
             score.append(sc)
             codon.append(si[1])
         maxi = score.index(max(score))
@@ -1225,9 +1227,9 @@ def get_protein_sequences(
                 )
             (ORF1, accept1) = calculate_orf_length(codon=codon, sequence=seq)
             ORFa[header] = ORF1
-            number_seqs = number_seqs + 1  # freq
+            number_seqs += 1  # freq
             if accept1 == 0:
-                orf_fail = orf_fail + 1
+                orf_fail += 1
             if accept1 != 0:
                 if len(ORF1) > 1:
                     min_score, found = 2, 0
@@ -1240,15 +1242,15 @@ def get_protein_sequences(
                         seq = seq[codon1 : len(seq)]
                         found = 1
                     if found == 1:
-                        number_accepted = number_accepted + 1
+                        number_accepted += 1
                 else:
                     p_seq[header] = ORF1[0][0]
-                    number_accepted = number_accepted + 1
+                    number_accepted += 1
                     seq = seq[ORF1[0][1] : len(seq)]
                 seqs[seq][header].value = 1
-                indb = indb + 1
+                indb += 1
                 if indb >= batch:
-                    batch_number = batch_number + 1
+                    batch_number += 1
                     out = ""
                     for seq_id in p_seq:
                         out = out + ">" + seq_id + "\n" + p_seq[seq_id] + "\n"
@@ -1260,7 +1262,7 @@ def get_protein_sequences(
     out, ind = "", 0
     for seq_id in p_seq:
         out = out + ">" + seq_id + "\n" + p_seq[seq_id] + "\n"
-        ind = ind + 1
+        ind += 1
         if ind > 500:
             write_out(out, filtered_out)
             out, ind = "", 0
@@ -1297,7 +1299,7 @@ def get_nucleotide_sequences(
         if header in ids:
             out = out + ">" + header + "\n" + sequence + "\n"
             done[header] = 1
-            ind = ind + 1
+            ind += 1
             if ind > 500:
                 write_out(out, nn_orf_filtered)
                 out, ind = "", 0
@@ -1330,8 +1332,9 @@ def filter_igj_genes(trim1: Path, trim2: Path, refj):
         inf = 0
         out = out + ">" + header + "\n" + sequence[inf : len(sequence)] + "\n"
         seqs[header] = sequence
-        ind, batch = ind + 1, batch + 1
-        c = c + 1
+        ind += 1
+        batch += 1
+        c += 1
         if batch >= batch_size:
             blast_match_j(
                 out=out,
@@ -1459,7 +1462,7 @@ def reduce_sequences(trim2, trim3):
             + head
         )
         out = out + header + "\n" + seq + "\n"
-        ind = ind + 1
+        ind += 1
         if ind > 500:
             write_out(out, trim3)
             out, ind = "", 0
@@ -1488,11 +1491,11 @@ def count_barcodes(primer_tag_file: Path) -> Tuple[int, int, int]:
             bc = l[3] + ":" + l[4]
             if l[1] != "NA":
                 freq = int(l[1])  # int(l[0].split(READ_NUMBER_DIVISION)[1])
-                uniq_seq = uniq_seq + 1
+                uniq_seq += 1
                 bc_uniq[bc] = 1
-                bc_count = bc_count + freq
+                bc_count += freq
                 if l[6] != "YES":
-                    bc_failed = bc_failed + 1
+                    bc_failed += 1
     fh.close()
     n_barcodes, uniq_sequences, total_sequences_included_before_bc = (
         len(bc_uniq),
@@ -1524,7 +1527,7 @@ def get_number_sequences(file: Path) -> int:
     if c[0] not in ["wc:", "ls:"]:
         fh = open(file, "r")
         for header, sequence in fasta_iterator(fh):
-            count = count + 1
+            count += 1
         fh.close()
     else:
         count = -1
