@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from collections import defaultdict
 from pathlib import Path
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 
 from isotyper.utilities._settings import (
     REVERSE_COMPLEMENT_DICT,
