@@ -53,7 +53,7 @@ jobs:
       with:
         auto-activate-base: true
         auto-update-conda : true
-        activate-environment: bulkBCRseq
+        activate-environment: isotyper
         channels: conda-forge, bioconda, anaconda, defaults
         channel-priority: true
         python-version: ${{ matrix.python-version }}

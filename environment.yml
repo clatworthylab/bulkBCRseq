@@ -1,4 +1,4 @@
-name: bulkBCRseq
+name: isotyper
 channels:
 - conda-forge
 - bioconda
