@@ -263,7 +263,6 @@ def trim_sequences_bcr_tcr(
     Fail_file,
     Output_trim,
     paired,
-    species,
     primer_tag_file,
     tmp_file,
     primer_tag_file_count,
@@ -281,8 +280,6 @@ def trim_sequences_bcr_tcr(
     Output_trim : TYPE
         Description
     paired : TYPE
-        Description
-    species : TYPE
         Description
     primer_tag_file : TYPE
         Description
@@ -320,7 +317,6 @@ def trim_sequences_bcr_tcr(
             primer_tag_file,
             tmp_file,
             paired,
-            species,
             primer_tag_file_count,
             ref_const,
             v_ref,
@@ -579,8 +575,6 @@ def single_j_barcoded_trimming_clustered(
     primer_tag_file,
     tmp_file,
     paired,
-    species,
-    primer_file,
     primer_tag_file_count,
     ref_const,
     v_ref,
@@ -625,8 +619,6 @@ def single_j_barcoded_trimming_clustered(
         Fail_file,
         Output_trim,
         paired,
-        species,
-        primer_file,
         primer_tag_file,
         tmp_file,
         primer_tag_file_count,
@@ -972,8 +964,6 @@ def read_untrimmed_file_single(
     Fail_file,
     Output_trim,
     paired,
-    species,
-    primer_file,
     primer_tag_file,
     tmp_file,
     primer_tag_file_count,
@@ -992,10 +982,6 @@ def read_untrimmed_file_single(
     Output_trim : TYPE
         Description
     paired : TYPE
-        Description
-    species : TYPE
-        Description
-    primer_file : TYPE
         Description
     primer_tag_file : TYPE
         Description
@@ -1197,8 +1183,6 @@ def get_sequences(file):
     TYPE
         Description
     """
-    command = "gunzip {}".format(file)
-    os.system(command)
     fh = open(file, "r")
     seqs = {}
     for header, sequence in fasta_iterator(fh):
@@ -3299,7 +3283,6 @@ if command_source.count("2") != 0:
         Fail_file,
         trim1,
         paired,
-        species,
         primer_tag_file,
         tmp_file,
         primer_tag_file_count,
