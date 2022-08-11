@@ -1,147 +1,65 @@
 #!/usr/bin/env python
-import os
-from subprocess import call
-
+from pathlib import Path
+from subprocess import run
+from glob import glob
 import pytest
 
-
-class Tester:
-
-    """Summary
-
-    Attributes
-    ----------
-    bsub : TYPE
-        Description
-    execute : TYPE
-        Description
-    metadata : TYPE
-        Description
-    option : TYPE
-        Description
-    verbose : TYPE
-        Description
-    """
-
-    __test__ = False
-
-    def __init__(self, option, metadata, bsub, verbose, execute):
-        """Summary
-
-        Parameters
-        ----------
-        option : TYPE
-            Description
-        metadata : TYPE
-            Description
-        bsub : TYPE
-            Description
-        verbose : TYPE
-            Description
-        execute : TYPE
-            Description
-        """
-        self.option = option
-        self.metadata = metadata
-        self.bsub = bsub
-        self.verbose = verbose
-        self.execute = execute
-
-    def run_test(self):
-        """Summary"""
-        env = os.environ.copy()
-        if self.option is None:
-            opt = 1
-        else:
-            opt = self.option
-        if self.metadata is None:
-            meta = "tests/data/Sample_metadata.txt"
-        else:
-            meta = self.metadata
-        if self.bsub:
-            bsub_ = "Y"
-        else:
-            bsub_ = "N"
-        if self.verbose:
-            verbose_ = "Y"
-        else:
-            verbose_ = "N"
-        if self.execute:
-            execute_ = "Y"
-        else:
-            execute_ = "N"
-        cmd = [
-            "python",
-            "Processing_sequences_large_scale.py",
-            meta,
-            str(opt),
-            bsub_,
-            verbose_,
-            execute_,
-        ]
-        call(cmd, env=env)
+TESTFOLDER = Path("tests")
+TESTDATFOLDER = TESTFOLDER / "data"
+TESTOUTFOLDER = TESTFOLDER / "out"
 
 
-@pytest.fixture
-def tester_standard(request):
-    """Summary
-
-    Parameters
-    ----------
-    request : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    return Tester(request.param, None, False, True, False)
-
-
-@pytest.fixture
-def tester_bsub(request):
-    """Summary
-
-    Parameters
-    ----------
-    request : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
-    """
-    return Tester(request.param, None, True, True, False)
+@pytest.mark.parametrize("option", [1, 2, 3, 4])
+def test_call_script(option):
+    """Basic call script."""
+    cmd = [
+        "python",
+        "Processing_sequences_large_scale.py",
+        str(TESTDATFOLDER / "Sample_metadata.txt"),
+        str(option),
+        "N",
+        "Y",
+        "Y",
+    ]
+    run(cmd)
+    assert len(glob(TESTOUTFOLDER / "FASTQ_FILES")) == 1
+    assert len(glob(TESTOUTFOLDER / "ORIENTATED_SEQUENCES")) == 1
+    assert len(glob(TESTOUTFOLDER / "FASTQ_FILES" / "*.qc.fq")) > 0
 
 
-class TestRun:
+@pytest.mark.parametrize("option", [1, 2, 3, 4])
+def test_call_script_fastq_gz(option):
+    """Basic call script on fastq.gz."""
+    cmd = [
+        "python",
+        "Processing_sequences_large_scale.py",
+        str(TESTDATFOLDER / "Sample_metadata2a.txt"),
+        str(option),
+        "N",
+        "Y",
+        "Y",
+    ]
+    run(cmd)
+    assert len(glob(TESTOUTFOLDER / "FASTQ_FILES" / "*test1*.qc.fq")) > 0
 
-    """Summary"""
 
-    @pytest.mark.parametrize(
-        "tester_standard", [1, 2, 3, 4], indirect=["tester_standard"]
-    )
-    def test_run1(self, tester_standard):
-        """Summary
+def test_prep_fastq():
+    """unzip gz file."""
+    for file in ["test1_R1_001.fastq.gz", "test1_R2_001.fastq.gz"]:
+        zipped = TESTDATFOLDER / file
+        run(["gunzip", zipped])
 
-        Parameters
-        ----------
-        tester_standard : TYPE
-            Description
-        """
-        tester_standard.run_test()
 
-    @pytest.mark.parametrize(
-        "tester_bsub", [1, 2, 3, 4], indirect=["tester_bsub"]
-    )
-    def test_run2(self, tester_bsub):
-        """Summary
-
-        Parameters
-        ----------
-        tester_bsub : TYPE
-            Description
-        """
-        tester_bsub.run_test()
+@pytest.mark.parametrize("option", [1, 2, 3, 4])
+def test_call_script_fastq(option):
+    """Basic call script on fastq."""
+    cmd = [
+        "python",
+        "Processing_sequences_large_scale.py",
+        str(TESTDATFOLDER / "Sample_metadata2b.txt"),
+        str(option),
+        "N",
+        "Y",
+        "Y",
+    ]
+    run(cmd)
