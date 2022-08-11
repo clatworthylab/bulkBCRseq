@@ -3253,9 +3253,9 @@ ref_const = str(LIBPATH / f"Reference_nn_{ORG}_IGH_constant_exon1.fasta")
 
 # Commands
 if command_source.count("1") != 0:
-    from isotyper.preprocessing import prep
+    from isotyper.qualitycontrol import preliminary
 
-    prep.main()
+    preliminary.main()
 
 
 # Tip: it is good to check all the fasta files in the FASTQ_FILES directory have
