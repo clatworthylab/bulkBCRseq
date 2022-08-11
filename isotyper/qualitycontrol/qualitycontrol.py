@@ -1402,7 +1402,7 @@ def blast_match_j(
         "-word_size",
         "4",
     ]
-    subprocess.run(command1)
+    subprocess.run(command1, stderr=subprocess.DEVNULL)
     fh = open(blasted_j_results, "r")
     out, done = "", {}
     for l in fh:
