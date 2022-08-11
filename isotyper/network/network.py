@@ -6,9 +6,10 @@ from pathlib import Path
 from typing import Dict, Tuple, List
 
 from isotyper.utilities import (
-    Tree,
+    create_file,
     cluster_i,
     fasta_iterator,
+    Tree,
     write_out,
     EDGE_LENGTHS,
     READ_NUMBER_DIVISION,
@@ -532,8 +533,7 @@ def get_cluster_similarities_single(
     inv : Dict
         dictionary
     """
-    fh = open(file_out, "w")
-    fh.close()
+    create_file(file_out)
     ind = 0
     total = len(cluster)
     t = 0
@@ -628,8 +628,7 @@ def output_cluster_file(graph: nx.Graph, cluster_file: Path):
     ind = 0
     ind1 = 0
     ind2 = 0
-    fh = open(cluster_file, "w")
-    fh.close()
+    create_file(cluster_file)
     out = "# Connected_components\n"
     max_f, t, nvertmax = 0, 0, 0
     for i in con:
@@ -695,8 +694,7 @@ def reduce_identical_sequences(reduced_file: Path, att_file: Path):
     att_file : Path
         path to Att.txt (final node table)
     """
-    fh = open(reduced_file, "w")
-    fh.close()
+    create_file(reduced_file)
     fh = open(att_file, "r")
     (ind, out) = (0, "")
     for l in fh:
@@ -738,8 +736,7 @@ def get_network_input(
     checked_edges : Path
         path to Checked_edges.txt
     """
-    fh = open(outfile, "w")
-    fh.close()
+    create_file(outfile)
     fh = open(file_cluster, "r")
     cluster = Tree()
     ids = {}
@@ -766,8 +763,7 @@ def get_network_input(
             write_out(out, outfile)
             (out, ind) = ("", 0)
     write_out(out, outfile)
-    fh = open(checked_edges, "w")
-    fh.close()
+    create_file(checked_edges)
     fh = open(edge_file, "r")
     (out, ind) = ("", 0)
     for l in fh:

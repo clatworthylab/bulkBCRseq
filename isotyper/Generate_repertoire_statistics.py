@@ -16,6 +16,7 @@ from isotyper.utilities import (
     intialise_tmp_directory,
     translate_tree,
     get_codons_tree,
+    READ_NUMBER_DIVISION,
 )
 
 from isotyper.qualitycontrol import CODON_FILE
@@ -100,7 +101,12 @@ def get_sequence_length_distributions(seq_file, seq_length_ditribution):
     lengths = {}
     for header, sequence in fasta_iterator(fh):
         l = len(sequence)
-        f = sum(map(int, header.split("|")[0].split("__")[1].split("_")))
+        f = sum(
+            map(
+                int,
+                header.split("|")[0].split(READ_NUMBER_DIVISION)[1].split("_"),
+            )
+        )
         if l in lengths:
             lengths[l] = lengths[l] + f
         else:
@@ -522,8 +528,10 @@ def blast_match(
                     ) - int(l[9])
                     end_diff = v_end_ref - v_end_query
                     V_end_potential = v_end_query
-                    if l[0].split("__")[0] in prots:
-                        CDR3_prot_potential = prots[l[0].split("__")[0]]
+                    if l[0].split(READ_NUMBER_DIVISION)[0] in prots:
+                        CDR3_prot_potential = prots[
+                            l[0].split(READ_NUMBER_DIVISION)[0]
+                        ]
                         shift = int((V_end_potential / 3) - 5)
                         CDR3_prot_potential = CDR3_prot_potential[
                             shift : len(CDR3_prot_potential)
@@ -681,7 +689,7 @@ def get_annotation(
     #     "IGHV_end\tIGHJ\tIGHJ_start\tCDR3s\tCDR3e\tCDR3_prot\tCDR3_nn\n")
     out = ""
     for id in seqs:
-        # o=id.split("__")[0] ################# remove
+        # o=id.split(READ_NUMBER_DIVISION)[0] ################# remove
         o = id
         if id in passesv:
             v_found = [
@@ -826,7 +834,7 @@ def get_protein_sequences(protein_file):
     seqs = {}
     fh = open(protein_file, "r")
     for header, seq in fasta_iterator(fh):
-        seqs[header.split("__")[0]] = seq.upper()
+        seqs[header.split(READ_NUMBER_DIVISION)[0]] = seq.upper()
     fh.close()
     return seqs
 
@@ -1026,11 +1034,11 @@ def assign_sequences(
     )
     seqs, failed, indent = {}, 0, 80
     for header, seq in fasta_iterator(fh):
-        # if(header.split("__")[0] in prots):
+        # if(header.split(READ_NUMBER_DIVISION)[0] in prots):
         if 1 == 1:
-            # if(header.split("__")[0] in ids_test):
+            # if(header.split(READ_NUMBER_DIVISION)[0] in ids_test):
             (t, ind) = (t + 1, ind + 1)
-            header = header.split("__")[0]
+            header = header.split(READ_NUMBER_DIVISION)[0]
             out = out + ">" + header + "\n" + seq + "\n"
             out1 = (
                 out1
@@ -1157,7 +1165,7 @@ def Get_clusters(cluster_file):
     for l in fh:
         if l[0] != "#":
             l = l.strip().split()
-            clusters[l[2].split("__")[0]] = l[1]
+            clusters[l[2].split(READ_NUMBER_DIVISION)[0]] = l[1]
     fh.close()
     return clusters
 
@@ -1179,17 +1187,17 @@ def Get_max_cluster(seqs, max_id, clusters):
     """
     max_seq, max_aa = seqs[max_id][1], seqs[max_id][2]
     max_v, max_j = seqs[max_id][3], seqs[max_id][4]
-    max_c = clusters[max_id.split("__")[0]]
+    max_c = clusters[max_id.split(READ_NUMBER_DIVISION)[0]]
     l1 = len(max_seq)
     max_cluster = {}
     max_cluster[max_id] = 1
     mismatch = 6
     for id in seqs:
         if id != max_id:
-            if clusters[id.split("__")[0]] == max_c:
+            if clusters[id.split(READ_NUMBER_DIVISION)[0]] == max_c:
                 max_cluster[id] = max_c
             else:
-                max_cluster[id] = clusters[id.split("__")[0]]
+                max_cluster[id] = clusters[id.split(READ_NUMBER_DIVISION)[0]]
                 seq2, seqs2aa, v, j = (
                     seqs[id][1],
                     seqs[id][2],
@@ -1363,7 +1371,7 @@ def refine_cdr3(annot_file, refined_file, cluster_file):
                             for i in range(1, 19):
                                 o = o + "\t" + l[i]
                             annot[l[0]] = o
-                            freq = int(l[0].split("__")[1])
+                            freq = int(l[0].split(READ_NUMBER_DIVISION)[1])
                             seqs[l[0]] = [
                                 freq,
                                 l[18],
@@ -1394,7 +1402,7 @@ def refine_cdr3(annot_file, refined_file, cluster_file):
                 + "\t"
                 + str(len(seqs[id][2]))
                 + "\t"
-                + str(id.split("__")[1])
+                + str(id.split(READ_NUMBER_DIVISION)[1])
                 + "\t"
                 + cluster
                 + "\n"
@@ -1583,8 +1591,15 @@ def get_network_statistics_per_chain(
             id = l[2]
             chains, freq, id_short = (
                 id.split("|")[1].split("_"),
-                list(map(int, id.split("__")[1].split("|")[0].split("_"))),
-                id.split("__")[0],
+                list(
+                    map(
+                        int,
+                        id.split(READ_NUMBER_DIVISION)[1]
+                        .split("|")[0]
+                        .split("_"),
+                    )
+                ),
+                id.split(READ_NUMBER_DIVISION)[0],
             )
             t1 = t1 + sum(freq)
             n = n + 1
@@ -1893,7 +1908,7 @@ def get_large_clusters(
         if l[0] != "#":
             l = l.strip().split()
             c, id, f = l[1], l[2], int(l[3])
-            id = id.split("__")[0] + "__" + l[3]
+            id = id.split(READ_NUMBER_DIVISION)[0] + READ_NUMBER_DIVISION + l[3]
             total = total + f
             if c in clust_size:
                 clust_size[c] = clust_size[c] + f
@@ -1973,7 +1988,7 @@ def Get_ids(header_file, seq_file_all, id, seq_file):
         for l in fh:
             if l[0] == ">":
                 id = l.strip().replace(">", "")
-                f = id.split("__")[1].split("_")[index_used]
+                f = id.split(READ_NUMBER_DIVISION)[1].split("_")[index_used]
                 if f != "0":
                     ids[id.split(":")[0]] = int(f)
                     # print id.split(":")[0]
@@ -1981,7 +1996,7 @@ def Get_ids(header_file, seq_file_all, id, seq_file):
         fh.close()
     fh = open(seq_file, "r")
     for header, seq in fasta_iterator(fh):
-        ids[header.split(":")[0]] = int(header.split("__")[1])
+        ids[header.split(":")[0]] = int(header.split(READ_NUMBER_DIVISION)[1])
     fh.close()
     print("IDS read", len(ids))
     return ids
@@ -2002,14 +2017,14 @@ def get_annotation_for_clusters(annot_file, ids):
     """
     ids_find = {}
     for id in ids:
-        ids_find[id.split("__")[0]] = id
+        ids_find[id.split(READ_NUMBER_DIVISION)[0]] = id
     fh = open(annot_file, "r")
     cluster_annot, cluster_mutations, CDR3s = Tree(), {}, {}
     for l in fh:
         if l[0] != "#":
             l = l.strip().split()
-            if l[0].split("__")[0] in ids_find:
-                c = ids[ids_find[l[0].split("__")[0]]]
+            if l[0].split(READ_NUMBER_DIVISION)[0] in ids_find:
+                c = ids[ids_find[l[0].split(READ_NUMBER_DIVISION)[0]]]
                 if len(l) >= 14:
                     # v, j = l[1], l[13]
                     j = l[13]
@@ -2018,7 +2033,7 @@ def get_annotation_for_clusters(annot_file, ids):
                     vj = l[1] + "\t" + l[13]
                     cluster_annot[c][vj][l[0]].value = 1
                     if len(l) >= 20 and l[19].count("CDR") == 0:
-                        CDR3s[l[0].split("__")[0]] = l[17]
+                        CDR3s[l[0].split(READ_NUMBER_DIVISION)[0]] = l[17]
                         if c in cluster_mutations:
                             cluster_mutations[c] = deepcopy(
                                 cluster_mutations[c]
@@ -2092,12 +2107,12 @@ def get_max_sequences(seq_file, ids):
     """
     ids_find = {}
     for id in ids:
-        ids_find[id.split("__")[0]] = id
+        ids_find[id.split(READ_NUMBER_DIVISION)[0]] = id
     fh = open(seq_file, "r")
     seqs = {}
     for header, sequence in fasta_iterator(fh):
-        if header.split("__")[0] in ids_find:
-            seqs[header.split("__")[0]] = sequence
+        if header.split(READ_NUMBER_DIVISION)[0] in ids_find:
+            seqs[header.split(READ_NUMBER_DIVISION)[0]] = sequence
     fh.close()
     return seqs
 
@@ -2160,8 +2175,8 @@ def get_cluster_stats(
                 max_seq,
                 reads_in_max_seq,
             ) = sig_clust_info[i]
-            if max_seq.split("__")[0] in seqs:
-                seq = seqs[max_seq.split("__")[0]]
+            if max_seq.split(READ_NUMBER_DIVISION)[0] in seqs:
+                seq = seqs[max_seq.split(READ_NUMBER_DIVISION)[0]]
             else:
                 seq = max_seq
             if c in cluster_annotation:
@@ -2359,12 +2374,15 @@ def get_gene_frequencies(annot_file, gene_freq_file, gene, id):
         if l[0] != "#":
             l = l.strip().split()
             if len(l) >= 13:
-                if l[0].count("__") != 0:
+                if l[0].count(READ_NUMBER_DIVISION) != 0:
                     f, v, j = (
                         sum(
                             map(
                                 int,
-                                l[0].split("__")[1].split("|")[0].split("_"),
+                                l[0]
+                                .split(READ_NUMBER_DIVISION)[1]
+                                .split("|")[0]
+                                .split("_"),
                             )
                         ),
                         l[1].split("*")[0],
@@ -2383,12 +2401,15 @@ def get_gene_frequencies(annot_file, gene_freq_file, gene, id):
                 else:
                     print(l)
             elif len(l) == 9:
-                if l[0].count("__") != 0:
+                if l[0].count(READ_NUMBER_DIVISION) != 0:
                     f, v, j = (
                         sum(
                             map(
                                 int,
-                                l[0].split("__")[1].split("|")[0].split("_"),
+                                l[0]
+                                .split(READ_NUMBER_DIVISION)[1]
+                                .split("|")[0]
+                                .split("_"),
                             )
                         ),
                         l[1].split("*")[0],

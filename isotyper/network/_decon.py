@@ -4,10 +4,11 @@ from pathlib import Path
 from typing import Dict, Tuple, List
 
 from isotyper.utilities import (
-    fasta_iterator,
-    write_out,
-    Tree,
+    create_file,
     deconvolute_same_array,
+    fasta_iterator,
+    Tree,
+    write_out,
     READ_NUMBER_DIVISION,
 )
 from isotyper.network._settings import CLUSTERED_TMP_FILE
@@ -81,8 +82,7 @@ def print_vertices(
     """
     out = ""
     # total = 0
-    fh = open(att_file, "w")
-    fh.close()
+    create_file(att_file)
     ind = 0
     for seq_id in all_seqs:
         ind += 1
@@ -310,8 +310,7 @@ def print_single_edges(
     raw : Dict
         Description
     """
-    fh = open(tmp_file, "w")
-    fh.close()
+    create_file(tmp_file)
     edge, ind = "", 0
     for id1 in edges:
         ida = id1

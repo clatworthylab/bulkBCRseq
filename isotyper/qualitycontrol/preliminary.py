@@ -8,11 +8,11 @@ from pathlib import Path
 from typing import Union
 
 from isotyper.utilities._settings import (
+    EXTPATH,
+    MIN_QUAL,
+    PERLCMD,
     R1PATTERN,
     R2PATTERN,
-    MIN_QUAL,
-    EXTPATH,
-    PERLCMD,
 )
 from isotyper.utilities._args import (
     LENGTH,

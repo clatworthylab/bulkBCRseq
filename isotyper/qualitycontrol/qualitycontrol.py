@@ -8,6 +8,7 @@ from typing import Dict, Tuple, List
 from isotyper.utilities._utils import (
     check_fasta_not_empty,
     cluster_i,
+    create_file,
     fasta_iterator,
     get_codons,
     get_freq,
@@ -67,8 +68,7 @@ def get_paired_reads_overlapping(
     seqs2 = get_sequences(seq_file2)
     print("Forward reads:", len(seqs1), "Reverse reads:", len(seqs2))
     out, ind = "", 0
-    fh = open(outfile, "w")
-    fh.close()
+    create_file(outfile)
     tot, f_joining, total, length, fail_no_pair = 0, 0, 0, 30, 0
     for seq_id in seqs1:
         if seq_id in seqs2:
@@ -734,8 +734,7 @@ def read_untrimmed_file_single(
     v_ref : TYPE
         Description
     """
-    fh = open(primer_tag_file_count, "w")
-    fh.close()
+    create_file(primer_tag_file_count)
     fh = open(untrimmed_file, "r")
     minl, maxl = 120, 1000000
     seqs1, t = Tree(), 0
@@ -1203,10 +1202,8 @@ def get_protein_sequences(
     ref_protein : Path
         reference fasta file.
     """
-    fh = open(filtered_out, "w")
-    fh.close()
-    fh = open(nn_orf_filtered, "w")
-    fh.close()
+    create_file(filtered_out)
+    create_file(nn_orf_filtered)
     codon = get_codons(codon_file=CODON_FILE)
     (word) = 4
     (dict1) = get_sequences_ref(file=ref_protein, word=word)
@@ -1285,8 +1282,7 @@ def get_nucleotide_sequences(
     nn_orf_filtered : Path
         filtered nucleotide fasta file.
     """
-    fh = open(nn_orf_filtered, "w")
-    fh.close()
+    create_file(nn_orf_filtered)
     fh = open(filtered_out, "r")
     ids = {}
     for header, sequence in fasta_iterator(fh):
@@ -1321,8 +1317,7 @@ def filter_igj_genes(trim1: Path, trim2: Path, refj):
         IGHJ reference.
     """
     mode = "WITHIN"
-    fh = open(trim2, "w")
-    fh.close()
+    create_file(trim2)
     out, ind, batch, batch_size = "", 0, 0, 100
     seqs, indent = {}, 120
     fh = open(trim1, "r")
@@ -1427,8 +1422,7 @@ def reduce_sequences(trim2, trim3):
         Description
     """
     minl = 185  # change for shorter runs
-    fh = open(trim3, "w")
-    fh.close()
+    create_file(trim3)
     fh = open(trim2, "r")
     seqs, head = Tree(), ""
     for header, seq in fasta_iterator(fh):

@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 from isotyper.utilities._args import (
-    # ORG,
     SAMPLE_ID,
     OUT_NET,
-    # OUT_FASTQ,
-    # OUT_ORTSEQ,
-    # OUT_ORTSEQ_TMP,
 )
 
 # clustered files
