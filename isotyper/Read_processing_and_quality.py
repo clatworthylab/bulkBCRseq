@@ -493,9 +493,9 @@ def separate_sequences(
             )
             ind = ind + 1
             if ind > 100:
-                write_out(out, Output_trim)
+                write_out(out, output_trim)
                 out, ind = "", 0
-    write_out(out, Output_trim)
+    write_out(out, output_trim)
 
 
 def assess_gene_score(consensus, word_dict):
