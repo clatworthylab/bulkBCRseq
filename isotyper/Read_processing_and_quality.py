@@ -160,7 +160,7 @@ def check_fasta_not_empty(fh):
     return pfh
 
 
-def get_consensus_sequence(u_seq, u_freq, tmp_file):
+def get_consensus_sequence(u_seq, u_freq):
     """Summary
 
     Parameters
@@ -168,8 +168,6 @@ def get_consensus_sequence(u_seq, u_freq, tmp_file):
     u_seq : TYPE
         Description
     u_freq : TYPE
-        Description
-    tmp_file : TYPE
         Description
 
     Returns
@@ -180,28 +178,27 @@ def get_consensus_sequence(u_seq, u_freq, tmp_file):
     out = ""
     for i in range(0, len(u_seq)):
         out = out + ">" + str(i) + "\n" + u_seq[i] + "\n"
-    fh = open(tmp_file + "txt", "w")
+    fh = open(TMP_FILE, "w")
     fh.write(out)
     fh.close()
+    main_cmd = [
+        "mafft",
+        "--retree",
+        "2",
+    ]
     if len(u_seq) > 2000:
-        command1 = (
-            "mafft --retree 2 --parttree "
-            + "{}txt".format(tmp_file)
-            + " > {}aligned".format(tmp_file)
-        )
-    else:
-        command1 = (
-            "mafft --retree 2 "
-            + "{}txt".format(tmp_file)
-            + " > {}aligned".format(tmp_file)
-        )
-    os.system(command1)
-    fh = open(tmp_file + "aligned", "r")
+        main_cmd = main_cmd + ["--parttree"]
+    main_cmd = main_cmd + [f"{TMP_FILE}"]
+    subprocess.run(
+        main_cmd,
+        stdout=open(TMP_FILE.with_suffix(".aligned"), "w"),
+    )
+    fh = open(TMP_FILE.with_suffix(".aligned"), "r")
     max_seqs = {}
     pfh = check_fasta_not_empty(fh)
     fh.close()
     if pfh == 1:
-        fh = open(tmp_file + "aligned", "r")
+        fh = open(TMP_FILE.with_suffix(".aligned"), "r")
         for header, sequence in fasta_iterator(fh):
             max_seqs[sequence.upper()] = int(header)
         fh.close()
@@ -252,7 +249,6 @@ def get_consensus_sequence(u_seq, u_freq, tmp_file):
                                     )
                                 )
                             consensus = consensus + "_"
-        # else:print "ERROR", u_freq, u_seq
     else:
         consensus = ""
     return consensus
@@ -305,7 +301,6 @@ def trim_sequences_bcr_tcr(
     fh_out = open(Fail_file, "w")
     fh_out.close()
     if barcoded_j == 1 and barcoded_v == 0:
-        print("J barcoded")
         single_j_barcoded_trimming_clustered(
             forward,
             reverse,
@@ -750,7 +745,6 @@ def check_barcodes_malbac(
                     len(u_seq[i]),
                     ids,
                     sum(u_freq),
-                    tmp_file,
                 )
                 if consensus != "" and pass_consensus == 1:
                     outp = (
@@ -777,7 +771,7 @@ def check_barcodes_malbac(
                     fail_less_than_threshold = fail_less_than_threshold + 1
             else:
                 consensus, pass_consensus = get_consensus_sequence_cluster(
-                    u_seq, u_freq, tmp_file
+                    u_seq, u_freq
                 )
                 if consensus.count("_") == 0 and pass_consensus == 1:
                     outp = (
@@ -810,7 +804,7 @@ def check_barcodes_malbac(
     print(total_tags, passed_seqs_total, fail_less_than_threshold)
 
 
-def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file):
+def get_consensus_sequence_cluster(u_seq, u_freq):
     """Summary
 
     Parameters
@@ -818,8 +812,6 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file):
     u_seq : TYPE
         Description
     u_freq : TYPE
-        Description
-    tmp_file : TYPE
         Description
 
     Returns
@@ -830,24 +822,23 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file):
     out = ""
     for i in range(0, len(u_seq)):
         out = out + ">" + str(i) + "\n" + u_seq[i] + "\n"
-    fh = open(tmp_file + "txt", "w")
+    fh = open(TMP_FILE, "w")
     fh.write(out)
     fh.close()
+    main_cmd = [
+        "mafft",
+        "--retree",
+        "2",
+    ]
     if len(u_seq) > 2000:
-        # command1 = "mafft --retree 2 " + insert + " " + tmp_file + "txt > " + tmp_file + "aligned"
-        command1 = (
-            "mafft --retree 2 --parttree "
-            + "{}txt".format(tmp_file)
-            + " > {}aligned".format(tmp_file)
-        )
-    else:
-        command1 = (
-            "mafft --retree 2 "
-            + "{}txt".format(tmp_file)
-            + " > {}aligned".format(tmp_file)
-        )
+        main_cmd = main_cmd + ["--parttree"]
+    main_cmd = main_cmd + [f"{TMP_FILE}"]
+    subprocess.run(
+        main_cmd,
+        stdout=open(TMP_FILE.with_suffix(".aligned"), "w"),
+    )
     os.system(command1)
-    fh = open(tmp_file + "aligned", "r")
+    fh = open(TMP_FILE.with_suffix(".aligned"), "r")
     max_seqs = {}
     for header, sequence in fasta_iterator(fh):
         max_seqs[sequence.upper()] = int(header)
@@ -902,9 +893,7 @@ def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file):
     return (consensus, pass_consensus)
 
 
-def get_consensus_sequence_large(
-    out_cluster, Fail_file, l1, ids, sum_u_freq, tmp_file
-):
+def get_consensus_sequence_large(out_cluster, Fail_file, l1, ids, sum_u_freq):
     """Summary
 
     Parameters
@@ -918,8 +907,6 @@ def get_consensus_sequence_large(
     ids : TYPE
         Description
     sum_u_freq : TYPE
-        Description
-    tmp_file : TYPE
         Description
 
     Returns
@@ -951,7 +938,7 @@ def get_consensus_sequence_large(
         for id in cluster[max_clust]:
             seq_align.append(ids[id][0])
             s_freq.append(ids[id][1])
-        consensus = get_consensus_sequence(seq_align, s_freq, tmp_file)
+        consensus = get_consensus_sequence(seq_align, s_freq)
         if consensus.count("_") == 0 and len(consensus) > 3:
             pass_consensus = 1
         else:

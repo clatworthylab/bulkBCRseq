@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from pathlib import Path
 from isotyper import __path__
-from isotyper.utilities._args import ORG
+from isotyper.utilities._args import ORG, OUT_NET, SAMPLE_ID
 
 ISOTYPERPREFIX = Path(__path__[0])
 # set up some default paths
@@ -26,3 +26,4 @@ MIN_QUAL = 32
 R1PATTERN = "_R1_001"
 R2PATTERN = "_R2_001"
 PRIMER_FILE = LIBPATH / f"Primers_{ORG}_IG_RBR_Constant_region_MPLX_table.txt"
+TMP_FILE = OUT_NET / f"NN_Tmp_cluster_{SAMPLE_ID}.txt"
