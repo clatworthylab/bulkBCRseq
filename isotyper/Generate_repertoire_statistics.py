@@ -2393,9 +2393,9 @@ intialise_tmp_directory(dir)
 if "ANNOTATE" in command:
     if species in [
         "HOMO_SAPIENS",
-        "MACACA_MULATTA",
+        # "MACACA_MULATTA",
         "MUS_MUSCULUS",
-        "LLAMA_GLAMA",
+        # "LLAMA_GLAMA",
     ]:
         assign_sequences(
             seq_file,

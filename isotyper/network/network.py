@@ -789,7 +789,7 @@ def main():
     )
     deconvolute_edges(
         seq_file=FILTERED_OUT_NT,
-        file_vertex=VERTEX_REL_FILE,
+        ver_rel_file=VERTEX_REL_FILE,
         att_file=ATT_FILE,
         file_seqs=SEQS_FILE,
         file_edges=EDGES_FILE,
