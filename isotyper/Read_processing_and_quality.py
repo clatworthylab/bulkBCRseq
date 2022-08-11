@@ -15,7 +15,7 @@ from typing import Union, Tuple
 from isotyper.utilities import *
 
 
-def reduce_sequences(trim2, trim3, primer_file):
+def reduce_sequences(trim2, trim3):
     """Summary
 
     Parameters
@@ -24,48 +24,48 @@ def reduce_sequences(trim2, trim3, primer_file):
         Description
     trim3 : TYPE
         Description
-    primer_file : TYPE
-        Description
     """
-    const = "TRUE"
     minl = 185  # change for shorter runs
-    if const == "TRUE":
-        fh = open(trim3, "w")
-        fh.close()
-        fh = open(trim2, "r")
-        seqs, head = Tree(), ""
-        for header, seq in fasta_iterator(fh):
-            if len(seq) >= minl:
-                seq = seq.upper()
-                seqs[seq][header].value = 1
-                head = header.split("|")[1]
-            else:
-                print(seq)
-        fh.close()
-        out, ind, times = "", 0, len(head.split("_"))
-        print("number of chains", times)
-        for seq in seqs:
-            f = [0] * times
-            for id in seqs[seq]:
-                f1 = list(map(int, id.split("__")[1].split("|")[0].split("_")))
-                f = list(map(add, f, f1))
-            header = (
-                ">"
-                + id.split("__")[0]
-                + "__"
-                + "_".join(map(str, f))
-                + "|"
-                + head
+    fh = open(trim3, "w")
+    fh.close()
+    fh = open(trim2, "r")
+    seqs, head = Tree(), ""
+    for header, seq in fasta_iterator(fh):
+        if len(seq) >= minl:
+            seq = seq.upper()
+            seqs[seq][header].value = 1
+            head = header.split("|")[1]
+        else:
+            print(seq)
+    fh.close()
+    out, ind, times = "", 0, len(head.split("_"))
+    print("number of chains", times)
+    for seq in seqs:
+        f = [0] * times
+        for seq_id in seqs[seq]:
+            f1 = list(
+                map(
+                    int,
+                    seq_id.split(READ_NUMBER_DIVISION)[1]
+                    .split("|")[0]
+                    .split("_"),
+                )
             )
-            out = out + header + "\n" + seq + "\n"
-            ind = ind + 1
-            if ind > 500:
-                write_out(out, trim3)
-                out, ind = "", 0
-        write_out(out, trim3)
-    else:
-        command1 = "cp {} {}".format(trim2, trim3)
-        os.system(command1)
+            f = list(map(add, f, f1))
+        header = (
+            ">"
+            + seq_id.split(READ_NUMBER_DIVISION)[0]
+            + READ_NUMBER_DIVISION
+            + "_".join(map(str, f))
+            + "|"
+            + head
+        )
+        out = out + header + "\n" + seq + "\n"
+        ind = ind + 1
+        if ind > 500:
+            write_out(out, trim3)
+            out, ind = "", 0
+    write_out(out, trim3)
 
 
 def get_match(primer, seq):
@@ -264,11 +264,9 @@ def trim_sequences_bcr_tcr(
     Output_trim,
     paired,
     species,
-    primer_file,
     primer_tag_file,
     tmp_file,
     primer_tag_file_count,
-    sample,
     ref_const,
     reverse_primer_group,
 ):
@@ -291,8 +289,6 @@ def trim_sequences_bcr_tcr(
     tmp_file : TYPE
         Description
     primer_tag_file_count : TYPE
-        Description
-    sample : TYPE
         Description
     ref_const : TYPE
         Description
@@ -473,7 +469,7 @@ def separate_sequences(
             l = l.strip().split()
             if l[6] == "YES":
                 consensus = l[7]
-                id = l[0].split("__")[0]
+                id = l[0].split(READ_NUMBER_DIVISION)[0]
                 seqs[consensus][id].value = 1
     fh.close()
     print(len(seqs))
@@ -515,8 +511,8 @@ def separate_sequences(
             out = (
                 out
                 + ">"
-                + id.split("__")[0]
-                + "__"
+                + id.split(READ_NUMBER_DIVISION)[0]
+                + READ_NUMBER_DIVISION
                 + "_".join(map(str, f))
                 + "|"
                 + header
@@ -701,7 +697,11 @@ def check_barcodes_malbac(
                 ind + 1,
             )
         f = sum(u_freq)
-        h = h.split(":")[0].split("__")[0] + "__" + str(sum(u_freq))
+        h = (
+            h.split(":")[0].split(READ_NUMBER_DIVISION)[0]
+            + READ_NUMBER_DIVISION
+            + str(sum(u_freq))
+        )
         if sum(u_freq) > 20:
             print("BC group size:\t", len(u_freq), t1.split())
         if len(u_freq) == 1:
@@ -1287,7 +1287,7 @@ def join_reads(s1, s2, length):
     return (seq, failed)
 
 
-def get_paired_reads_overlapping(file1, file2, outfile, paired, id):
+def get_paired_reads_overlapping(file1, file2, outfile, paired):
     """Summary
 
     Parameters
@@ -1300,13 +1300,6 @@ def get_paired_reads_overlapping(file1, file2, outfile, paired, id):
         Description
     paired : TYPE
         Description
-    id : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     seqs1 = get_sequences(file1)
     seqs2 = get_sequences(file2)
@@ -1315,22 +1308,21 @@ def get_paired_reads_overlapping(file1, file2, outfile, paired, id):
     fh = open(outfile, "w")
     fh.close()
     tot, f_joining, total, length, fail_no_pair = 0, 0, 0, 30, 0
-    for id in seqs1:
-        if id in seqs2:
+    for seq_id in seqs1:
+        if seq_id in seqs2:
             total = total + 1
-            (seq, failed) = join_reads(seqs1[id], seqs2[id], length)
+            (seq, failed) = join_reads(seqs1[seq_id], seqs2[seq_id], length)
             if failed == 0 and len(seq) > 180:
                 ind, tot = ind + 1, tot + 1
-                out = out + ">" + id + "\n" + seq + "\n"
+                out = out + ">" + seq_id + "\n" + seq + "\n"
             else:
-                seq2 = reverse_comp(seqs2[id])
-                (seq, failed) = join_reads(seqs1[id], seq2, length)
+                seq2 = reverse_comp(seqs2[seq_id])
+                (seq, failed) = join_reads(seqs1[seq_id], seq2, length)
                 if failed == 0 and len(seq) > 180:
                     ind, tot = ind + 1, tot + 1
-                    out = out + ">" + id + "\n" + seq + "\n"
+                    out = out + ">" + seq_id + "\n" + seq + "\n"
                 else:
                     f_joining = f_joining + 1
-                    # print seqs1[id], seqs2[id]
             if ind > 100:
                 write_out(out, outfile)
                 out, ind = "", 0
@@ -1339,7 +1331,7 @@ def get_paired_reads_overlapping(file1, file2, outfile, paired, id):
     write_out(out, outfile)
     del out, ind
     print(
-        id + "\tTotal sequences:",
+        SAMPLE_ID + "\tTotal sequences:",
         total,
         "\tNumber of Failed sequences:",
         f_joining,
@@ -1350,7 +1342,6 @@ def get_paired_reads_overlapping(file1, file2, outfile, paired, id):
         "\tNo pairs:",
         fail_no_pair,
     )
-    return ()
 
 
 def calculate_orf_length(codon, sequence, type, gene):
@@ -1624,15 +1615,17 @@ def get_protein_sequences(
         if seq.count("N") == 0:
             seq = seq.replace("-", "")
             header = header.split("#")[0]
-            if header.count("__") == 0:
+            if header.count(READ_NUMBER_DIVISION) == 0:
                 freq = get_freq(header)
-                header = header.replace(":", "") + "__" + str(freq)
+                header = (
+                    header.replace(":", "") + READ_NUMBER_DIVISION + str(freq)
+                )
             (ORF1, accept1) = calculate_orf_length(codon, seq, "V", gene)
             ORFa[header] = ORF1
             number_seqs = number_seqs + 1  # freq
             if accept1 == 0:
                 orf_fail = orf_fail + 1
-                # if(int(header.split("__")[1])>100):
+                # if(int(header.split(READ_NUMBER_DIVISION)[1])>100):
                 #  print header, ORF1, seq
             if accept1 != 0:
                 if len(ORF1) > 1:
@@ -1646,12 +1639,12 @@ def get_protein_sequences(
                     if found == 1:
                         number_accepted = (
                             number_accepted + 1
-                        )  # int(header.split("__")[1])
+                        )  # int(header.split(READ_NUMBER_DIVISION)[1])
                 else:
                     p_seq[header] = ORF1[0][0]
                     number_accepted = (
                         number_accepted + 1
-                    )  # int(header.split("__")[1])
+                    )  # int(header.split(READ_NUMBER_DIVISION)[1])
                     seq = seq[ORF1[0][1] : len(seq)]
                 seqs[seq][header].value = 1
                 indb = indb + 1
@@ -1795,7 +1788,12 @@ def get_reduced_number_sequences_multi_constants(file):
         fh = open(file, "r")
         for header, sequence in fasta_iterator(fh):
             count = count + sum(
-                map(int, header.split("__")[1].split("|")[0].split("_"))
+                map(
+                    int,
+                    header.split(READ_NUMBER_DIVISION)[1]
+                    .split("|")[0]
+                    .split("_"),
+                )
             )
         fh.close()
     return count
@@ -1822,7 +1820,7 @@ def count_barcodes(primer_tag_file):
             l = l.strip().split()
             bc = l[3] + ":" + l[4]
             if l[1] != "NA":
-                freq = int(l[1])  # int(l[0].split("__")[1])
+                freq = int(l[1])  # int(l[0].split(READ_NUMBER_DIVISION)[1])
                 uniq_seq = uniq_seq + 1
                 bc_uniq[bc] = 1
                 bc_count = bc_count + freq
@@ -1848,7 +1846,6 @@ def get_read_report(
     species,
     dir,
     primer_tag_file_count,
-    primer_file,
     barcode_group,
 ):
     """Summary
@@ -1875,14 +1872,7 @@ def get_read_report(
         Description
     primer_tag_file_count : TYPE
         Description
-    primer_file : TYPE
-        Description
     barcode_group : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     barcoded_j, barcoded_v = 1, 0
@@ -1943,7 +1933,6 @@ def get_read_report(
     fh.write(out)
     fh.close()
     print(out)
-    return ()
 
 
 def cluster_i(Reduced_file, tmp_file, diff):
@@ -1989,7 +1978,7 @@ def get_seqs_single(file):
     fh = open(file, "r")
     seqs = {}
     for header, sequence in fasta_iterator(fh):
-        seqs[header.split("__")[0]] = sequence
+        seqs[header.split(READ_NUMBER_DIVISION)[0]] = sequence
     fh.close()
     return seqs
 
@@ -2245,7 +2234,11 @@ def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
             t = 0
             for id in cluster[c]:
                 clust_seqs.append(
-                    (id, seqs[id.split("__")[0]], len(seqs[id.split("__")[0]]))
+                    (
+                        id,
+                        seqs[id.split(READ_NUMBER_DIVISION)[0]],
+                        len(seqs[id.split(READ_NUMBER_DIVISION)[0]]),
+                    )
                 )
                 t = t + 1
             for c1 in coclust[c]:
@@ -2253,8 +2246,8 @@ def get_cluster_similarities_single(seqs, coclust, cluster, file_out, inv):
                     clust_seqs.append(
                         (
                             id,
-                            seqs[id.split("__")[0]],
-                            len(seqs[id.split("__")[0]]),
+                            seqs[id.split(READ_NUMBER_DIVISION)[0]],
+                            len(seqs[id.split(READ_NUMBER_DIVISION)[0]]),
                         )
                     )
                     t = t + 1
@@ -2523,7 +2516,7 @@ def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
     fh = open(seq_file, "r")
     freq_id = {}
     for header, sequence in fasta_iterator(fh):
-        freq_id[header.split("__")[0]] = header
+        freq_id[header.split(READ_NUMBER_DIVISION)[0]] = header
     fh.close()
     inverse, raw = get_inverse_ids(file_seqs, file_vertex, freq_id)
     edges, edges23 = Tree(), Tree()
@@ -2532,7 +2525,10 @@ def decon_edges(att_file, file_seqs, file_edges, file_vertex, seq_file):
         l = l.strip()
         l1 = l.split()
         if int(l1[0]) == 1 or int(l1[0]) == 2:
-            id1, id2 = l1[1].split("__")[0], l1[2].split("__")[0]
+            id1, id2 = (
+                l1[1].split(READ_NUMBER_DIVISION)[0],
+                l1[2].split(READ_NUMBER_DIVISION)[0],
+            )
             id1, id2 = freq_id[id1], freq_id[id2]
             edges[id2][id1].value = 1
     fh1.close()
@@ -2566,15 +2562,17 @@ def get_inverse_ids(file_seqs, file_vertex, freq_id):
             l = l.strip()
             l = l.replace(">", "")
             l = l.split("||")
-            inverse[freq_id[l[0].split("__")[0]]] = freq_id[l[1].split("__")[0]]
-            raw[l[1].split("__")[0]] = 1
+            inverse[freq_id[l[0].split(READ_NUMBER_DIVISION)[0]]] = freq_id[
+                l[1].split(READ_NUMBER_DIVISION)[0]
+            ]
+            raw[l[1].split(READ_NUMBER_DIVISION)[0]] = 1
             ind = ind + 1
     fh.close()
     fh = open(file_vertex, "r")
     for l in fh:
         l = l.strip().split()
-        if l[0].split("__")[0] in raw:
-            raw[l[0].split("__")[0]] = l[0]
+        if l[0].split(READ_NUMBER_DIVISION)[0] in raw:
+            raw[l[0].split(READ_NUMBER_DIVISION)[0]] = l[0]
     fh.close()
     return (inverse, raw)
 
@@ -2607,9 +2605,9 @@ def decon_identical(
     fh = open(seq_file, "r")
     all, seqs, freq_id = {}, {}, {}
     for header, sequence in fasta_iterator(fh):
-        seqs[header.split("__")[0]] = sequence
-        all[header.split("__")[0]] = sequence
-        freq_id[header.split("__")[0]] = header
+        seqs[header.split(READ_NUMBER_DIVISION)[0]] = sequence
+        all[header.split(READ_NUMBER_DIVISION)[0]] = sequence
+        freq_id[header.split(READ_NUMBER_DIVISION)[0]] = header
     fh.close()
     fh1 = open(att_file, "r")
     same1 = Tree()
@@ -2630,15 +2628,19 @@ def decon_identical(
         sub_same = Tree()
         for id1 in same1[c]:
             for id2 in same1[c][id1]:
-                sub_same[id1.split("__")[0]][id2.split("__")[0]].value = 1
-                sub_same[id2.split("__")[0]][id1.split("__")[0]].value = 1
+                sub_same[id1.split(READ_NUMBER_DIVISION)[0]][
+                    id2.split(READ_NUMBER_DIVISION)[0]
+                ].value = 1
+                sub_same[id2.split(READ_NUMBER_DIVISION)[0]][
+                    id1.split(READ_NUMBER_DIVISION)[0]
+                ].value = 1
         (sub_same, sub_inv) = deconvolute_same_array(sub_same)
         for i in sub_same:
-            s = seqs[i.split("__")[0]]
+            s = seqs[i.split(READ_NUMBER_DIVISION)[0]]
             total = 0
             mins = s
             for j in sub_same[i]:
-                j1 = freq_id[j.split("__")[0]]
+                j1 = freq_id[j.split(READ_NUMBER_DIVISION)[0]]
                 freq = list(
                     map(
                         int,
@@ -2651,7 +2653,7 @@ def decon_identical(
                     total = freq
                 else:
                     total = list(map(add, freq, total))
-                inverse[j.split("__")[0]] = i
+                inverse[j.split(READ_NUMBER_DIVISION)[0]] = i
                 out = (
                     out
                     + ">"
@@ -2659,10 +2661,10 @@ def decon_identical(
                     + "||"
                     + i
                     + "\n"
-                    + seqs[j.split("__")[0]]
+                    + seqs[j.split(READ_NUMBER_DIVISION)[0]]
                     + "\n"
                 )
-                s = seqs[j.split("__")[0]]
+                s = seqs[j.split(READ_NUMBER_DIVISION)[0]]
                 if len(s) < len(mins):
                     mins = s
                 ind = ind + 1
@@ -2674,12 +2676,16 @@ def decon_identical(
             length[i] = mins
     info = ""
     if (
-        len(freq_id[j.split("__")[0]].split(read_number_division)[1].split("|"))
+        len(
+            freq_id[j.split(READ_NUMBER_DIVISION)[0]]
+            .split(read_number_division)[1]
+            .split("|")
+        )
         >= 2
     ):
         info = (
             "|"
-            + freq_id[j.split("__")[0]]
+            + freq_id[j.split(READ_NUMBER_DIVISION)[0]]
             .split(read_number_division)[1]
             .split("|")[1]
         )
@@ -2726,14 +2732,14 @@ def print_single_edges(file_edges, inverse, edges, tmp_file, raw):
         ida = id1
         if id1 in inverse:
             ida = inverse[id1]
-            if ida.split("__")[0] in raw:
-                ida = raw[ida.split("__")[0]]
+            if ida.split(READ_NUMBER_DIVISION)[0] in raw:
+                ida = raw[ida.split(READ_NUMBER_DIVISION)[0]]
         for id2 in edges[id1]:
             idb = id2
             if id2 in inverse:
                 idb = inverse[id2]
-                if idb.split("__")[0] in raw:
-                    idb = raw[idb.split("__")[0]]
+                if idb.split(READ_NUMBER_DIVISION)[0] in raw:
+                    idb = raw[idb.split(READ_NUMBER_DIVISION)[0]]
             if ida != idb:
                 edge = (
                     edge
@@ -3202,7 +3208,7 @@ def get_freq(id):
     TYPE
         Description
     """
-    id = id.split("__")
+    id = id.split(READ_NUMBER_DIVISION)
     return int(id[1])
 
 
@@ -3287,20 +3293,16 @@ if command_source.count("1") != 0:
 
 # Filtering and processing reads
 if command_source.count("2") != 0:
-    get_paired_reads_overlapping(
-        Seq_file1, Seq_file2, tmp_Tmp_file, paired, sample_id
-    )
+    get_paired_reads_overlapping(Seq_file1, Seq_file2, tmp_Tmp_file, paired)
     trim_sequences_bcr_tcr(
         tmp_Tmp_file,
         Fail_file,
         trim1,
         paired,
         species,
-        PRIMER_FILE,
         primer_tag_file,
         tmp_file,
         primer_tag_file_count,
-        sample_id,
         ref_const,
         reverse_primer_group,
     )
@@ -3311,7 +3313,7 @@ if command_source.count("2") != 0:
         ref_const,
         primer_tag_file_count,
     )
-    reduce_sequences(trim2, trim3, PRIMER_FILE)
+    reduce_sequences(trim2, trim3)
     orf_calculation_single(
         trim3,
         Filtered_out1,
@@ -3336,7 +3338,6 @@ if command_source.count("2") != 0:
         gene,
         out_path,
         primer_tag_file_count,
-        PRIMER_FILE,
         barcode_group,
     )
 
