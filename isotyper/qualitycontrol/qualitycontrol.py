@@ -198,25 +198,22 @@ def trim_sequences_bcr_tcr(
     output_trim: Path,
     primer_tag_file: Path,
     primer_tag_file_count: Path,
-    ref_const,
-    reverse_primer_group,
+    ref_const: Path,
 ):
     """Summary
 
     Parameters
     ----------
     untrimmed_file : Path
-        Description
+        path to untrimmed fasta file.
     output_trim : Path
-        Description
+        path to output fasta file.
     primer_tag_file : Path
-        Description
+        path to primer tag table.
     primer_tag_file_count : Path
-        Description
-    ref_const : TYPE
-        Description
-    reverse_primer_group : TYPE
-        Description
+        path to another primer tag table.
+    ref_const : Path
+        path to constant reference file.
     """
     forward, reverse, barcoded_j, barcoded_v, v_ref = get_primers_split(
         PRIMER_FILE
@@ -249,7 +246,7 @@ def single_j_barcoded_trimming_clustered(
     output_trim: Path,
     primer_tag_file: Path,
     primer_tag_file_count: Path,
-    ref_const,
+    ref_const: Path,
     v_ref,
 ):
     """Summary
@@ -1675,7 +1672,6 @@ def main():
         primer_tag_file=PRIMER_TAG_FILE,
         primer_tag_file_count=PRIMER_TAG_FILE_COUNT,
         ref_const=REF_CONST,
-        reverse_primer_group=reverse_primer_group,
     )
     filter_igj_genes(
         trim1=TRIM1_ALL,

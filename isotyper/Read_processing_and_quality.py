@@ -2959,6 +2959,7 @@ from isotyper.utilities._args import (
     OUT_ORTSEQ,
     OUT_ORTSEQ_TMP,
     OUT_PATH,
+    REVERSE_PRIMER_GROUP,
     SAMPLE_ID,
     SOURCE,
 )
@@ -2975,11 +2976,11 @@ from isotyper.utilities._args import (
 # method = sys.argv[10]
 command_source = sys.argv[11]
 command_source = command_source.split(",")
-if len(sys.argv) > 13:
-    reverse_primer_group = sys.argv[13]
-else:
-    reverse_primer_group = "OTHER"
-print("Reverse primer group: ", reverse_primer_group)
+# if len(sys.argv) > 13:
+#     reverse_primer_group = sys.argv[13]
+# else:
+#     reverse_primer_group = "OTHER"
+print("Reverse primer group: ", REVERSE_PRIMER_GROUP)
 
 # Files for QC and filtering
 # seq_file1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fasta"
