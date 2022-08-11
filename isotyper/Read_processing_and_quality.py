@@ -91,9 +91,7 @@ def get_match(primer, seq):
     return loc
 
 
-def filter_igj_genes(
-    trim1, trim2, refj, primer_file, ref_const, primer_tag_file_count
-):
+def filter_igj_genes(trim1, trim2, refj, ref_const, primer_tag_file_count):
     """Summary
 
     Parameters
@@ -103,8 +101,6 @@ def filter_igj_genes(
     trim2 : TYPE
         Description
     refj : TYPE
-        Description
-    primer_file : TYPE
         Description
     ref_const : TYPE
         Description
@@ -266,7 +262,6 @@ def trim_sequences_bcr_tcr(
     tmp_Tmp_file,
     Fail_file,
     Output_trim,
-    gene,
     paired,
     species,
     primer_file,
@@ -287,13 +282,9 @@ def trim_sequences_bcr_tcr(
         Description
     Output_trim : TYPE
         Description
-    gene : TYPE
-        Description
     paired : TYPE
         Description
     species : TYPE
-        Description
-    primer_file : TYPE
         Description
     primer_tag_file : TYPE
         Description
@@ -314,7 +305,7 @@ def trim_sequences_bcr_tcr(
         Description
     """
     forward, reverse, barcoded_j, barcoded_v, v_ref = get_primers_split(
-        primer_file
+        PRIMER_FILE
     )
     fh_out = open(Output_trim, "w")
     fh_out.close()
@@ -332,15 +323,12 @@ def trim_sequences_bcr_tcr(
             Output_trim,
             primer_tag_file,
             tmp_file,
-            gene,
             paired,
             species,
-            primer_file,
             primer_tag_file_count,
             ref_const,
             v_ref,
         )
-    return ()
 
 
 def get_primers_split(primer_file: Path) -> Tuple:
@@ -452,11 +440,6 @@ def separate_sequences(
         Description
     ref_const : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     fh = open(ref_const, "r")
     word_length = 8
@@ -503,7 +486,7 @@ def separate_sequences(
         scores = assess_gene_score(s, word_dict)
         if len(scores) > 0:
             if (
-                scores[0][0] > threshold
+                scores[0][0] > THRESHOLD_GENE_SCORE
             ):  # for non-housekeeping genes, trimmed sequences to remove constant region
                 if len(scores) == 1:
                     if len(scores[0][2]) > 50:
@@ -546,7 +529,6 @@ def separate_sequences(
                 write_out(out, Output_trim)
                 out, ind = "", 0
     write_out(out, Output_trim)
-    return ()
 
 
 def assess_gene_score(consensus, word_dict):
@@ -600,7 +582,6 @@ def single_j_barcoded_trimming_clustered(
     Output_trim,
     primer_tag_file,
     tmp_file,
-    gene,
     paired,
     species,
     primer_file,
@@ -630,8 +611,6 @@ def single_j_barcoded_trimming_clustered(
         Description
     tmp_file : TYPE
         Description
-    gene : TYPE
-        Description
     paired : TYPE
         Description
     species : TYPE
@@ -644,17 +623,11 @@ def single_j_barcoded_trimming_clustered(
         Description
     v_ref : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     read_untrimmed_file_single(
         tmp_Tmp_file,
         Fail_file,
         Output_trim,
-        gene,
         paired,
         species,
         primer_file,
@@ -674,7 +647,6 @@ def single_j_barcoded_trimming_clustered(
     separate_sequences(
         primer_tag_file_count, primer_tag_file, Output_trim, ref_const
     )
-    return ()
 
 
 def check_barcodes_malbac(
@@ -691,11 +663,6 @@ def check_barcodes_malbac(
     Fail_file : TYPE
         Description
     Output_trim : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     header_txt = (
@@ -849,7 +816,6 @@ def check_barcodes_malbac(
     write_out(outp, primer_tag_file)
     outp, ind = "", 0
     print(total_tags, passed_seqs_total, fail_less_than_threshold)
-    return ()
 
 
 def get_consensus_sequence_cluster(u_seq, u_freq, tmp_file):
@@ -1005,7 +971,6 @@ def read_untrimmed_file_single(
     tmp_Tmp_file,
     Fail_file,
     Output_trim,
-    gene,
     paired,
     species,
     primer_file,
@@ -1026,8 +991,6 @@ def read_untrimmed_file_single(
         Description
     Output_trim : TYPE
         Description
-    gene : TYPE
-        Description
     paired : TYPE
         Description
     species : TYPE
@@ -1046,23 +1009,12 @@ def read_untrimmed_file_single(
         Description
     v_ref : TYPE
         Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
     for f in [primer_tag_file_count]:
         fh = open(f, "w")
         fh.close()
     fh = open(tmp_Tmp_file, "r")
-    minl, maxl = 110, 1000000
-    if gene == "HEAVY" or gene == "IGH":
-        minl = 120
-    if gene == "KAPPA" or gene == "IGK":
-        minl = 110
-    if gene == "LAMBDA" or gene == "IGL":
-        (minl, maxl) = (90, 150)
+    minl, maxl = 120, 1000000
     seqs1, t = Tree(), 0
     for header, seq in fasta_iterator(fh):
         seq = seq.upper()
@@ -1230,7 +1182,6 @@ def read_untrimmed_file_single(
         + "\tPassed sequences:\t"
         + str(pass_all)
     )
-    return ()
 
 
 def get_sequences(file):
@@ -1336,9 +1287,7 @@ def join_reads(s1, s2, length):
     return (seq, failed)
 
 
-def get_paired_reads_overlapping(
-    file1, file2, outfile, gene, paired, id, method
-):
+def get_paired_reads_overlapping(file1, file2, outfile, paired, id):
     """Summary
 
     Parameters
@@ -1349,13 +1298,9 @@ def get_paired_reads_overlapping(
         Description
     outfile : TYPE
         Description
-    gene : TYPE
-        Description
     paired : TYPE
         Description
     id : TYPE
-        Description
-    method : TYPE
         Description
 
     Returns
@@ -1370,10 +1315,6 @@ def get_paired_reads_overlapping(
     fh = open(outfile, "w")
     fh.close()
     tot, f_joining, total, length, fail_no_pair = 0, 0, 0, 30, 0
-    if method in ["5RACE"]:
-        length = 20
-    if gene == "LAMBDA" or gene == "KAPPA" or gene == "IGK":
-        length = 30
     for id in seqs1:
         if id in seqs2:
             total = total + 1
@@ -1905,11 +1846,9 @@ def get_read_report(
     filtering_report,
     id,
     species,
-    gene,
     dir,
     primer_tag_file_count,
     primer_file,
-    method,
     barcode_group,
 ):
     """Summary
@@ -1932,15 +1871,11 @@ def get_read_report(
         Description
     species : TYPE
         Description
-    gene : TYPE
-        Description
     dir : TYPE
         Description
     primer_tag_file_count : TYPE
         Description
     primer_file : TYPE
-        Description
-    method : TYPE
         Description
     barcode_group : TYPE
         Description
@@ -1983,7 +1918,7 @@ def get_read_report(
         + "\t"
         + species
         + "\t"
-        + gene
+        + "IGH"
         + "\t"
         + orf_perc
         + "\t"
@@ -3292,7 +3227,7 @@ paired = sys.argv[5]
 # source = sys.argv[7]
 length = sys.argv[8]
 # primer_file = sys.argv[9]
-method = sys.argv[10]
+# method = sys.argv[10]
 command_source = sys.argv[11]
 command_source = command_source.split(",")
 if len(sys.argv) > 13:
@@ -3352,62 +3287,58 @@ if command_source.count("1") != 0:
 
 # Filtering and processing reads
 if command_source.count("2") != 0:
-    if gene.count("IG") != 0:
-        get_paired_reads_overlapping(
-            Seq_file1, Seq_file2, tmp_Tmp_file, gene, paired, sample_id, method
-        )
-        trim_sequences_bcr_tcr(
-            tmp_Tmp_file,
-            Fail_file,
-            trim1,
-            gene,
-            paired,
-            species,
-            PRIMER_FILE,
-            primer_tag_file,
-            tmp_file,
-            primer_tag_file_count,
-            sample_id,
-            ref_const,
-            reverse_primer_group,
-        )
-        filter_igj_genes(
-            trim1,
-            trim2,
-            refj,
-            PRIMER_FILE,
-            ref_const,
-            primer_tag_file_count,
-        )
-        reduce_sequences(trim2, trim3, PRIMER_FILE)
-        orf_calculation_single(
-            trim3,
-            Filtered_out1,
-            nn_orf_filtered,
-            out_path,
-            gene,
-            refv,
-            refj,
-            refvp,
-            refjp,
-            tmp_file_orf,
-        )
-        get_read_report(
-            Seq_file1,
-            Seq_file2,
-            tmp_Tmp_file,
-            trim1,
-            nn_orf_filtered,
-            filtering_report,
-            sample_id,
-            species,
-            gene,
-            out_path,
-            primer_tag_file_count,
-            PRIMER_FILE,
-            method,
-            barcode_group,
-        )
+    get_paired_reads_overlapping(
+        Seq_file1, Seq_file2, tmp_Tmp_file, paired, sample_id
+    )
+    trim_sequences_bcr_tcr(
+        tmp_Tmp_file,
+        Fail_file,
+        trim1,
+        paired,
+        species,
+        PRIMER_FILE,
+        primer_tag_file,
+        tmp_file,
+        primer_tag_file_count,
+        sample_id,
+        ref_const,
+        reverse_primer_group,
+    )
+    filter_igj_genes(
+        trim1,
+        trim2,
+        refj,
+        ref_const,
+        primer_tag_file_count,
+    )
+    reduce_sequences(trim2, trim3, PRIMER_FILE)
+    orf_calculation_single(
+        trim3,
+        Filtered_out1,
+        nn_orf_filtered,
+        out_path,
+        gene,
+        refv,
+        refj,
+        refvp,
+        refjp,
+        tmp_file_orf,
+    )
+    get_read_report(
+        Seq_file1,
+        Seq_file2,
+        tmp_Tmp_file,
+        trim1,
+        nn_orf_filtered,
+        filtering_report,
+        sample_id,
+        species,
+        gene,
+        out_path,
+        primer_tag_file_count,
+        PRIMER_FILE,
+        barcode_group,
+    )
 
 # Clustering reads
 if command_source.count("3") != 0:
