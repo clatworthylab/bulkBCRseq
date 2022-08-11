@@ -12,10 +12,8 @@ from isotyper.utilities._args import (
 PRIMER_FILE = LIBPATH / f"Primers_{ORG}_IG_RBR_Constant_region_MPLX_table.txt"
 
 # reference files
-REFV = LIBPATH / f"Reference_nn_{ORG}_IGHV.fasta"
 REFJ = LIBPATH / f"Reference_nn_{ORG}_IGHJ.fasta"
 REFVP = LIBPATH / f"Reference_protein_{ORG}_IGHV.fasta"
-REFJP = LIBPATH / f"Reference_protein_{ORG}_IGHJ.fasta"
 REF_CONST = LIBPATH / f"Reference_nn_{ORG}_IGH_constant_exon1.fasta"
 
 # get overlapping paired reads
@@ -30,4 +28,13 @@ PRIMER_TAG_FILE = (
     OUT_ORTSEQ_TMP / f"Barcode_filtering_information_{SAMPLE_ID}.txt"
 )
 PRIMER_TAG_FILE_COUNT = OUT_ORTSEQ_TMP / f"All_barcodes_{SAMPLE_ID}.txt"
-TRIM1 = OUT_ORTSEQ_TMP / f"trimmed_orientated_all_{SAMPLE_ID}.fasta"
+
+# trimmed
+TRIM1_ALL = OUT_ORTSEQ_TMP / f"trimmed_orientated_all_{SAMPLE_ID}.fasta"
+TRIM2_J = OUT_ORTSEQ_TMP / f"Filtered_J_{SAMPLE_ID}.fasta"
+TRIM3_RED = OUT_ORTSEQ_TMP / f"Filtered_reduced_{SAMPLE_ID}.fasta"
+
+# filtered
+FILTERED_OUT = OUT_ORTSEQ / f"Filtered_ORFs_sequences_all_{SAMPLE_ID}.fasta"
+FILTERED_OUT_NT = OUT_ORTSEQ / f"Nucleotide_ORF_filtered_all_{SAMPLE_ID}.fasta"
+FILTERING_REPORT = OUT_ORTSEQ / f"Filtering_report_{SAMPLE_ID}.txt"

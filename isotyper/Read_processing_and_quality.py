@@ -92,7 +92,7 @@ def get_match(primer, seq):
     return loc
 
 
-def filter_igj_genes(trim1, trim2, refj, ref_const, primer_tag_file_count):
+def filter_igj_genes(trim1, trim2, refj):
     """Summary
 
     Parameters
@@ -102,15 +102,6 @@ def filter_igj_genes(trim1, trim2, refj, ref_const, primer_tag_file_count):
     trim2 : TYPE
         Description
     refj : TYPE
-        Description
-    ref_const : TYPE
-        Description
-    primer_tag_file_count : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     mode = "WITHIN"
@@ -1210,20 +1201,22 @@ def join_reads(s1, s2, length):
     return (seq, failed)
 
 
-def get_paired_reads_overlapping(file1: Path, file2: Path, outfile: Path):
+def get_paired_reads_overlapping(
+    seq_file1: Path, seq_file2: Path, outfile: Path
+):
     """Summary
 
     Parameters
     ----------
-    file1 : Path
+    seq_file1 : Path
         path to pre-QC read 1 in fasta format.
-    file2 : Path
+    seq_file2 : Path
         path to pre-QC read 2 in fasta format.
     outfile : Path
         path to untrimmed seqeunces in fasta format.
     """
-    seqs1 = get_sequences(file1)
-    seqs2 = get_sequences(file2)
+    seqs1 = get_sequences(seq_file1)
+    seqs2 = get_sequences(seq_file2)
     print("Forward reads:", len(seqs1), "Reverse reads:", len(seqs2))
     out, ind = "", 0
     fh = open(outfile, "w")
@@ -1412,103 +1405,57 @@ def blast_match_j(out, seqs, trim1, trim2, refj, e_value):
 
 
 def orf_calculation_single(
-    Output_trim,
-    Filtered_out1,
+    output_trim,
+    filtered_out,
     nn_orf_filtered,
-    dir_ind,
-    ref,
-    refj,
     ref_protein,
-    refjp,
-    tmp_file,
 ):
     """Summary
 
     Parameters
     ----------
-    Output_trim : TYPE
+    output_trim : TYPE
         Description
-    Filtered_out1 : TYPE
+    filtered_out : TYPE
         Description
     nn_orf_filtered : TYPE
         Description
-    dir_ind : TYPE
-        Description
-    ref : TYPE
-        Description
-    refj : TYPE
-        Description
     ref_protein : TYPE
-        Description
-    refjp : TYPE
-        Description
-    tmp_file : TYPE
         Description
     """
     get_protein_sequences(
-        Output_trim,
-        Filtered_out1,
-        nn_orf_filtered,
-        dir_ind,
-        ref,
-        refj,
-        ref_protein,
-        refjp,
-        tmp_file,
+        output_trim=output_trim,
+        filtered_out=filtered_out,
+        nn_orf_filtered=nn_orf_filtered,
+        ref_protein=ref_protein,
     )
     get_nucleotide_sequences(
-        Output_trim,
-        Filtered_out1,
-        nn_orf_filtered,
-        dir_ind,
-        ref,
-        refj,
-        ref_protein,
-        refjp,
-        tmp_file,
+        output_trim=output_trim,
+        filtered_out=filtered_out,
+        nn_orf_filtered=nn_orf_filtered,
     )
 
 
 def get_protein_sequences(
-    Output_trim,
-    Filtered_out1,
+    output_trim,
+    filtered_out,
     nn_orf_filtered,
-    dir_ind,
-    ref,
-    refj,
     ref_protein,
-    refjp,
-    tmp_file,
 ):
     """Summary
 
     Parameters
     ----------
-    Output_trim : TYPE
+    output_trim : TYPE
         Description
-    Filtered_out1 : TYPE
+    filtered_out : TYPE
         Description
     nn_orf_filtered : TYPE
         Description
-    dir_ind : TYPE
-        Description
-    ref : TYPE
-        Description
-    refj : TYPE
-        Description
     ref_protein : TYPE
         Description
-    refjp : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
-        Description
     """
-    fh = open(Filtered_out1, "w")
+    fh = open(filtered_out, "w")
     fh.close()
     fh = open(nn_orf_filtered, "w")
     fh.close()
@@ -1516,7 +1463,7 @@ def get_protein_sequences(
     # (word, v_match) = (4, 45)
     (word) = 4
     (dict1) = get_sequences_ref(ref_protein, word)
-    fh = open(Output_trim, "r")
+    fh = open(output_trim, "r")
     number_seqs, number_accepted, batch, indb = 0, 0, 1000, 0
     # V_region, seqs, ORFa, ORFb = '', Tree(), {}, {}
     seqs, ORFa = Tree(), {}
@@ -1536,8 +1483,6 @@ def get_protein_sequences(
             number_seqs = number_seqs + 1  # freq
             if accept1 == 0:
                 orf_fail = orf_fail + 1
-                # if(int(header.split(READ_NUMBER_DIVISION)[1])>100):
-                #  print header, ORF1, seq
             if accept1 != 0:
                 if len(ORF1) > 1:
                     min_score, found = 2, 0
@@ -1548,14 +1493,10 @@ def get_protein_sequences(
                         seq = seq[codon1 : len(seq)]
                         found = 1
                     if found == 1:
-                        number_accepted = (
-                            number_accepted + 1
-                        )  # int(header.split(READ_NUMBER_DIVISION)[1])
+                        number_accepted = number_accepted + 1
                 else:
                     p_seq[header] = ORF1[0][0]
-                    number_accepted = (
-                        number_accepted + 1
-                    )  # int(header.split(READ_NUMBER_DIVISION)[1])
+                    number_accepted = number_accepted + 1
                     seq = seq[ORF1[0][1] : len(seq)]
                 seqs[seq][header].value = 1
                 indb = indb + 1
@@ -1564,71 +1505,46 @@ def get_protein_sequences(
                     out = ""
                     for id in p_seq:
                         out = out + ">" + id + "\n" + p_seq[id] + "\n"
-                    write_out(out, Filtered_out1)
+                    write_out(out, filtered_out)
                     p_seq = {}
                     out = ""
-                    # break ############################
     fh.close()
-    write_out(out, Filtered_out1)
+    write_out(out, filtered_out)
     out, ind = "", 0
     for id in p_seq:
         out = out + ">" + id + "\n" + p_seq[id] + "\n"
         ind = ind + 1
         if ind > 500:
-            write_out(out, Filtered_out1)
+            write_out(out, filtered_out)
             out, ind = "", 0
-    write_out(out, Filtered_out1)
-    return ()
+    write_out(out, filtered_out)
 
 
 def get_nucleotide_sequences(
-    Output_trim,
-    Filtered_out1,
+    output_trim,
+    filtered_out,
     nn_orf_filtered,
-    dir_ind,
-    ref,
-    refj,
-    ref_protein,
-    refjp,
-    tmp_file,
 ):
     """Summary
 
     Parameters
     ----------
-    Output_trim : TYPE
+    output_trim : TYPE
         Description
-    Filtered_out1 : TYPE
+    filtered_out : TYPE
         Description
     nn_orf_filtered : TYPE
-        Description
-    dir_ind : TYPE
-        Description
-    ref : TYPE
-        Description
-    refj : TYPE
-        Description
-    ref_protein : TYPE
-        Description
-    refjp : TYPE
-        Description
-    tmp_file : TYPE
-        Description
-
-    Returns
-    -------
-    TYPE
         Description
     """
     fh = open(nn_orf_filtered, "w")
     fh.close()
-    fh = open(Filtered_out1, "r")
+    fh = open(filtered_out, "r")
     ids = {}
     for header, sequence in fasta_iterator(fh):
         ids[header] = 1
     fh.close()
     out, ind = "", 0
-    fh = open(Output_trim, "r")
+    fh = open(output_trim, "r")
     done = {}
     for header, sequence in fasta_iterator(fh):
         if header in ids:
@@ -1641,21 +1557,20 @@ def get_nucleotide_sequences(
     write_out(out, nn_orf_filtered)
     fh.close()
     print(len(ids), len(done))
-    return ()
 
 
-def get_number_sequences(file):
-    """Summary
+def get_number_sequences(file: Path) -> int:
+    """Count number of sequences (umi) in file
 
     Parameters
     ----------
-    file : TYPE
-        Description
+    file : Path
+        Input fasta file.
 
     Returns
     -------
-    TYPE
-        Description
+    int
+        number of sequences.
     """
     count = 0
     process = subprocess.Popen(
@@ -1673,18 +1588,18 @@ def get_number_sequences(file):
     return count
 
 
-def get_reduced_number_sequences_multi_constants(file):
-    """Summary
+def get_reduced_number_sequences_multi_constants(file: Path) -> int:
+    """Count number of sequences (umi) with multiple contant gene assignments.
 
     Parameters
     ----------
-    file : TYPE
-        Description
+    file : Path
+        Input fasta file.
 
     Returns
     -------
-    TYPE
-        Description
+    int
+        number of sequences.
     """
     count = 0
     process = subprocess.Popen(
@@ -1707,18 +1622,18 @@ def get_reduced_number_sequences_multi_constants(file):
     return count
 
 
-def count_barcodes(primer_tag_file):
-    """Summary
+def count_barcodes(primer_tag_file: Path) -> Tuple[int, int, int]:
+    """Count number of barcodes and unique sequences.
 
     Parameters
     ----------
-    primer_tag_file : TYPE
-        Description
+    primer_tag_file : Path
+        path to barcode filtering information table.
 
     Returns
     -------
-    TYPE
-        Description
+    Tuple[int, int, int]
+        number of barcodes and unique sequences.
     """
     fh = open(primer_tag_file, "r")
     bc_uniq, bc_count, bc_failed = {}, 0, 0
@@ -1744,43 +1659,37 @@ def count_barcodes(primer_tag_file):
 
 
 def get_read_report(
-    seq_file1,
-    seq_file2,
-    untrimmed_file,
-    trim1,
-    nn_orf_filtered,
-    filtering_report,
-    id,
-    species,
-    dir,
-    primer_tag_file_count,
-    barcode_group,
+    seq_file1: Path,
+    seq_file2: Path,
+    untrimmed_file: Path,
+    trim1: Path,
+    nn_orf_filtered: Path,
+    filtering_report: Path,
+    sample_id: str,
+    species: str,
+    out_path: Path,
 ):
     """Summary
 
     Parameters
     ----------
-    seq_file1 : TYPE
+    seq_file1 : Path
         Description
-    seq_file2 : TYPE
+    seq_file2 : Path
         Description
-    untrimmed_file : TYPE
+    untrimmed_file : Path
         Description
-    trim1 : TYPE
+    trim1 : Path
         Description
-    nn_orf_filtered : TYPE
+    nn_orf_filtered : Path
         Description
-    filtering_report : TYPE
+    filtering_report : Path
         Description
-    id : TYPE
+    sample_id : str
         Description
-    species : TYPE
+    species : str
         Description
-    dir : TYPE
-        Description
-    primer_tag_file_count : TYPE
-        Description
-    barcode_group : TYPE
+    out_path : Path
         Description
     """
     barcoded_j, barcoded_v = 1, 0
@@ -1789,36 +1698,43 @@ def get_read_report(
         n_barcodes,
         uniq_sequences,
         total_sequences_included_before_bc,
-    ) = count_barcodes(primer_tag_file)
+    ) = count_barcodes(primer_tag_file=primer_tag_file)
     print(n_barcodes, uniq_sequences, total_sequences_included_before_bc)
-    raw1, raw2, joined, gene_matching = (
-        get_number_sequences(seq_file1),
-        get_number_sequences(seq_file2),
-        get_number_sequences(untrimmed_file),
-        get_reduced_number_sequences_multi_constants(trim1),
+    (
+        raw1,
+        raw2,
+        joined,
+        number_unique_seqs,
+        gene_matching,
+        orf,
+        number_unique_seqs,
+    ) = (
+        get_number_sequences(file=seq_file1),
+        get_number_sequences(file=seq_file2),
+        get_number_sequences(file=untrimmed_file),
+        get_number_sequences(file=nn_orf_filtered),
+        get_reduced_number_sequences_multi_constants(file=trim1),
+        get_reduced_number_sequences_multi_constants(file=nn_orf_filtered),
     )
-    # count_bc_found, count_uniq_bcs = -1, -1
-    orf = get_reduced_number_sequences_multi_constants(nn_orf_filtered)
-    number_unique_seqs = get_number_sequences(nn_orf_filtered)
     out = (
         "Directory\tSample\tSpecies\tGene\t% reads retained\tN raw reads (1)\t"
         + "N raw reads (2)\tN joined reads\tN reads with BCs\tN uniq BCs\tN reads gene matched\t"
         + "N reads w/t ORF\tUnique sequences\n"
     )
-    orf_perc = str(orf * 100.0 / min([raw1, raw2]))
+    orf_perc = orf * 100.0 / min([raw1, raw2])
     if min([raw1, raw2]) == -1:
         orf_perc = "NA"
     out = (
         out
-        + dir
+        + str(out_path)
         + "\t"
-        + id
+        + sample_id
         + "\t"
         + species
         + "\t"
-        + "IGH"
+        + "IGH"  # always IGH in Clatworthy Lab
         + "\t"
-        + orf_perc
+        + str(orf_perc)
         + "\t"
         + str(raw1)
         + "\t"
@@ -3166,17 +3082,17 @@ print("Reverse primer group: ", reverse_primer_group)
 # seq_file2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fasta"
 # untrimmed_file = OUT_ORTSEQ_TMP / f"Untrimmed_{SAMPLE_ID}.fasta"
 # trim1 = OUT_ORTSEQ_TMP / f"trimmed_orientated_all_{SAMPLE_ID}.fasta"
-trim2 = OUT_ORTSEQ_TMP / f"Filtered_J_{SAMPLE_ID}.fasta"
-trim3 = OUT_ORTSEQ_TMP / f"Filtered_reduced_{SAMPLE_ID}.fasta"
+# trim2 = OUT_ORTSEQ_TMP / f"Filtered_J_{SAMPLE_ID}.fasta"
+# trim3 = OUT_ORTSEQ_TMP / f"Filtered_reduced_{SAMPLE_ID}.fasta"
 # Fail_file = OUT_FASTQ / f"Fail_filtered_{SAMPLE_ID}.fasta"
 # primer_tag_file = (
 #     OUT_ORTSEQ_TMP / f"Barcode_filtering_information_{SAMPLE_ID}.txt"
 # )
 # primer_tag_file_count = OUT_ORTSEQ_TMP / f"All_barcodes_{SAMPLE_ID}.txt"
-Filtered_out1 = OUT_ORTSEQ / f"Filtered_ORFs_sequences_all_{SAMPLE_ID}.fasta"
-nn_orf_filtered = (
-    OUT_ORTSEQ / f"Nucleotsample_ide_ORF_filtered_all_{SAMPLE_ID}.fasta"
-)
+# filtered_out = OUT_ORTSEQ / f"Filtered_ORFs_sequences_all_{SAMPLE_ID}.fasta"
+# nn_orf_filtered = (
+#     OUT_ORTSEQ / f"Nucleotide_ORF_filtered_all_{SAMPLE_ID}.fasta"
+# )
 tmp_file_orf = OUT_ORTSEQ_TMP / f"Blast_matching_{SAMPLE_ID}"
 filtering_report = OUT_ORTSEQ / f"Filtering_report_{SAMPLE_ID}.txt"
 # Files for clustering
@@ -3207,56 +3123,49 @@ if command_source.count("1") != 0:
 # Filtering and processing reads
 if command_source.count("2") != 0:
     get_paired_reads_overlapping(
-        file1=SEQ_FASTA_FILE1, file2=SEQ_FASTA_FILE2, outfile=UNTRIMMED_FASTA
+        seq_file1=SEQ_FASTA_FILE1,
+        seq_file2=SEQ_FASTA_FILE2,
+        outfile=UNTRIMMED_FASTA,
     )
     trim_sequences_bcr_tcr(
         untrimmed_file=UNTRIMMED_FASTA,
-        output_trim=TRIM1,
+        output_trim=TRIM1_ALL,
         primer_tag_file=PRIMER_TAG_FILE,
         primer_tag_file_count=PRIMER_TAG_FILE_COUNT,
         ref_const=REF_CONST,
         reverse_primer_group=reverse_primer_group,
     )
     filter_igj_genes(
-        TRIM1,
-        trim2,
-        REFJ,
-        REF_CONST,
-        PRIMER_TAG_FILE_COUNT,
+        trim1=TRIM1_ALL,
+        trim2=TRIM2_J,
+        refj=REFJ,
     )
-    reduce_sequences(trim2, trim3)
+    reduce_sequences(trim2=TRIM2_J, trim3=TRIM3_RED)
     orf_calculation_single(
-        trim3,
-        Filtered_out1,
-        nn_orf_filtered,
-        OUT_PATH,
-        REFV,
-        REFJ,
-        REFVP,
-        REFJP,
-        tmp_file_orf,
+        output_trim=TRIM3_RED,
+        filtered_out=FILTERED_OUT,
+        nn_orf_filtered=FILTERED_OUT_NT,
+        ref_protein=REFVP,
     )
     get_read_report(
-        SEQ_FASTA_FILE1,
-        SEQ_FASTA_FILE2,
-        UNTRIMMED_FASTA,
-        TRIM1,
-        nn_orf_filtered,
-        filtering_report,
-        SAMPLE_ID,
-        SPECIES,
-        OUT_PATH,
-        PRIMER_TAG_FILE_COUNT,
-        barcode_group,
+        seq_file1=SEQ_FASTA_FILE1,
+        seq_file2=SEQ_FASTA_FILE2,
+        untrimmed_file=UNTRIMMED_FASTA,
+        trim1=TRIM1_ALL,
+        nn_orf_filtered=FILTERED_OUT_NT,
+        filtering_report=FILTERING_REPORT,
+        sample_id=SAMPLE_ID,
+        species=SPECIES,
+        out_path=OUT_PATH,
     )
 
 # Clustering reads
 if command_source.count("3") != 0:
     generate_networks(
-        nn_orf_filtered, tmp_file_1, EDGE_LENGTHS, tmp_file, att_file
+        FILTERED_OUT_NT, tmp_file_1, EDGE_LENGTHS, tmp_file, att_file
     )
     deconvolute_edges(
-        nn_orf_filtered,
+        FILTERED_OUT_NT,
         att_file,
         file_vertex,
         file_seqs,
