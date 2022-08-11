@@ -1250,16 +1250,16 @@ def get_protein_sequences(
                 if indb >= batch:
                     batch_number = batch_number + 1
                     out = ""
-                    for id in p_seq:
-                        out = out + ">" + id + "\n" + p_seq[id] + "\n"
+                    for seq_id in p_seq:
+                        out = out + ">" + seq_id + "\n" + p_seq[seq_id] + "\n"
                     write_out(out, filtered_out)
                     p_seq = {}
                     out = ""
     fh.close()
     write_out(out, filtered_out)
     out, ind = "", 0
-    for id in p_seq:
-        out = out + ">" + id + "\n" + p_seq[id] + "\n"
+    for seq_id in p_seq:
+        out = out + ">" + seq_id + "\n" + p_seq[seq_id] + "\n"
         ind = ind + 1
         if ind > 500:
             write_out(out, filtered_out)
