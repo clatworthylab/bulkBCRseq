@@ -63,3 +63,7 @@ filterwarnings = ["ignore::DeprecationWarning",
                   "ignore::FutureWarning"
                   ]
 testpaths=["tests"]
+
+[project]
+name = "isotyper"
+version = "0.3.0"
