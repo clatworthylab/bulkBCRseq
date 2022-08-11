@@ -1080,11 +1080,11 @@ def orf_calculation_single(
         nn_orf_filtered=nn_orf_filtered,
         ref_protein=ref_protein,
     )
-    get_nucleotide_sequences(
-        output_trim=output_trim,
-        filtered_out=filtered_out,
-        nn_orf_filtered=nn_orf_filtered,
-    )
+    # get_nucleotide_sequences(
+    #     output_trim=output_trim,
+    #     filtered_out=filtered_out,
+    #     nn_orf_filtered=nn_orf_filtered,
+    # )
 
 
 def get_sequences_ref(file: Path, word: str) -> Dict:
@@ -1668,41 +1668,41 @@ def get_read_report(
 
 def main():
     """main function in step 2."""
-    get_paired_reads_overlapping(
-        seq_file1=SEQ_FASTA_FILE1,
-        seq_file2=SEQ_FASTA_FILE2,
-        outfile=UNTRIMMED_FASTA,
-    )
-    trim_sequences_bcr_tcr(
-        untrimmed_file=UNTRIMMED_FASTA,
-        output_trim=TRIM1_ALL,
-        primer_tag_file=PRIMER_TAG_FILE,
-        primer_tag_file_count=PRIMER_TAG_FILE_COUNT,
-        ref_const=REF_CONST,
-    )
-    filter_igj_genes(
-        trim1=TRIM1_ALL,
-        trim2=TRIM2_J,
-        refj=REFJ,
-    )
-    reduce_sequences(trim2=TRIM2_J, trim3=TRIM3_RED)
+    # get_paired_reads_overlapping(
+    #     seq_file1=SEQ_FASTA_FILE1,
+    #     seq_file2=SEQ_FASTA_FILE2,
+    #     outfile=UNTRIMMED_FASTA,
+    # )
+    # trim_sequences_bcr_tcr(
+    #     untrimmed_file=UNTRIMMED_FASTA,
+    #     output_trim=TRIM1_ALL,
+    #     primer_tag_file=PRIMER_TAG_FILE,
+    #     primer_tag_file_count=PRIMER_TAG_FILE_COUNT,
+    #     ref_const=REF_CONST,
+    # )
+    # filter_igj_genes(
+    #     trim1=TRIM1_ALL,
+    #     trim2=TRIM2_J,
+    #     refj=REFJ,
+    # )
+    # reduce_sequences(trim2=TRIM2_J, trim3=TRIM3_RED)
     orf_calculation_single(
         output_trim=TRIM3_RED,
         filtered_out=FILTERED_OUT,
         nn_orf_filtered=FILTERED_OUT_NT,
         ref_protein=REFVP,
     )
-    get_read_report(
-        seq_file1=SEQ_FASTA_FILE1,
-        seq_file2=SEQ_FASTA_FILE2,
-        untrimmed_file=UNTRIMMED_FASTA,
-        trim1=TRIM1_ALL,
-        nn_orf_filtered=FILTERED_OUT_NT,
-        filtering_report=FILTERING_REPORT,
-        sample_id=SAMPLE_ID,
-        species=SPECIES,
-        out_path=OUT_PATH,
-    )
+    # get_read_report(
+    #     seq_file1=SEQ_FASTA_FILE1,
+    #     seq_file2=SEQ_FASTA_FILE2,
+    #     untrimmed_file=UNTRIMMED_FASTA,
+    #     trim1=TRIM1_ALL,
+    #     nn_orf_filtered=FILTERED_OUT_NT,
+    #     filtering_report=FILTERING_REPORT,
+    #     sample_id=SAMPLE_ID,
+    #     species=SPECIES,
+    #     out_path=OUT_PATH,
+    # )
 
 
 if __name__ == "__main__":
