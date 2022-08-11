@@ -3,3 +3,4 @@
 *.ipynb_checkpoints
 SOP_RBR_RT-PCR Barcoded IsoTyper.pdf
 SOP_RBR_RT-PCR Barcoded IsoTyper_murine.pdf
+tests/output/
