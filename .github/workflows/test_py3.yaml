@@ -60,6 +60,10 @@ jobs:
         environment-file: environment.yml
         use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
     
+    - name: install
+      run: |
+        pip install .
+
     - name: Test with pytest
       run: |
         python -m pytest --cov=isotyper --cov-report=xml
