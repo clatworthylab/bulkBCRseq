@@ -160,7 +160,7 @@ def main():
                 sample_id=sample_ids[i],
                 mem=args.mem,
                 queue=args.queue,
-                ncores=arg.cores,
+                ncores=args.cores,
                 project=args.project,
                 group=args.group,
             )
