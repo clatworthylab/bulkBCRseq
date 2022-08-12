@@ -151,7 +151,9 @@ def bsub_job_options(
 
 def main():
     args = parse_args()
-    sample_ids, input_paths, output_paths, orgs = get_info(file=args.input)
+    sample_ids, input_paths, output_paths, orgs = get_info(
+        file=Path(args.input)
+    )
     for i in range(0, len(sample_ids)):
         if args.bsub:
             job_arg = bsub_job_options(
