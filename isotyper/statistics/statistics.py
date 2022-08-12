@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from operator import itemgetter
+from pathlib import Path
 from typing import Tuple, List
 
 from isotyper.statistics._settings import *
