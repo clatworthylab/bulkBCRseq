@@ -12,7 +12,7 @@ VERTEX_REL_FILE = OUT_NET / f"Vertex_relations_{SAMPLE_ID}.txt"
 ATT_FILE = OUT_NET / f"Att_{SAMPLE_ID}.txt"
 SEQS_FILE = OUT_NET / f"Sequences_{SAMPLE_ID}.txt"
 EDGES_FILE = OUT_NET / f"Edges_{SAMPLE_ID}.txt"
-CLUSTER_FILE = OUT_NET / f"Cluster_sample_identities_{SAMPLE_ID}.txt"
+CLUSTER_FILE = OUT_NET / f"Cluster_identities_{SAMPLE_ID}.txt"
 # final output
 REDUCED_FILE = OUT_NET / f"Fully_reduced_{SAMPLE_ID}.fasta"
 # other output
