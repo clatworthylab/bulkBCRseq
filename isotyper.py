@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-import sys
-import os
+import subprocess
 import pandas as pd
 from pathlib import Path
 from typing import Literal, Tuple, List
