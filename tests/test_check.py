@@ -27,12 +27,11 @@ def test_call_script(option, expected2, expected3, expected4):
     """Basic call script."""
     cmd = [
         "python",
-        "Processing_sequences_large_scale.py",
-        str(TESTDATFOLDER / "Sample_metadata.txt"),
+        "isotyper.py",
+        "-i",
+        str(TESTDATFOLDER / "Sample_metadata1.txt"),
+        "-s",
         str(option),
-        "N",
-        "Y",
-        "Y",
     ]
     run(cmd)
     assert len(glob(str(TESTFASTQFOLDER))) == 1

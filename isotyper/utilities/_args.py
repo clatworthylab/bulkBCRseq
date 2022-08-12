@@ -3,12 +3,12 @@ from pathlib import Path
 import sys
 
 # from arguments
-OUT_PATH = Path(sys.argv[1])
-SAMPLE_ID = sys.argv[2]  # name of sample. Also the prefix of the file.
-ORG = sys.argv[6]  # organism
-SOURCE = Path(sys.argv[7])
-LENGTH = sys.argv[8]
-COMMAND_MODE = sys.argv[11]
+SAMPLE_ID = sys.argv[1]  # name of sample. Also the prefix of the file.
+SOURCE = Path(sys.argv[2])
+OUT_PATH = Path(sys.argv[3])
+ORG = sys.argv[4]  # organism
+LENGTH = sys.argv[5]
+COMMAND_MODE = sys.argv[6]
 # output subfolders
 OUT_FASTQ = OUT_PATH / "FASTQ_FILES"
 OUT_ORTSEQ = OUT_PATH / "ORIENTATED_SEQUENCES"
