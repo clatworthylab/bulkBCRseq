@@ -91,7 +91,7 @@ bsub arguments:
 # initial QC
 python isotyper.py -i meta.txt -s 1
 # trimming
-python isotyper.py -i meta.txt -s 2  --cores 10
+python isotyper.py -i meta.txt -s 2
 # generate network
 python isotyper.py -i meta.txt -s 3
 # generate network statistic
@@ -103,7 +103,7 @@ If using Sanger's farm:
 # initial QC
 python isotyper.py -i meta.txt -s 1 --bsub
 # trimming
-python isotyper.py -i meta.txt -s 2 --bsub --cores 10
+python isotyper.py -i meta.txt -s 2 --bsub
 # generate network
 python isotyper.py -i meta.txt -s 3 --bsub
 # generate network statistic
