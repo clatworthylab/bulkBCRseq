@@ -458,6 +458,8 @@ else:
                 + id
                 + ".txt STATISTICS "
                 + reverse_primer_group[i]
+                + " something "
+                + "4"
             )
             commands.append(bsub + command2)
         if "ISO1" in command:
