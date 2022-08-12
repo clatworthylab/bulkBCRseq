@@ -3,7 +3,12 @@ from operator import itemgetter
 from typing import Tuple, List
 
 from isotyper.utilities._args import *
-from isotyper.utilities import write_out, create_file, Tree
+from isotyper.utilities import (
+    write_out,
+    create_file,
+    Tree,
+    READ_NUMBER_DIVISION,
+)
 
 
 def renyi_entropy(
