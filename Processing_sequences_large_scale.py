@@ -434,34 +434,34 @@ else:
             )
             commands.append(bsub + command1)
         if "4" in command:
-            command2 = (
+            command1 = (
                 "python "
-                + "isotyper/Generate_repertoire_statistics.py "
+                + "isotyper/Read_processing_and_quality.py "
                 + dir
-                + "ORIENTATED_SEQUENCES/ANNOTATIONS/ "
+                + " "
                 + id
                 + " "
-                + dir
-                + "ORIENTATED_SEQUENCES/NETWORKS/Fully_reduced_"
-                + id
-                + ".fasta "
-                + dir
-                + "ORIENTATED_SEQUENCES/Filtered_ORFs_sequences_all_"
-                + id
-                + ".fasta "
+                + sample
+                + " "
                 + gene_types
+                + " "
+                + pair
                 + " "
                 + species
                 + " "
-                + dir
-                + "ORIENTATED_SEQUENCES/NETWORKS/Cluster_identities_"
-                + id
-                + ".txt STATISTICS "
+                + sources
+                + " "
+                + str(100)
+                + " "
+                + primers
+                + " "
+                + platforms
+                + " 4 "
+                + other
+                + " "
                 + reverse_primer_group[i]
-                + " something "
-                + "4"
             )
-            commands.append(bsub + command2)
+            commands.append(bsub + command1)
         if "ISO1" in command:
             command1 = (
                 "python "

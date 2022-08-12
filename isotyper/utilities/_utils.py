@@ -125,30 +125,6 @@ def get_codons(codon_file: Path) -> Dict:
     return codon
 
 
-def get_codons_tree(codon_file: Path) -> Tree:
-    """Get codons from codon table file.
-
-    Parameters
-    ----------
-    codon_file : Path
-        path to codon file e.g. Codon_table2.txt
-
-    Returns
-    -------
-    Tree
-        Codons in a Tree data structure.
-    """
-    fh = open(codon_file, "r")
-    codon = Tree()
-    for l in fh:
-        l = l.strip()
-        l1 = l.split()
-        l2 = list(l1[0])
-        codon[l2[0]][l2[1]][l2[2]][l1[1]].value = 1
-    fh.close()
-    return codon
-
-
 def reverse_comp(seq: str) -> str:
     """convert nucleotide sequence to reverse complementary.
     Parameters
@@ -230,29 +206,6 @@ def translate(seq: str, codon: Dict) -> str:
     return p_seq
 
 
-def translate_tree(seq: str, codon: Tree) -> str:
-    """Translate sequence to amino acid.
-
-    Parameters
-    ----------
-    seq : str
-        sequence to translate.
-    codon : Tree
-        tree dictionary of codons.
-
-    Returns
-    -------
-    str
-        translated sequence.
-    """
-    p_seq = ""
-    for cod in range(0, int(len(seq) / 3 - 1)):
-        cod = cod * 3
-        for c in codon[seq[cod + 0]][seq[cod + 1]][seq[cod + 2]]:
-            p_seq = p_seq + str(c)
-    return p_seq
-
-
 def write_out(out: str, file: Path):
     """Generic writer in append mode.
 
@@ -278,19 +231,6 @@ def create_file(file: Path):
     """
     fh = open(file, "w")
     fh.close()
-
-
-def intialise_tmp_directory(loc: Path):
-    """Initialise temporary directories.
-
-    Parameters
-    ----------
-    loc : Path
-        path to create directories.
-    """
-    dirs_to_add = [loc, loc / "TMP"]
-    for d in dirs_to_add:
-        d.mkdir(exist_ok=True, parents=True)
 
 
 def join_reads(s1: str, s2: str, length: int) -> Tuple[str, int]:

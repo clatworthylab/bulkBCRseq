@@ -306,16 +306,16 @@ def single_j_barcoded_trimming_clustered(
 def check_barcodes_malbac(
     primer_tag_file_count: Path, primer_tag_file: Path, output_trim: Path
 ):
-    """Summary
+    """Check barcodes.
 
     Parameters
     ----------
-    primer_tag_file_count : TYPE
-        Description
-    primer_tag_file : TYPE
-        Description
-    output_trim : TYPE
-        Description
+    primer_tag_file_count : Path
+        path to primer tag file 1.
+    primer_tag_file : Path
+        path to primer tag file 2.
+    output_trim : Path
+        path to output trimmed file.
     """
     header_txt = (
         "#ID\tnumber_of_reads\ttotal_reads_with_BC\tJ_barcode\tV_barcode\t"
@@ -1304,7 +1304,7 @@ def get_nucleotide_sequences(
     print(len(ids), len(done))
 
 
-def filter_igj_genes(trim1: Path, trim2: Path, refj):
+def filter_igj_genes(trim1: Path, trim2: Path, refj: Path):
     """Filter IGHJ genes based on quality
 
     Parameters
@@ -1313,8 +1313,8 @@ def filter_igj_genes(trim1: Path, trim2: Path, refj):
         path to all trimmed sequences.
     trim2 : Path
         path to all trimmed sequences after blast for J gene.
-    refj : TYPE
-        IGHJ reference.
+    refj : Path
+        path to IGHJ reference.
     """
     mode = "WITHIN"
     create_file(trim2)
@@ -1411,15 +1411,15 @@ def blast_match_j(
     fh.close()
 
 
-def reduce_sequences(trim2, trim3):
-    """Summary
+def reduce_sequences(trim2: Path, trim3: Path):
+    """Reduce sequences.
 
     Parameters
     ----------
-    trim2 : TYPE
-        Description
-    trim3 : TYPE
-        Description
+    trim2 : Path
+        path to trim 2 J file.
+    trim3 : Path
+        path to trim 3 reduced file.
     """
     minl = 185  # change for shorter runs
     create_file(trim3)
