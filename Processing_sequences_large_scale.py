@@ -456,7 +456,7 @@ else:
                 + dir
                 + "ORIENTATED_SEQUENCES/NETWORKS/Cluster_identities_"
                 + id
-                + ".txt ANNOTATE,STATISTICS "
+                + ".txt STATISTICS "
                 + reverse_primer_group[i]
             )
             commands.append(bsub + command2)
