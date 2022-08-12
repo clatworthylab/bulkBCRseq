@@ -2,9 +2,9 @@
 [![codecov](https://codecov.io/gh/clatworthylab/bulkBCRseq/branch/master/graph/badge.svg?token=I6APMCARTA)](https://codecov.io/gh/clatworthylab/bulkBCRseq)
 
 # bulk_BCR_analysis
-Bulk BCR-seq processing scripts use in Fitzpatrick et al., Nature (2020). Package belongs to Rachael Bashford-Rogers.
+Bulk BCR-seq processing scripts use in Fitzpatrick et al., Nature (2020). Original (legacy) package/scripts provided by Dr. Rachael Bashford-Rogers (Oxford).
 
-This repository is an reimplementation of the original script (in legacy branch), which seeems to be an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
+This repository is an reimplementation of the original python2 scripts (in legacy branch), which seeems to be an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
 
 Requires python>=3.8 (or 2.7 if using the legacy branch). Please run the commands directly in the folder where this is cloned.
 
@@ -38,14 +38,16 @@ cd bulkBCRseq
 conda env update --name isotyper --file environment.yml
 ```
 
-Usage instructions on Farm:
 ```bash
+# export this to your ~/.bashrc or ~/.bash_profile
+export PYTHONPATH=/path/to/bulkBCRseq:$PYTHONPATH
 conda activate isotyper
+python /path/to/bulkBCRseq/isotyper.py [options]
 ```
 
 ## Note!
-If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1/read2 suffix isn't this pattern, please modify the `R1PATTERN` and `R2PATTERN` variables after cloning this repository, in here directly:
-https://github.com/clatworthylab/bulkBCRseq/blob/3d17a2752a6b482f50c0b8d211db94ddf5e655d1/BIN/Read_processing_and_quality.py#L3641-L3643
+If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1/read2 suffix isn't this pattern, please modify the `R1PATTERN` and `R2PATTERN` variables file after cloning this repository, in the `_settings.py` directly:
+https://github.com/clatworthylab/bulkBCRseq/blob/5d310de8863b64352d68230977c6e7e62d5c0b8f/isotyper/utilities/_settings.py#L25-L27
 
 
 ## Basic usage:
