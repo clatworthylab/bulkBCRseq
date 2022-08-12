@@ -39,6 +39,9 @@ def parse_args():
         ),
     )
     main_group.add_argument(
+        "-c", "--cores", default=1, help=("number of cores to run this on.txt")
+    )
+    main_group.add_argument(
         "-l", "--length", default=100, help=("minimum length of reads to keep.")
     )
     main_group.add_argument(
@@ -60,9 +63,6 @@ def parse_args():
     )
     bsub_group.add_argument(
         "-q", "--queue", default="normal", help=("job queue to submit to.")
-    )
-    bsub_group.add_argument(
-        "-c", "--cores", default=10, help=("number of cores to run this on")
     )
     bsub_group.add_argument(
         "-p",
@@ -143,7 +143,7 @@ def bsub_job_options(
     ]
     queue_arg = ["-q", queue]
     cmd = (
-        ["bsub"] + prog_arg + grp_arg + log_arg + core_arg + mem_arg + queue_arg
+        ["bsub"] + prog_arg + grp_arg + log_arg + queue_arg + core_arg + mem_arg
     )
     return cmd
 
@@ -175,6 +175,7 @@ def main():
             str(orgs[i]),
             str(args.length),
             str(args.step),
+            str(args.cores),
         ]
         print(" ".join(main_cmd))
         if not args.dryrun:

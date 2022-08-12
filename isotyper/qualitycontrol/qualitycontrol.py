@@ -1304,7 +1304,12 @@ def get_nucleotide_sequences(
     print(len(ids), len(done))
 
 
-def filter_igj_genes(trim1: Path, trim2: Path, refj: Path):
+def filter_igj_genes(
+    trim1: Path,
+    trim2: Path,
+    refj: Path,
+    num_thread: int = 10,
+):
     """Filter IGHJ genes based on quality
 
     Parameters
@@ -1315,6 +1320,8 @@ def filter_igj_genes(trim1: Path, trim2: Path, refj: Path):
         path to all trimmed sequences after blast for J gene.
     refj : Path
         path to IGHJ reference.
+    num_thread : int, optional
+        number of threads/cpus to use
     """
     mode = "WITHIN"
     create_file(trim2)
@@ -1338,6 +1345,7 @@ def filter_igj_genes(trim1: Path, trim2: Path, refj: Path):
                 trim2=trim2,
                 refj=refj,
                 e_value=e_value,
+                num_thread=num_thread,
             )
             out, batch, seqs = "", 0, {}
     fh.close()
@@ -1349,12 +1357,19 @@ def filter_igj_genes(trim1: Path, trim2: Path, refj: Path):
             trim2=trim2,
             refj=refj,
             e_value=e_value,
+            num_thread=num_thread,
         )
         out, batch = "", 0
 
 
 def blast_match_j(
-    out: str, seqs: Dict, trim1: Path, trim2: Path, refj: Path, e_value: float
+    out: str,
+    seqs: Dict,
+    trim1: Path,
+    trim2: Path,
+    refj: Path,
+    e_value: float,
+    num_thread: int = 10,
 ):
     """Use blast to QC J gene assignments.
 
@@ -1372,6 +1387,8 @@ def blast_match_j(
         path to j reference file.
     e_value : float
         e-value cut off.
+    num_thread : int, optional
+        number of threads/cpus to use
     """
     blasted_j_file = trim1.with_suffix(trim1.suffix + "_blast_J")
     blasted_j_results = trim1.with_suffix(trim1.suffix + "_blast_J_results")
@@ -1381,7 +1398,7 @@ def blast_match_j(
     command1 = [
         "blastn",
         "-num_threads",
-        "10",
+        str(num_thread),
         "-db",
         f"{str(refj)}",
         "-evalue",
@@ -1676,6 +1693,7 @@ def main():
         trim1=TRIM1_ALL,
         trim2=TRIM2_J,
         refj=REFJ,
+        num_threads=NCPUS,
     )
     reduce_sequences(trim2=TRIM2_J, trim3=TRIM3_RED)
     orf_calculation_single(

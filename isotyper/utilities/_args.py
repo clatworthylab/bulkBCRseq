@@ -9,6 +9,7 @@ OUT_PATH = Path(sys.argv[3])
 ORG = sys.argv[4]  # organism
 LENGTH = sys.argv[5]
 COMMAND_MODE = sys.argv[6]
+NCPUS = sys.argv[7]
 # output subfolders
 OUT_FASTQ = OUT_PATH / "FASTQ_FILES"
 OUT_ORTSEQ = OUT_PATH / "ORIENTATED_SEQUENCES"
