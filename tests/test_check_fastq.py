@@ -28,7 +28,7 @@ def test_call_script(option, expected2, expected3, expected4):
     cmd = [
         "python",
         "Processing_sequences_large_scale.py",
-        str(TESTDATFOLDER / "Sample_metadata.txt"),
+        str(TESTDATFOLDER / "Sample_metadata2a.txt"),
         str(option),
         "N",
         "Y",
