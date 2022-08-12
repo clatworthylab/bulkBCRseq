@@ -60,12 +60,9 @@ jobs:
         environment-file: environment.yml
         use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
 
-    - name: set path
-      run: |
-        echo "::set-env name=PYTHONPATH::/home/runner/work/bulkBCRseq/bulkBCRseq"
-
     - name: Test with pytest
       run: |
+        export PYTHONPATH=/home/runner/work/bulkBCRseq/bulkBCRseq
         pytest --cov=isotyper --cov-report=xml
 
     - name: Show coverage
