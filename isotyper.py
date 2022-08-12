@@ -134,7 +134,7 @@ def bsub_job_options(
     """
     prog_arg = ["-P", project]
     grp_arg = ["-G", group]
-    log_arg = ["-o" f"logs/log_{sample_id}"]
+    log_arg = ["-o", f"logs/log_{sample_id}"]
     core_arg = ["-n", str(ncores)]
     mem_arg = [
         f"-R'select[mem>{str(mem)}] rusage[mem={str(mem)} span[hosts=1]'",
