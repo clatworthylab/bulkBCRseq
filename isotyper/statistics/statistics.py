@@ -171,18 +171,18 @@ def get_network_statistics_per_chain(
     for l in fh:
         if l[0] != "#":
             l = l.strip().split()
-            id = l[2]
+            seq_id = l[2]
             chains, freq, id_short = (
-                id.split("|")[1].split("_"),
+                seq_id.split("|")[1].split("_"),
                 list(
                     map(
                         int,
-                        id.split(READ_NUMBER_DIVISION)[1]
+                        seq_id.split(READ_NUMBER_DIVISION)[1]
                         .split("|")[0]
                         .split("_"),
                     )
                 ),
-                id.split(READ_NUMBER_DIVISION)[0],
+                seq_id.split(READ_NUMBER_DIVISION)[0],
             )
             t1 = t1 + sum(freq)
             n = n + 1
