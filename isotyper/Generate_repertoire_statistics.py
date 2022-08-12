@@ -8,17 +8,7 @@ import time
 from copy import deepcopy
 from operator import itemgetter
 
-from isotyper.utilities import (
-    Tree,
-    fasta_iterator,
-    create_file,
-    write_out,
-    intialise_tmp_directory,
-    translate_tree,
-    get_codons_tree,
-    READ_NUMBER_DIVISION,
-)
-
+from isotyper.utilities import *
 from isotyper.qualitycontrol import CODON_FILE
 
 
