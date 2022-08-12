@@ -149,6 +149,7 @@ def bsub_job_options(
 
 
 def main():
+    """Main script."""
     args = parse_args()
     sample_ids, input_paths, output_paths, orgs = get_info(
         file=Path(args.input)
