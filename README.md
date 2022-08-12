@@ -85,3 +85,5 @@ Main arguments:
   -g GROUP, --group GROUP
                         sanger group to send as job. [default teichlab]
 ```
+
+Take a look [here](https://github.com/clatworthylab/bulkBCRseq/tree/master/tests/data) for example files to provide to the tool.
