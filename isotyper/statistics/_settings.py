@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from isotyper.utilities._args import OUT_NET, OUT_PATH, SAMPLE_ID
+from isotyper.utilities._args import OUT_NET, OUT_PATH, SAMPLE_ID, ORG
 
 OUT_STAT = OUT_PATH / "STATISTICS"
 # FRSEQ_FILE = OUT_NET / f"Fully_reduced_{SAMPLE_ID}.fasta
