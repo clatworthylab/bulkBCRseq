@@ -1,0 +1,1 @@
+test1	tests/data/data_fastq/test1_R1_001.fastq.gz	tests/output/	HOMO_SAPIENS

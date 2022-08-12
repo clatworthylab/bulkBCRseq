@@ -1,0 +1,1 @@
+test1	tests/data/data_cram/test#1.cram	tests/output/	MUS_MUSCULUS
