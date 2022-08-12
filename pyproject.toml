@@ -31,7 +31,7 @@ ignore-private = false
 ignore-property-decorators = false
 ignore-module = true
 fail-under = 100
-exclude = ["setup.py", "docs", "build", "data", "bin", "orphan/*"]
+exclude = ["setup.py", "docs", "build", "data", "bin", "*orphan/*"]
 ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
 verbose = 2
 quiet = false
@@ -41,13 +41,9 @@ color = true
 
 [tool.coverage.run]
 parallel = true
-include = [
-    "bulkBCRseq/BIN/Network_generation_from_full_reduced_fasta.py",
-    "Processing_sequences_large_scale.py",
-
-]
 omit = [
-    "orphan/*",
+    "tests/*",
+    "*tests/*",
 ]
 
 [tool.coverage.report]
@@ -61,3 +57,8 @@ filterwarnings = ["ignore::DeprecationWarning",
                   "ignore::FutureWarning"
                   ]
 testpaths=["tests"]
+
+[project]
+name = "isotyper"
+version = "0.3.0"
+

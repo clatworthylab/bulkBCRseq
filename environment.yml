@@ -1,4 +1,4 @@
-name: bulkBCRseq
+name: isotyper
 channels:
 - conda-forge
 - bioconda
@@ -6,6 +6,7 @@ channels:
 - defaults
 dependencies:
 - numpy
+- pandas
 - networkx
 - pip
 - pytest

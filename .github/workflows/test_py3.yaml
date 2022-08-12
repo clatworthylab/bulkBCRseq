@@ -21,7 +21,7 @@ jobs:
       max-parallel: 5
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.7, 3.8, 3.9, "3.10"]
+        python-version: [3.8, 3.9, "3.10"]
     runs-on: ${{ matrix.os }}
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -53,16 +53,17 @@ jobs:
       with:
         auto-activate-base: true
         auto-update-conda : true
-        activate-environment: bulkBCRseq
+        activate-environment: isotyper
         channels: conda-forge, bioconda, anaconda, defaults
         channel-priority: true
         python-version: ${{ matrix.python-version }}
         environment-file: environment.yml
         use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
-    
+
     - name: Test with pytest
       run: |
-        pytest --cov=BIN --cov-report=xml
+        export PYTHONPATH=/home/runner/work/bulkBCRseq/bulkBCRseq
+        pytest --cov=isotyper --cov-report=xml
 
     - name: Show coverage
       run: |
