@@ -39,8 +39,8 @@ def test_call_script(option, expected2, expected3, expected4):
     assert len(glob(str(TESTFASTQFOLDER / "*.qc.fq"))) == 2
     assert len(glob(str(TESTFASTQFOLDER / "Fail*.fasta"))) == expected2
     assert len(glob(str(TESTNET / "Fully_reduced*.fasta"))) == expected3
-    assert len(
-        glob(str(TESTOUTFOLDER / "Network_statistics*.txt")) == expected4
+    assert (
+        len(glob(str(TESTOUTFOLDER / "Network_statistics*.txt"))) == expected4
     )
 
 
