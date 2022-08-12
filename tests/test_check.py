@@ -7,7 +7,7 @@ from subprocess import run
 from glob import glob
 
 TESTFOLDER = Path("tests")
-TESTDATFOLDER = TESTFOLDER / "data" / "data_cram"
+TESTDATFOLDER = TESTFOLDER / "data"
 TESTOUTFOLDER = TESTFOLDER / "output"
 TESTORTSEQFOLDER = TESTOUTFOLDER / "ORIENTATED_SEQUENCES"
 TESTFASTQFOLDER = TESTOUTFOLDER / "FASTQ_FILES"
@@ -19,9 +19,9 @@ TESTNET = TESTORTSEQFOLDER / "NETWORKS"
     "option,expected2,expected3,expected4",
     [
         pytest.param(1, 0, 0, 0),
-        pytest.param(2, 1, 0, 0),
-        pytest.param(3, 1, 1, 0),
-        pytest.param(4, 1, 1, 2),
+        pytest.param(2, 2, 0, 0),
+        pytest.param(3, 2, 2, 0),
+        pytest.param(4, 2, 2, 4),
     ],
 )
 def test_call_script(option, expected2, expected3, expected4):
@@ -30,14 +30,14 @@ def test_call_script(option, expected2, expected3, expected4):
         "python",
         "isotyper.py",
         "-i",
-        str(TESTDATFOLDER / "Sample_metadata1.txt"),
+        str(TESTDATFOLDER / "Sample_metadata.txt"),
         "-s",
         str(option),
     ]
     run(cmd)
     assert len(glob(str(TESTFASTQFOLDER))) == 1
     assert len(glob(str(TESTORTSEQFOLDER))) == 1
-    assert len(glob(str(TESTFASTQFOLDER / "*.qc.fq"))) == 2
+    assert len(glob(str(TESTFASTQFOLDER / "*.qc.fq"))) == 4
     assert len(glob(str(TESTFASTQFOLDER / "Fail*.fasta"))) == expected2
     assert len(glob(str(TESTNET / "Fully_reduced*.fasta"))) == expected3
     assert (

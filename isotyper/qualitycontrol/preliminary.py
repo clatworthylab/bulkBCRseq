@@ -3,7 +3,6 @@ import re
 import shutil
 import subprocess
 
-from glob import glob
 from pathlib import Path
 from typing import Union
 
@@ -34,30 +33,23 @@ def bam_to_fastq(source_path: Path):
     source_path : Path
         path of input file (cram or bam).
     """
-    if (
-        len(
-            glob(str(source_path.parent / "*.bam"))
-            + glob(str(source_path.parent / "*.cram"))
-        )
-        != 0
-    ):
-        pre_qc_fastq1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fastq"
-        pre_qc_fastq2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fastq"
-        pre_qc_bam = OUT_FASTQ / f"Sequences_{SAMPLE_ID}.bam"
-        if len(glob(str(source_path.parent / "*.cram"))) != 0:
-            cram_to_bam(cram_path=source_path, out_pre_qc_bam_path=pre_qc_bam)
-        command1 = [
-            "picard",
-            "SamToFastq",
-            "-I",
-            f"{str(pre_qc_bam)}",
-            "-FASTQ",
-            f"{pre_qc_fastq1}",
-            "-SECOND_END_FASTQ",
-            f"{pre_qc_fastq2}",
-        ]
-        print(" ".join(command1))
-        subprocess.run(command1)
+    pre_qc_fastq1 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_1.fastq"
+    pre_qc_fastq2 = OUT_FASTQ / f"Sequences_{SAMPLE_ID}_2.fastq"
+    pre_qc_bam = OUT_FASTQ / f"Sequences_{SAMPLE_ID}.bam"
+    if source_path.suffix == ".cram":
+        cram_to_bam(cram_path=source_path, out_pre_qc_bam_path=pre_qc_bam)
+    command1 = [
+        "picard",
+        "SamToFastq",
+        "-I",
+        f"{str(pre_qc_bam)}",
+        "-FASTQ",
+        f"{pre_qc_fastq1}",
+        "-SECOND_END_FASTQ",
+        f"{pre_qc_fastq2}",
+    ]
+    print(" ".join(command1))
+    subprocess.run(command1)
 
 
 def copy_prepped_fastq(fastq_path: Path, read_num: str):
@@ -227,23 +219,9 @@ def qc_samples(
 def main():
     """main function to prepare step 1."""
     intialise_files()
-    if (
-        len(
-            glob(str(SOURCE.parent / "*.bam*"))
-            + glob(str(SOURCE.parent / "*.cram"))
-        )
-        != 0
-    ):
+    if SOURCE.suffix in [".bam", ".cram"]:
         bam_to_fastq(source_path=SOURCE)
-    elif (
-        len(
-            glob(str(SOURCE.parent / "*.fastq"))
-            + glob(str(SOURCE.parent / "*.fastq.gz"))
-            + glob(str(SOURCE.parent / "*.fq*"))
-            + glob(str(SOURCE.parent / "*.fq.gz"))
-        )
-        != 0
-    ):
+    else:
         # rename them to Seqeuence_{SAMPLE_ID}_1.fastq Seqeuence_{SAMPLE_ID}_2.fastq
         prep_fastqs(
             source_path=SOURCE,

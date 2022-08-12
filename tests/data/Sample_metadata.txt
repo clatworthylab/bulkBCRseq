@@ -1,0 +1,2 @@
+test1	tests/data/test#1.cram	tests/output/	MUS_MUSCULUS
+test2	tests/data/test2_R1_001.fastq.gz	tests/output/	MUS_MUSCULUS
