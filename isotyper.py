@@ -47,12 +47,6 @@ def parse_args():
         ),
     )
     main_group.add_argument(
-        "-c",
-        "--cores",
-        default=1,
-        help=("number of cores to run this on. [Default 1]"),
-    )
-    main_group.add_argument(
         "-l",
         "--length",
         default=100,
@@ -71,6 +65,12 @@ def parse_args():
         "--bsub",
         action="store_true",
         help=("if passed, submits each row in meta.txt file as a job to bsub."),
+    )
+    bsub_group.add_argument(
+        "-c",
+        "--cores",
+        default=10,
+        help=("number of cores to run this on. [Default 10]"),
     )
     bsub_group.add_argument(
         "-m", "--mem", default=8000, help=("job memory request. [Default 8000]")
@@ -192,7 +192,6 @@ def main():
             str(orgs[i]),
             str(args.length),
             str(args.step),
-            str(args.cores),
         ]
         print(" ".join(main_cmd))
         if not args.dryrun:

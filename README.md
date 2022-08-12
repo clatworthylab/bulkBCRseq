@@ -50,9 +50,9 @@ https://github.com/clatworthylab/bulkBCRseq/blob/3d17a2752a6b482f50c0b8d211db94d
 
 ## Basic usage:
 ```
-usage: isotyper.py [-h] [-i INPUT] [-s STEP] [-c CORES] [-l LENGTH] [-dr] [-b] [-m MEM] [-q QUEUE] [-p PROJECT] [-g GROUP]
+usage: isotyper.py [-h] [-i INPUT] [-s STEP] [-l LENGTH] [-dr] [-b] [-c CORES] [-m MEM] [-q QUEUE] [-p PROJECT] [-g GROUP]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
 
 main arguments:
@@ -69,14 +69,14 @@ main arguments:
                             2 - Trim and filter reads.
                             3 - Generate networks.
                             4 - Generate network statistics.
-  -c CORES, --cores CORES
-                        number of cores to run this on. [Default 1]
   -l LENGTH, --length LENGTH
                         minimum length of reads to keep. [Default 100]
   -dr, --dryrun         if passed, prints commands but don't actually run.
 
 bsub arguments:
   -b, --bsub            if passed, submits each row in meta.txt file as a job to bsub.
+  -c CORES, --cores CORES
+                        number of cores to run this on. [Default 10]
   -m MEM, --mem MEM     job memory request. [Default 8000]
   -q QUEUE, --queue QUEUE
                         job queue to submit to. [Default normal]
