@@ -2,7 +2,7 @@
 from operator import itemgetter
 from typing import Tuple, List
 
-from isotyper.utilities._args import *
+from isotyper.statistics._settings import *
 from isotyper.utilities import (
     write_out,
     create_file,
@@ -457,6 +457,7 @@ def get_network_statistics(
 
 def main():
     """main function for step 4."""
+    OUT_STAT.mkdir(exist_ok=True, parents=True)
     get_network_statistics(
         cluster_file=CLUST_ID_FILE,
         sample_id=SAMPLE_ID,

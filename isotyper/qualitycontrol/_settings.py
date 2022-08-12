@@ -8,6 +8,7 @@ from isotyper.utilities._args import (
     OUT_ORTSEQ_TMP,
     OUT_PATH,  # for import into main script
     SAMPLE_ID,
+    NCPUS,
 )
 
 # primer file

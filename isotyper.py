@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import subprocess
+import textwrap
 import pandas as pd
 from pathlib import Path
 from typing import Literal, Tuple, List
@@ -12,43 +13,56 @@ Path("logs").mkdir(exist_ok=True)
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     # main arguments
-    main_group = parser.add_argument_group(title="Main arguments")
+    main_group = parser.add_argument_group(title="main arguments")
     main_group.add_argument(
         "-i",
         "--input",
-        help=(
-            "Input meta.txt file to run isotyper. File must contain the following four columns:\n"
-            + "1st column: name of sample.\n"
-            + "2nd column: path to input file. Either .cram file or read 1 fastq(.gz) file.\n"
-            + "3rd column: path to output folder.\n"
-            + "4th column: organism. Either HOMO_SAPIENS or MUS_MUSCULUS.\n"
-            + "No column names allowed."
+        help=textwrap.dedent(
+            """\
+            input meta.txt file to run isotyper.
+            file must contain the following four columns:
+                1st column - name of sample.
+                2nd column - path to input file. Either .cram file or read 1 fastq(.gz) file.
+                3rd column - path to output folder.
+                4th column - organism. Either HOMO_SAPIENS or MUS_MUSCULUS.
+                no column names allowed.
+            """
         ),
     )
     main_group.add_argument(
         "-s",
         "--step",
-        help=(
-            "Step to perform:\n"
-            + "1 - Convert raw sequencing files to fastq and perform QC.\n"
-            + "2 - Trim and filter reads.\n"
-            + "3 - Generate networks.\n"
-            + "4 - Generate network statistics.\n"
+        help=textwrap.dedent(
+            """\
+            step to perform:
+                1 - Convert raw sequencing files to fastq and perform QC.
+                2 - Trim and filter reads.
+                3 - Generate networks.
+                4 - Generate network statistics.
+            """
         ),
     )
     main_group.add_argument(
-        "-c", "--cores", default=1, help=("number of cores to run this on.txt")
+        "-c",
+        "--cores",
+        default=1,
+        help=("number of cores to run this on. [Default 1]"),
     )
     main_group.add_argument(
-        "-l", "--length", default=100, help=("minimum length of reads to keep.")
+        "-l",
+        "--length",
+        default=100,
+        help=("minimum length of reads to keep. [Default 100]"),
     )
     main_group.add_argument(
         "-dr",
         "--dryrun",
         action="store_true",
-        help=("Prints commands but don't actually run."),
+        help=("if passed, prints commands but don't actually run."),
     )
     # bsub arguments
     bsub_group = parser.add_argument_group(title="bsub arguments")
@@ -56,25 +70,28 @@ def parse_args():
         "-b",
         "--bsub",
         action="store_true",
-        help=("If passed, submits each row in meta.txt file as a job to bsub."),
+        help=("if passed, submits each row in meta.txt file as a job to bsub."),
     )
     bsub_group.add_argument(
-        "-m", "--mem", default=8000, help=("job memory request.")
+        "-m", "--mem", default=8000, help=("job memory request. [Default 8000]")
     )
     bsub_group.add_argument(
-        "-q", "--queue", default="normal", help=("job queue to submit to.")
+        "-q",
+        "--queue",
+        default="normal",
+        help=("job queue to submit to. [Default normal]"),
     )
     bsub_group.add_argument(
         "-p",
         "--project",
         default="team205",
-        help=("sanger project to send as job."),
+        help=("sanger project to send as job. [Default team205]"),
     )
     bsub_group.add_argument(
         "-g",
         "--group",
         default="teichlab",
-        help=("sanger group to send as job."),
+        help=("sanger group to send as job. [Default teichlab]"),
     )
     args = parser.parse_args()
     return args

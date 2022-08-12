@@ -11,6 +11,7 @@ TESTDATFOLDER = TESTFOLDER / "data"
 TESTOUTFOLDER = TESTFOLDER / "output"
 TESTORTSEQFOLDER = TESTOUTFOLDER / "ORIENTATED_SEQUENCES"
 TESTFASTQFOLDER = TESTOUTFOLDER / "FASTQ_FILES"
+TESTSTATFOLDER = TESTOUTFOLDER / "STATISTICS"
 TESTNET = TESTORTSEQFOLDER / "NETWORKS"
 
 
@@ -40,11 +41,11 @@ def test_call_script(option, expected2, expected3, expected4):
     assert len(glob(str(TESTFASTQFOLDER / "Fail*.fasta"))) == expected2
     assert len(glob(str(TESTNET / "Fully_reduced*.fasta"))) == expected3
     assert (
-        len(glob(str(TESTOUTFOLDER / "Network_statistics*.txt"))) == expected4
+        len(glob(str(TESTSTATFOLDER / "Network_statistics*.txt"))) == expected4
     )
 
 
 def test_clean_up():
     """clean up after test run."""
-    for out in [TESTORTSEQFOLDER, TESTFASTQFOLDER]:
+    for out in [TESTORTSEQFOLDER, TESTFASTQFOLDER, TESTSTATFOLDER]:
         shutil.rmtree(out)

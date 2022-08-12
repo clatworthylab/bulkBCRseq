@@ -50,40 +50,64 @@ https://github.com/clatworthylab/bulkBCRseq/blob/3d17a2752a6b482f50c0b8d211db94d
 
 ## Basic usage:
 ```
-usage: isotyper.py [-h] [-i INPUT] [-s STEP] [-l LENGTH] [-dr] [-b] [-m MEM] [-q QUEUE] [-c CORES] [-p PROJECT] [-g GROUP]
+usage: isotyper.py [-h] [-i INPUT] [-s STEP] [-c CORES] [-l LENGTH] [-dr] [-b] [-m MEM] [-q QUEUE] [-p PROJECT] [-g GROUP]
 
 optional arguments:
   -h, --help            show this help message and exit
 
-Main arguments:
+main arguments:
   -i INPUT, --input INPUT
-                        Input meta.txt file to run isotyper. File must contain the following four columns:
-                        	1st column: name of sample.
-                        	2nd column: path to input file. Either .cram file or read 1 fastq(.gz) file.
-                        	3rd column: path to output folder.
-                        	4th column: organism. Either HOMO_SAPIENS or MUS_MUSCULUS. No column names allowed.
-  -s STEP, --step STEP  
-  			Step to perform: 
-  				1 - Convert raw sequencing files to fastq and perform QC.
-  				2 - Trim and filter reads.
-  				3 - Generate networks.
-  				4 - Generate network statistics.
-  Optional:
-  -l LENGTH, --length LENGTH
-                        minimum length of reads to keep. [default 100]
-  -dr, --dryrun         Prints commands but don't actually run.
-
-  Optional bsub arguments:
-  -b, --bsub            If passed, submits each row in meta.txt file as a job to bsub.
-  -m MEM, --mem MEM     job memory request. [default 8000]
-  -q QUEUE, --queue QUEUE
-                        job queue to submit to. [default normal]
+                        input meta.txt file to run isotyper.
+                        file must contain the following four columns:
+                            1st column - name of sample.
+                            2nd column - path to input file. Either .cram file or read 1 fastq(.gz) file.
+                            3rd column - path to output folder.
+                            4th column - organism. Either HOMO_SAPIENS or MUS_MUSCULUS.
+                            no column names allowed.
+  -s STEP, --step STEP  step to perform:
+                            1 - Convert raw sequencing files to fastq and perform QC.
+                            2 - Trim and filter reads.
+                            3 - Generate networks.
+                            4 - Generate network statistics.
   -c CORES, --cores CORES
-                        number of cores to run this on [default 10]
+                        number of cores to run this on. [Default 1]
+  -l LENGTH, --length LENGTH
+                        minimum length of reads to keep. [Default 100]
+  -dr, --dryrun         if passed, prints commands but don't actually run.
+
+bsub arguments:
+  -b, --bsub            if passed, submits each row in meta.txt file as a job to bsub.
+  -m MEM, --mem MEM     job memory request. [Default 8000]
+  -q QUEUE, --queue QUEUE
+                        job queue to submit to. [Default normal]
   -p PROJECT, --project PROJECT
-                        sanger project to send as job. [default team205]
+                        sanger project to send as job. [Default team205]
   -g GROUP, --group GROUP
-                        sanger group to send as job. [default teichlab]
+                        sanger group to send as job. [Default teichlab]
+```
+
+### Basic usage
+```bash
+# initial QC
+python isotyper.py -i meta.txt -s 1
+# trimming
+python isotyper.py -i meta.txt -s 2  --cores 10
+# generate network
+python isotyper.py -i meta.txt -s 3
+# generate network statistic
+python isotyper.py -i meta.txt -s 4
+```
+
+If using Sanger's farm:
+```bash
+# initial QC
+python isotyper.py -i meta.txt -s 1 --bsub
+# trimming
+python isotyper.py -i meta.txt -s 2 --bsub --cores 10
+# generate network
+python isotyper.py -i meta.txt -s 3 --bsub
+# generate network statistic
+python isotyper.py -i meta.txt -s 4 --bsub
 ```
 
 Take a look [here](https://github.com/clatworthylab/bulkBCRseq/tree/master/tests/data) for example files to provide to the tool.
