@@ -20,7 +20,7 @@ TESTNET = TESTORTSEQFOLDER / "NETWORKS"
         pytest.param(1, 0, 0, 0),
         pytest.param(2, 1, 0, 0),
         pytest.param(3, 1, 1, 0),
-        pytest.param(3, 1, 1, 1),
+        pytest.param(4, 1, 1, 1),
     ],
 )
 def test_call_script(option, expected2, expected3, expected4):
