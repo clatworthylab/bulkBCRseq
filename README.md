@@ -28,63 +28,60 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
 bash Miniconda3-py39_4.12.0-Linux-x86_64.sh
 eval "$(/path/to/miniconda2/bin/conda shell.bash hook)"
 conda init
-conda create --name py3 python=3.9
+conda create --name isotyper python=3.9
 
 # clone this repo
 git clone https://github.com/clatworthylab/bulkBCRseq
 
 # change into the directory and install dependencies
 cd bulkBCRseq
-conda env update --name py3 --file environment.yml
+conda env update --name isotyper --file environment.yml
 ```
 
 Usage instructions on Farm:
 ```bash
-conda activate py3
-
-# if necessary, change path to where bulkBCRseq folder is
-# cd path/to/bulkBCRseq
+conda activate isotyper
 ```
 
 ## Note!
-If you are starting from fastq files directly, please change the 5th column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1 suffix isn't this pattern, please modify the `R1PATTERN` variable in here directly, after cloning this repository:
+If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1 suffix isn't this pattern, please modify the `R1PATTERN` variable after cloning this repository, in here directly:
 https://github.com/clatworthylab/bulkBCRseq/blob/3d17a2752a6b482f50c0b8d211db94ddf5e655d1/BIN/Read_processing_and_quality.py#L3641-L3643
 
 
 ## Basic usage:
-```bash
-python Processing_sequences_large_scale.py [sample file list] [commands (comma separated list)] [bsub command: Y/N] [print commands: Y/N] [run commands: Y/N]
 ```
-Available commands: 1, 2, 3, 4
+usage: isotyper.py [-h] [-i INPUT] [-s STEP] [-l LENGTH] [-dr] [-b] [-m MEM] [-q QUEUE] [-c CORES] [-p PROJECT] [-g GROUP]
 
-### Basic analysis: 1 - Converting raw sequencing files to fastq, QC
-```bash
-python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 1 Y Y Y
-```
+optional arguments:
+  -h, --help            show this help message and exit
 
-### Basic analysis: 2 - Trimming and filtering reads
-```bash
-python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 2 Y Y Y
-```
-### Basic analysis: 3 - Network generation
-```bash
-python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 3 Y Y Y
-```
-### Basic analysis: 4 - Generating network and population statistics
-```bash
-python Processing_sequences_large_scale.py Samples_Mouse_Zach.txt 4 Y Y Y
-```
+Main arguments:
+  -i INPUT, --input INPUT
+                        Input meta.txt file to run isotyper. File must contain the following four columns:
+                        	1st column: name of sample.
+                        	2nd column: path to input file. Either .cram file or read 1 fastq(.gz) file.
+                        	3rd column: path to output folder.
+                        	4th column: organism. Either HOMO_SAPIENS or MUS_MUSCULUS. No column names allowed.
+  -s STEP, --step STEP  
+  			Step to perform: 
+  				1 - Convert raw sequencing files to fastq and perform QC.
+  				2 - Trim and filter reads.
+  				3 - Generate networks.
+  				4 - Generate network statistics.
+  Optional:
+  -l LENGTH, --length LENGTH
+                        minimum length of reads to keep. [default 100]
+  -dr, --dryrun         Prints commands but don't actually run.
 
-## Advanced usage - some private adjustments - not complete!:
-```bash
-python Processing_sequences_large_scale.py [sample file list] [concat file list] [commands (comma separated list)] [bsub command: Y/N] [print commands: Y/N] [run commands: Y/N]
-```
-Available commands: 3.5, 3.51
-### Create the network from fully reduced fasta sequences: 3.5
-```bash
-python Processing_sequences_large_scale.py Samples_Mouse_DSS_2020.txt Samples_Mouse_DSS_2020_combined.txt 3.5 Y Y Y
-```
-### rerun the network generation pipeline using AIRR files: 3.51
-```bash
-python Processing_sequences_large_scale.py Samples_Mouse_DSS_2020.txt Samples_Mouse_DSS_2020_combined.txt 3.51 Y Y Y
+  Optional bsub arguments:
+  -b, --bsub            If passed, submits each row in meta.txt file as a job to bsub.
+  -m MEM, --mem MEM     job memory request. [default 8000]
+  -q QUEUE, --queue QUEUE
+                        job queue to submit to. [default normal]
+  -c CORES, --cores CORES
+                        number of cores to run this on [default 10]
+  -p PROJECT, --project PROJECT
+                        sanger project to send as job. [default team205]
+  -g GROUP, --group GROUP
+                        sanger group to send as job. [default teichlab]
 ```
