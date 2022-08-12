@@ -4,9 +4,9 @@
 # bulk_BCR_analysis
 Bulk BCR-seq processing scripts use in Fitzpatrick et al., Nature (2020). Package belongs to Rachael Bashford-Rogers.
 
-This repo is an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
+This repository is an reimplementation of the original script (in legacy branch), which seeems to be an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
 
-Requires python>=3.8 (or 2.7 if using the legacy branch). Currently only works when cloned onto farm with all paths set up pointing to this folder properly.
+Requires python>=3.8 (or 2.7 if using the legacy branch). Please run the commands directly in the folder where this is cloned.
 
 ## Citation
 Please cite the following papers:
@@ -44,7 +44,7 @@ conda activate isotyper
 ```
 
 ## Note!
-If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1 suffix isn't this pattern, please modify the `R1PATTERN` variable after cloning this repository, in here directly:
+If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1/read2 suffix isn't this pattern, please modify the `R1PATTERN` and `R2PATTERN` variables after cloning this repository, in here directly:
 https://github.com/clatworthylab/bulkBCRseq/blob/3d17a2752a6b482f50c0b8d211db94ddf5e655d1/BIN/Read_processing_and_quality.py#L3641-L3643
 
 
@@ -111,3 +111,14 @@ python isotyper.py -i meta.txt -s 4 --bsub
 ```
 
 Take a look [here](https://github.com/clatworthylab/bulkBCRseq/tree/master/tests/data) for example files to provide to the tool.
+
+
+### Post-processing
+
+After running steps 1 to 4, please annotate the `Fully_reduced_{sample_id}.fasta` file to proceed. You can annotate with [IMGT/HighV-QUEST](https://imgt.org/HighV-QUEST/home.action) or via other software e.g. [MiXCR](https://mixcr.readthedocs.io/en/latest/) in shotgun mode.
+
+```bash
+mixcr analyze shotgun -s hsa --starting-material rna --receptor-type igh Fully_reduced_{sample_id}.fasta {sample_id} 
+# export to AIRR format
+mixcr exportAirr --imgt-gaps in.[vdjca|clns|clna] out.tsv
+```
