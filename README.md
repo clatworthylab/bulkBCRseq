@@ -6,7 +6,7 @@ Bulk BCR-seq processing scripts use in Fitzpatrick et al., Nature (2020). Packag
 
 This repo is an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
 
-Requires python>=3.7 (or 2.7 if using the legacy branch). Currently only works when cloned onto farm with all paths set up pointing to this folder properly.
+Requires python>=3.8 (or 2.7 if using the legacy branch). Currently only works when cloned onto farm with all paths set up pointing to this folder properly.
 
 ## Citation
 Please cite the following papers:
