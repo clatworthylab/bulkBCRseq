@@ -1,24 +1,24 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5717959.svg)](https://doi.org/10.5281/zenodo.5717959)
 [![codecov](https://codecov.io/gh/clatworthylab/bulkBCRseq/branch/master/graph/badge.svg?token=I6APMCARTA)](https://codecov.io/gh/clatworthylab/bulkBCRseq)
 
-# bulk_BCR_analysis
-Bulk BCR-seq processing scripts use in Fitzpatrick et al., Nature (2020). Original (legacy) package/scripts provided by Dr. Rachael Bashford-Rogers (Oxford).
+# bulkBCRseq : isotyper
+Bulk BCR-seq processing package used in `Fitzpatrick et al., Nature (2020)`. The original (legacy) package/scripts was provided by Dr. Rachael Bashford-Rogers (Oxford).
 
-This repository is an reimplementation of the original python2 scripts (in legacy branch), which seeems to be an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
+This repository is a `python3` reimplementation of the original `python2` scripts (found in [legacy branch](https://github.com/clatworthylab/bulkBCRseq/tree/legacy)); the original script is an older version of what seems to be now at https://github.com/rbr1/BCR_TCR_PROCESSING_PIPELINE.
 
-Requires python>=3.8 (or 2.7 if using the legacy branch).
+Requires `python>=3.8` (or `python==2.7.9` if using the [legacy branch](https://github.com/clatworthylab/bulkBCRseq/tree/legacy)).
 
 ## Citation
 Please cite the following papers:
+```
+Fitzpatrick, Z., Frazer, G., Ferro, A., Clare, S., Bouladoux, N., Ferdinand, J., Tuong, Z.K., Negro-Demontel, M.L., Kumar, N., Suchanek, O. and Tajsic, T., 2020. Gut-educated IgA plasma cells defend the meningeal venous sinuses. Nature, 587(7834), pp.472-476.
 
-*Fitzpatrick, Z., Frazer, G., Ferro, A., Clare, S., Bouladoux, N., Ferdinand, J., Tuong, Z.K., Negro-Demontel, M.L., Kumar, N., Suchanek, O. and Tajsic, T., 2020. Gut-educated IgA plasma cells defend the meningeal venous sinuses. Nature, 587(7834), pp.472-476.*
+Bashford-Rogers, R.J., Palser, A.L., Huntly, B.J., Rance, R., Vassiliou, G.S., Follows, G.A. and Kellam, P., 2013. Network properties derived from deep sequencing of human B-cell receptor repertoires delineate B-cell populations. Genome research, 23(11), pp.1874-1884.
 
-*Bashford-Rogers, R.J., Palser, A.L., Huntly, B.J., Rance, R., Vassiliou, G.S., Follows, G.A. and Kellam, P., 2013. Network properties derived from deep sequencing of human B-cell receptor repertoires delineate B-cell populations. Genome research, 23(11), pp.1874-1884.*
+Bashford-Rogers, R.J.M., Bergamaschi, L., McKinney, E.F., Pombal, D.C., Mescia, F., Lee, J.C., Thomas, D.C., Flint, S.M., Kellam, P., Jayne, D.R.W. and Lyons, P.A., 2019. Analysis of the B cell receptor repertoire in six immune-mediated diseases. Nature, 574(7776), pp.122-126.
+```
 
-*Bashford-Rogers, R.J.M., Bergamaschi, L., McKinney, E.F., Pombal, D.C., Mescia, F., Lee, J.C., Thomas, D.C., Flint, S.M., Kellam, P., Jayne, D.R.W. and Lyons, P.A., 2019. Analysis of the B cell receptor repertoire in six immune-mediated diseases. Nature, 574(7776), pp.122-126.*
-
-
-## Pre-requisites:
+## Setup:
 ```bash
 # create a conda virtual environment
 # sample for python 3 set up, switch to python 2 where appropriate
@@ -30,7 +30,7 @@ eval "$(/path/to/miniconda2/bin/conda shell.bash hook)"
 conda init
 conda create --name isotyper python=3.9
 
-# clone this repo
+# clone this repository
 git clone https://github.com/clatworthylab/bulkBCRseq
 
 # change into the directory and install dependencies
@@ -39,18 +39,15 @@ conda env update --name isotyper --file environment.yml
 ```
 
 ```bash
-# export this to your ~/.bashrc or ~/.bash_profile
+# eithe run this everytime or just
+# export to your ~/.bashrc or ~/.bash_profile
 export PYTHONPATH=/path/to/bulkBCRseq:$PYTHONPATH
+# always activate the environment before proceeding
 conda activate isotyper
+# main usage
 python /path/to/bulkBCRseq/isotyper.py [options]
 ```
 
-## Note!
-If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1/read2 suffix isn't this pattern, please modify the `R1PATTERN` and `R2PATTERN` variables file after cloning this repository, in the `_settings.py` directly:
-https://github.com/clatworthylab/bulkBCRseq/blob/5d310de8863b64352d68230977c6e7e62d5c0b8f/isotyper/utilities/_settings.py#L25-L27
-
-
-## Basic usage:
 ```
 usage: isotyper.py [-h] [-i INPUT] [-s STEP] [-l LENGTH] [-dr] [-b] [-c CORES] [-m MEM] [-q QUEUE] [-p PROJECT] [-g GROUP]
 
@@ -88,6 +85,11 @@ bsub arguments:
                         sanger group to send as job. [Default teichlab]
 ```
 
+## Note!
+If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1/read2 suffix isn't this pattern, please modify the `R1PATTERN` and `R2PATTERN` variables file after cloning this repository, in the `_settings.py` directly:
+https://github.com/clatworthylab/bulkBCRseq/blob/5d310de8863b64352d68230977c6e7e62d5c0b8f/isotyper/utilities/_settings.py#L25-L27
+
+
 ### Basic usage
 ```bash
 # initial QC
@@ -117,10 +119,13 @@ Take a look [here](https://github.com/clatworthylab/bulkBCRseq/tree/master/tests
 
 ### Post-processing
 
-After running steps 1 to 4, please annotate the `Fully_reduced_{sample_id}.fasta` file to proceed. You can annotate with [IMGT/HighV-QUEST](https://imgt.org/HighV-QUEST/home.action) or via other software e.g. [MiXCR](https://mixcr.readthedocs.io/en/latest/) in shotgun mode.
+After running steps `1` to `4`, please annotate the `Fully_reduced_{sample_id}.fasta` file for downstream analysis. You can annotate with [IMGT/HighV-QUEST](https://imgt.org/HighV-QUEST/home.action) or via other software e.g. [MiXCR](https://mixcr.readthedocs.io/en/latest/) in shotgun mode.
 
 ```bash
 mixcr analyze shotgun -s hsa --starting-material rna --receptor-type igh Fully_reduced_{sample_id}.fasta {sample_id} 
 # export to AIRR format
 mixcr exportAirr --imgt-gaps in.[vdjca|clns|clna] out.tsv
 ```
+
+To generate the network plots, you would use the node table (`Att_{sample_id}.txt`) and edge table (`Edges_{sample_id}.txt`) and feed it into a graphing software e.g. `networkx`/`igraph` and continue as per normal. The `orphan` folder has example scripts (probably buggy) on how to use `python-igraph` to generate the plots.
+
