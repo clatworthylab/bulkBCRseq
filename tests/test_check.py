@@ -44,8 +44,8 @@ def test_call_script(option, expected2, expected3, expected4):
 
 def test_clean_up():
     """clean up after test run."""
-    for out in ["FASTQ_FILES", "ORIENTATED_SEQUENCES"]:
-        shutil.rmtree(TESTOUTFOLDER / out)
+    for out in [TESTORTSEQFOLDER, TESTFASTQFOLDER]:
+        shutil.rmtree(out)
 
 
 # @pytest.mark.parametrize("option", [1, 2, 3, 4])
