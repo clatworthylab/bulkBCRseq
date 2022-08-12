@@ -9,6 +9,9 @@ from glob import glob
 TESTFOLDER = Path("tests")
 TESTDATFOLDER = TESTFOLDER / "data"
 TESTOUTFOLDER = TESTFOLDER / "output"
+TESTORTSEQFOLDER = TESTOUTFOLDER / "ORIENTATED_SEQUENCES"
+TESTFASTQFOLDER = TESTOUTFOLDER / "FASTQ_FILES"
+TESTNET = TESTORTSEQFOLDER / "NETWORKS"
 
 
 @pytest.mark.parametrize(
@@ -32,17 +35,11 @@ def test_call_script(option, expected2, expected3, expected4):
         "Y",
     ]
     run(cmd)
-    assert len(glob(str(TESTOUTFOLDER / "FASTQ_FILES"))) == 1
-    assert len(glob(str(TESTOUTFOLDER / "ORIENTATED_SEQUENCES"))) == 1
-    assert len(glob(str(TESTOUTFOLDER / "FASTQ_FILES" / "*.qc.fq"))) == 2
-    assert (
-        len(glob(str(TESTOUTFOLDER / "FASTQ_FILES" / "Fail*.fasta")))
-        == expected2
-    )
-    assert (
-        len(glob(str(TESTOUTFOLDER / "NETWORKS" / "Fully_reduced*.fasta")))
-        == expected3
-    )
+    assert len(glob(str(TESTFASTQFOLDER))) == 1
+    assert len(glob(str(TESTORTSEQFOLDER))) == 1
+    assert len(glob(str(TESTFASTQFOLDER / "*.qc.fq"))) == 2
+    assert len(glob(str(TESTFASTQFOLDER / "Fail*.fasta"))) == expected2
+    assert len(glob(str(TESTNET / "Fully_reduced*.fasta"))) == expected3
 
 
 def test_clean_up():
