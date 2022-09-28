@@ -39,9 +39,11 @@ conda env update --name isotyper --file environment.yml
 ```
 
 ```bash
-# eithe run this everytime or just
+# either run this everytime or just
 # export to your ~/.bashrc or ~/.bash_profile
 export PYTHONPATH=/path/to/bulkBCRseq:$PYTHONPATH
+export REF_PATH=/lustre/scratch117/core/sciops_repository/cram_cache/%2s/%2s/%s:/lustre/scratch118/core/sciops_repository/cram_cache/%2s/%2s/%s:URL=http:://refcache.dnapipelines.sanger.ac.uk::8000/%s
+
 # always activate the environment before proceeding
 conda activate isotyper
 # main usage
