@@ -39,9 +39,11 @@ conda env update --name isotyper --file environment.yml
 ```
 
 ```bash
-# eithe run this everytime or just
+# either run this everytime or just
 # export to your ~/.bashrc or ~/.bash_profile
 export PYTHONPATH=/path/to/bulkBCRseq:$PYTHONPATH
+export REF_PATH=/lustre/scratch117/core/sciops_repository/cram_cache/%2s/%2s/%s:/lustre/scratch118/core/sciops_repository/cram_cache/%2s/%2s/%s:URL=http:://refcache.dnapipelines.sanger.ac.uk::8000/%s
+
 # always activate the environment before proceeding
 conda activate isotyper
 # main usage
@@ -88,6 +90,12 @@ bsub arguments:
 ## Note!
 If you are starting from fastq files directly, please change the 2nd column in the `.txt` file (path to `.cram`) to path to `_R1_001.fastq.gz` (read1) instead. If your read1/read2 suffix isn't this pattern, please modify the `R1PATTERN` and `R2PATTERN` variables file after cloning this repository, in the `_settings.py` directly:
 https://github.com/clatworthylab/bulkBCRseq/blob/5d310de8863b64352d68230977c6e7e62d5c0b8f/isotyper/utilities/_settings.py#L25-L27
+
+this also means that your files should be named with the suffix like:
+```
+<sample1>_R1_001.fastq.gz
+<sample1>_R2_001.fastq.gz
+```
 
 
 ### Basic usage
